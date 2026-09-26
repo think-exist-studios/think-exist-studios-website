@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070b16">
+<meta name="description" content="Think Exist Crypto — live market snapshots, studio crypto projects and Think Exist HQ updates.">
+<title>Think Exist Crypto | Think Exist Studios</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top"><div class="topin shell">
+  <a class="brand" href="index.html">Think <b>Exist</b> Studios</a>
+  <nav class="nav"><a href="index.html#projects">Projects</a><a href="index.html#people">People</a><a href="creator-studio.html">Creator Studio</a><a href="https://x.com/ThinkExistHQ" target="_blank" rel="noopener">X ↗</a></nav>
+</div></header>
+
+<main class="shell">
+<section class="hero">
+  <div class="eyebrow">Web3 · market watch · studio projects</div>
+  <h1>Think Exist <span class="grad">Crypto</span></h1>
+  <p>A live hub for crypto-related Think Exist projects, daily market snapshots, trending assets and updates from Think Exist HQ.</p>
+  <div class="row"><a class="btn primary" href="#markets">Live market →</a><a class="btn" href="#xfeed">X feed</a><a class="btn" href="#studio-projects">Studio projects</a></div>
+</section>
+
+<section class="section" id="markets">
+  <div class="sectionhead"><div><div class="eyebrow">Live daily feed</div><h2>Market snapshot</h2></div><p>USD prices and 24-hour movement. Data refreshes automatically while this page is open.</p></div>
+  <div class="market" id="marketCards">
+    <article class="card"><div class="eyebrow">Bitcoin</div><div class="price">Loading…</div></article>
+    <article class="card"><div class="eyebrow">Ethereum</div><div class="price">Loading…</div></article>
+    <article class="card"><div class="eyebrow">Solana</div><div class="price">Loading…</div></article>
+  </div>
+  <div class="statusline" id="marketStatus">Connecting to market data…</div>
+</section>
+
+<section class="section">
+  <div class="sectionhead"><div><div class="eyebrow">What's moving</div><h2>Trending on CoinGecko</h2></div><p>Live trending searches, not a recommendation to buy or sell.</p></div>
+  <div class="grid3" id="trending"><article class="card"><p>Loading trends…</p></article></div>
+</section>
+
+<section class="section" id="studio-projects">
+  <div class="sectionhead"><div><div class="eyebrow">Think Exist</div><h2>Crypto projects</h2></div><p>Official project destinations and studio pages.</p></div>
+  <div class="grid2">
+    <article class="card"><div class="tagrow"><span class="tag">Pre-launch</span><span class="tag">GRIP</span></div><h3>Professor HODL's Grip Tonic</h3><p>Professor HODL, GRIP artwork and project information.</p><a class="feature-link" href="https://grip.thinkexiststudios.com/" target="_blank" rel="noopener">Official GRIP site ↗</a></article>
+    <article class="card"><div class="tagrow"><span class="tag">Order</span><span class="tag">Community</span></div><h3>The Order of the Unfinished</h3><p>Sir Barely, Sir Almost and the Order's community project.</p><a class="feature-link" href="https://order.thinkexiststudios.com/" target="_blank" rel="noopener">Official Order site ↗</a></article>
+  </div>
+</section>
+
+<section class="section" id="xfeed">
+  <div class="sectionhead"><div><div class="eyebrow">Think Exist HQ</div><h2>Live X feed</h2></div><p>Posts from the official Think Exist HQ profile are embedded here when X's widget is available.</p></div>
+  <div class="feedbox">
+    <a class="twitter-timeline" data-theme="dark" data-height="700" data-chrome="noheader nofooter transparent" href="https://twitter.com/ThinkExistHQ">Posts by ThinkExistHQ</a>
+    <noscript><a class="feature-link" href="https://x.com/ThinkExistHQ" target="_blank" rel="noopener">Open Think Exist HQ on X ↗</a></noscript>
+  </div>
+  <div class="row" style="justify-content:flex-start"><a class="btn" href="https://x.com/ThinkExistHQ" target="_blank" rel="noopener">Open @ThinkExistHQ on X ↗</a></div>
+</section>
+
+<section class="section">
+  <div class="callout"><div class="eyebrow">Safety note</div><h2>Verify before you connect</h2><p>Crypto links on this page should point only to official Think Exist destinations. Never enter a seed phrase or private key into a website. Market data is informational and may be delayed or temporarily unavailable.</p></div>
+</section>
+</main>
+
+<footer class="footer shell">Think Exist Crypto · Think Exist Studios</footer>
+
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<script>
+(() => {
+  const cards=document.getElementById('marketCards'), status=document.getElementById('marketStatus'), trend=document.getElementById('trending');
+  const names={bitcoin:'Bitcoin',ethereum:'Ethereum',solana:'Solana'};
+  const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:n<1?4:2}).format(n);
+  async function loadMarket(){
+    try{
+      const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true',{cache:'no-store'});
+      if(!r.ok)throw new Error('Market service unavailable');
+      const d=await r.json();
+      cards.innerHTML=Object.keys(names).map(id=>{
+        const p=d[id]?.usd, c=d[id]?.usd_24h_change;
+        const cls=(c??0)>=0?'up':'down', sign=(c??0)>=0?'+':'';
+        return '<article class="card"><div class="eyebrow">'+names[id]+'</div><div class="price">'+money(p)+'</div><div class="'+cls+'">'+sign+(Number(c)||0).toFixed(2)+'% · 24h</div></article>';
+      }).join('');
+      status.textContent='Updated '+new Date().toLocaleTimeString()+' · CoinGecko market data';
+    }catch(e){status.textContent='Live market data is temporarily unavailable. Try again shortly.';}
+  }
+  async function loadTrending(){
+    try{
+      const r=await fetch('https://api.coingecko.com/api/v3/search/trending',{cache:'no-store'});
+      if(!r.ok)throw new Error();
+      const d=await r.json(), top=(d.coins||[]).slice(0,6);
+      trend.innerHTML=top.map(x=>{
+        const i=x.item||{}, rank=i.market_cap_rank?('#'+i.market_cap_rank):'Unranked';
+        return '<article class="card"><div class="eyebrow">'+rank+'</div><h3>'+String(i.name||'').replace(/[<>&]/g,'')+' <span style="color:var(--muted)">('+String(i.symbol||'').replace(/[<>&]/g,'')+')</span></h3><p>Trending search activity on CoinGecko.</p></article>';
+      }).join('') || '<article class="card"><p>No trend data available.</p></article>';
+    }catch(e){trend.innerHTML='<article class="card"><p>Trending feed is temporarily unavailable.</p></article>';}
+  }
+  loadMarket(); loadTrending();
+  setInterval(loadMarket,120000);
+  setInterval(loadTrending,300000);
+})();
+</script>
+</body></html>

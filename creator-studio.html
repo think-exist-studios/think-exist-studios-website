@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070b16">
+<meta name="description" content="Think Exist Studios Creator Studio">
+<title>Creator Studio | Think Exist Studios</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header class="top"><div class="topin shell">
+  <a class="brand" href="index.html">Think <b>Exist</b> Studios</a>
+  <nav class="nav"><a href="index.html#people">People</a><a href="crypto.html">Crypto</a><a href="https://x.com/ThinkExistHQ" target="_blank" rel="noopener">X ↗</a></nav>
+</div></header>
+
+<main class="shell">
+<section class="hero" style="padding-bottom:12px">
+  <div class="eyebrow">Approved collaborators</div>
+  <h1>Creator <span class="grad">Studio</span></h1>
+  <p>Add artwork, project links and portfolio entries without editing website code.</p>
+</section>
+
+<section class="authbox" id="authBox">
+  <h2>Creator access</h2>
+  <p style="color:var(--muted)">First time here? Claim your approved account with the invite code. Already claimed it? Sign in below.</p>
+
+  <div class="grid2">
+    <form id="claimForm" class="card">
+      <div class="eyebrow">First-time setup</div><h3>Claim access</h3>
+      <div class="field"><label for="claimEmail">Approved email</label><input id="claimEmail" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="inviteCode">Invite code</label><input id="inviteCode" type="password" autocomplete="one-time-code" required></div>
+      <div class="field"><label for="claimPassword">Create password</label><input id="claimPassword" type="password" minlength="10" autocomplete="new-password" required></div>
+      <button class="btn primary" type="submit">Activate creator account</button>
+    </form>
+
+    <form id="loginForm" class="card">
+      <div class="eyebrow">Returning creator</div><h3>Sign in</h3>
+      <div class="field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
+      <button class="btn primary" type="submit">Sign in</button>
+    </form>
+  </div>
+  <div class="statusline" id="authStatus"></div>
+</section>
+
+<section class="editor hide" id="editor">
+  <div class="toolbar" style="justify-content:space-between;align-items:center">
+    <div><div class="eyebrow">Portfolio manager</div><h2 style="margin:.2rem 0">Add new work</h2></div>
+    <button class="btn" id="signOut" type="button">Sign out</button>
+  </div>
+  <p class="statusline" id="who"></p>
+
+  <form id="workForm">
+    <div class="split">
+      <div class="field"><label for="title">Title</label><input id="title" required maxlength="120"></div>
+      <div class="field"><label for="projectUrl">Project link</label><input id="projectUrl" type="url" placeholder="https://…"></div>
+    </div>
+    <div class="field"><label for="description">Description</label><textarea id="description" maxlength="900" placeholder="What is this piece or project?"></textarea></div>
+    <div class="split">
+      <div class="field"><label for="tags">Tags</label><input id="tags" placeholder="Comic, Sci-Fi, Character Art"></div>
+      <div class="field"><label for="artFile">Artwork image</label><input id="artFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></div>
+    </div>
+    <div class="split">
+      <div class="field"><label for="sortOrder">Display order</label><input id="sortOrder" type="number" value="0"></div>
+      <div class="field"><label><input id="published" type="checkbox" checked> Publish immediately</label></div>
+    </div>
+    <button class="btn primary" type="submit">Add to portfolio</button>
+    <div class="statusline" id="saveStatus"></div>
+  </form>
+
+  <div class="section" style="padding-top:35px">
+    <div class="sectionhead"><div><div class="eyebrow">Your work</div><h2>Portfolio entries</h2></div><p>Publish, unpublish or remove items here.</p></div>
+    <div id="items"></div>
+  </div>
+</section>
+</main>
+
+<footer class="footer shell">Think Exist Studios Creator Studio</footer>
+
+<script>
+(() => {
+  const sb = supabase.createClient(
+    'https://aivziwaudzuzwlkjmuly.supabase.co',
+    'sb_publishable_07ChHzoUQS98-PHaxbNx2g_zmZ2QXeP'
+  );
+  const authBox=document.getElementById('authBox'), editor=document.getElementById('editor');
+  const authStatus=document.getElementById('authStatus'), saveStatus=document.getElementById('saveStatus'), items=document.getElementById('items');
+  let session=null, contributor=null;
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const setAuthMessage=(m)=>authStatus.textContent=m;
+
+  async function refresh(){
+    const {data:{session:s}}=await sb.auth.getSession(); session=s;
+    if(!session){authBox.classList.remove('hide');editor.classList.add('hide');return;}
+    const {data,error}=await sb.from('studio_contributors').select('slug,email,display_name,role_title').single();
+    if(error||!data){await sb.auth.signOut();setAuthMessage('This account is not approved for Creator Studio.');return;}
+    contributor=data; authBox.classList.add('hide'); editor.classList.remove('hide');
+    document.getElementById('who').textContent='Signed in as '+data.display_name+' · '+data.email;
+    await loadItems();
+  }
+
+  document.getElementById('claimForm').addEventListener('submit',async e=>{
+    e.preventDefault(); setAuthMessage('Activating creator account…');
+    const email=document.getElementById('claimEmail').value.trim();
+    const inviteCode=document.getElementById('inviteCode').value.trim();
+    const password=document.getElementById('claimPassword').value;
+    const {data,error}=await sb.functions.invoke('claim-contributor',{body:{email,inviteCode,password}});
+    if(error){setAuthMessage(error.message||'Could not activate account.');return;}
+    if(data?.error){setAuthMessage(data.error);return;}
+    setAuthMessage('Account activated. Signing you in…');
+    const sign=await sb.auth.signInWithPassword({email,password});
+    if(sign.error){setAuthMessage('Account activated. Use the sign-in form with your new password.');return;}
+    await refresh();
+  });
+
+  document.getElementById('loginForm').addEventListener('submit',async e=>{
+    e.preventDefault(); setAuthMessage('Signing in…');
+    const email=document.getElementById('loginEmail').value.trim();
+    const password=document.getElementById('loginPassword').value;
+    const {error}=await sb.auth.signInWithPassword({email,password});
+    if(error){setAuthMessage(error.message);return;} await refresh();
+  });
+
+  document.getElementById('signOut').addEventListener('click',async()=>{await sb.auth.signOut();contributor=null;session=null;await refresh();});
+
+  document.getElementById('workForm').addEventListener('submit',async e=>{
+    e.preventDefault(); if(!session||!contributor)return;
+    saveStatus.textContent='Saving…';
+    let imageUrl=null;
+    const file=document.getElementById('artFile').files[0];
+    if(file){
+      const clean=file.name.replace(/[^a-zA-Z0-9._-]/g,'-');
+      const path=session.user.id+'/'+Date.now()+'-'+clean;
+      const up=await sb.storage.from('creator-portfolio').upload(path,file,{upsert:false});
+      if(up.error){saveStatus.textContent='Image upload failed: '+up.error.message;return;}
+      imageUrl=sb.storage.from('creator-portfolio').getPublicUrl(path).data.publicUrl;
+    }
+    const payload={
+      contributor_slug:contributor.slug,
+      title:document.getElementById('title').value.trim(),
+      description:document.getElementById('description').value.trim(),
+      project_url:document.getElementById('projectUrl').value.trim()||null,
+      image_url:imageUrl,
+      tags:document.getElementById('tags').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,12),
+      sort_order:Number(document.getElementById('sortOrder').value)||0,
+      published:document.getElementById('published').checked
+    };
+    const {error}=await sb.from('portfolio_items').insert(payload);
+    if(error){saveStatus.textContent='Could not save: '+error.message;return;}
+    e.target.reset(); document.getElementById('published').checked=true; document.getElementById('sortOrder').value='0';
+    saveStatus.textContent='Added to your portfolio.'; await loadItems();
+  });
+
+  async function loadItems(){
+    const {data,error}=await sb.from('portfolio_items').select('*').eq('contributor_slug',contributor.slug).order('sort_order',{ascending:true}).order('created_at',{ascending:false});
+    if(error){items.textContent='Could not load portfolio items.';return;}
+    if(!data?.length){items.innerHTML='<p class="statusline">No portfolio items yet.</p>';return;}
+    items.innerHTML=data.map(i=>'<div class="itemrow" data-id="'+esc(i.id)+'"><div class="toolbar" style="justify-content:space-between"><div><strong>'+esc(i.title)+'</strong><div class="statusline">'+(i.published?'Published':'Draft')+'</div></div><div class="toolbar"><button class="btn toggle" type="button" data-state="'+i.published+'">'+(i.published?'Unpublish':'Publish')+'</button><button class="btn delete" type="button">Delete</button></div></div></div>').join('');
+    items.querySelectorAll('.toggle').forEach(btn=>btn.addEventListener('click',async()=>{
+      const row=btn.closest('.itemrow'), state=btn.dataset.state==='true';
+      await sb.from('portfolio_items').update({published:!state,updated_at:new Date().toISOString()}).eq('id',row.dataset.id); await loadItems();
+    }));
+    items.querySelectorAll('.delete').forEach(btn=>btn.addEventListener('click',async()=>{
+      const row=btn.closest('.itemrow');
+      if(!confirm('Remove this portfolio item?'))return;
+      await sb.from('portfolio_items').delete().eq('id',row.dataset.id); await loadItems();
+    }));
+  }
+
+  sb.auth.onAuthStateChange(()=>setTimeout(refresh,0));
+  refresh();
+})();
+</script>
+</body></html>

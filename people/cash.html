@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070b16">
+<meta name="description" content="Cash (Cassius) Miller — creator profile and portfolio at Think Exist Studios.">
+<title>Cash (Cassius) Miller | Think Exist Studios</title>
+<link rel="stylesheet" href="../styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header class="top"><div class="topin shell">
+  <a class="brand" href="../index.html">Think <b>Exist</b> Studios</a>
+  <nav class="nav"><a href="../index.html#people">People</a><a href="../crypto.html">Crypto</a><a href="../creator-studio.html">Creator Studio</a><a href="https://x.com/ThinkExistHQ" target="_blank" rel="noopener">X ↗</a></nav>
+</div></header>
+
+<main class="shell">
+<section class="profilehero">
+  <div>
+    <div class="eyebrow">Creator profile</div>
+    <h1>Cash <span class="grad">(Cassius) Miller</span></h1>
+    <p>Graphic designer, comic book artist, writer and creator of <strong>StarGazer</strong>.</p>
+    <div class="tagrow" style="margin-top:14px"><span class="tag">Artist</span><span class="tag">Business</span><span class="tag">Writer</span><span class="tag">Creative</span></div>
+    <div class="row" style="justify-content:flex-start"><a class="btn primary" href="#portfolio">View work ↓</a><a class="btn" href="../creator-studio.html">Manage portfolio</a></div>
+  </div>
+  <img src="../assets/cash-stargazer-hero.jpg" alt="StarGazer artwork by Cash Cassius Miller">
+</section>
+
+<section class="section">
+  <div class="sectionhead"><div><div class="eyebrow">Cash's links</div><h2>Follow the work</h2></div><p>Direct links to StarGazer and Cash's creator channels.</p></div>
+  <div class="links">
+    <a class="linktile" href="https://www.webtoons.com/en/canvas/stargazer/list?title_no=995671" target="_blank" rel="noopener"><strong>StarGazer on WEBTOON ↗</strong><span>Read the comic</span></a>
+    <a class="linktile" href="https://patreon.com/StarGazerWebtoon" target="_blank" rel="noopener"><strong>Patreon ↗</strong><span>StarGazerWebtoon</span></a>
+    <a class="linktile" href="https://instagram.com/stargazerwebtoon" target="_blank" rel="noopener"><strong>Instagram ↗</strong><span>@stargazerwebtoon</span></a>
+    <a class="linktile" href="mailto:stargazer.webtoon@gmail.com"><strong>Email ↗</strong><span>stargazer.webtoon@gmail.com</span></a>
+    <a class="linktile" href="https://cash.app/$cashsiusm" target="_blank" rel="noopener"><strong>Cash App ↗</strong><span>$cashsiusm</span></a>
+  </div>
+</section>
+
+<section class="section" id="portfolio">
+  <div class="sectionhead"><div><div class="eyebrow">Showcase</div><h2>Selected work</h2></div><p>This gallery updates from Creator Studio when Cash publishes new work.</p></div>
+  <div class="portfolio" id="portfolioGrid">
+    <article class="work"><img src="../assets/cash-stargazer-hero.jpg" alt="StarGazer artwork"><div class="body"><h3>StarGazer</h3><p>Original sci-fi superhero webcomic by Cassius Miller.</p><a class="feature-link" href="https://www.webtoons.com/en/canvas/stargazer/list?title_no=995671" target="_blank" rel="noopener">View project ↗</a></div></article>
+    <article class="work"><img src="../assets/cash-stargazer-group.jpg" alt="StarGazer character artwork"><div class="body"><h3>StarGazer character work</h3><p>Character and world artwork from the StarGazer project.</p></div></article>
+  </div>
+  <div class="statusline" id="portfolioStatus">Loading published portfolio…</div>
+</section>
+
+<section class="section">
+  <div class="callout"><div class="eyebrow">Related People</div><h2>Creators around the studio</h2><p>This area is built to link Cash, Ganny and future collaborators to one another while keeping each person's work separate and clearly credited.</p><a class="feature-link" href="../index.html#people">See the studio people →</a></div>
+</section>
+</main>
+
+<footer class="footer shell">Cash's creator space · Think Exist Studios</footer>
+
+<script>
+(() => {
+  const sb = supabase.createClient(
+    'https://aivziwaudzuzwlkjmuly.supabase.co',
+    'sb_publishable_07ChHzoUQS98-PHaxbNx2g_zmZ2QXeP'
+  );
+  const grid = document.getElementById('portfolioGrid');
+  const status = document.getElementById('portfolioStatus');
+  const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  async function load(){
+    const {data,error} = await sb.from('portfolio_items')
+      .select('title,description,image_url,project_url,tags,sort_order')
+      .eq('contributor_slug','cash-cassius-miller')
+      .eq('published',true)
+      .order('sort_order',{ascending:true})
+      .order('created_at',{ascending:false});
+    if(error || !data?.length){status.textContent='Showing featured work.';return;}
+    grid.innerHTML = data.map(item => {
+      const image = item.image_url ? '<img src="'+esc(item.image_url)+'" alt="Artwork for '+esc(item.title)+'">' : '';
+      const tags = (item.tags||[]).map(t=>'<span class="tag">'+esc(t)+'</span>').join('');
+      const link = item.project_url ? '<a class="feature-link" href="'+esc(item.project_url)+'" target="_blank" rel="noopener">View project ↗</a>' : '';
+      return '<article class="work">'+image+'<div class="body"><div class="tagrow">'+tags+'</div><h3>'+esc(item.title)+'</h3><p>'+esc(item.description||'')+'</p>'+link+'</div></article>';
+    }).join('');
+    status.textContent='Portfolio synced with Creator Studio.';
+  }
+  load();
+})();
+</script>
+</body></html>

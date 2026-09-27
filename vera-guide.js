@@ -20,8 +20,8 @@
    'Try the video shuffle button. I approve of controlled chaos.'
   ],
   watch:[
-   'This watch page uses YouTube embeds so you can view clips without leaving the studio site.',
-   'Tap a video to load the player, then scroll down for the next one.',
+   'Think Exist Watch now supports playable video from YouTube, TikTok, Twitch, Vimeo, Dailymotion and PeerTube.',
+   'Use the source tabs on Watch to switch platforms without leaving the Think Exist site.',
    'The feed refreshes from selected YouTube channels without exposing your private account data.'
   ],
   crypto:[

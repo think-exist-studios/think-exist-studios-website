@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#070b16">
-<meta name="description" content="Think Exist Watch — a shorts-style video feed from selected YouTube channels.">
+<meta name="description" content="Think Exist Watch — playable videos from YouTube, TikTok, Twitch, Vimeo, Dailymotion and PeerTube.">
 <title>Watch | Think Exist Studios</title><link rel="stylesheet" href="styles.css">
 </head>
 <body data-page="watch">
@@ -12,23 +12,82 @@
   <nav class="nav"><a href="index.html#projects">Projects</a><a href="games.html">Games</a><a href="discover.html">Discover</a><a href="watch.html">Watch</a><a href="crypto.html">Crypto</a><a href="creator-studio.html">Creator Studio</a></nav>
 </div></header>
 
-<div class="signalbar"><div class="signaltrack"><span><i></i> WATCH FEED ACTIVE</span><span>YOUTUBE VIDEOS</span><span>SCROLL · TAP · WATCH</span><span>TECH + SCIENCE</span><span><i></i> WATCH FEED ACTIVE</span><span>YOUTUBE VIDEOS</span><span>SCROLL · TAP · WATCH</span><span>TECH + SCIENCE</span></div></div>
+<div class="signalbar"><div class="signaltrack">
+  <span><i></i> WATCH HUB ACTIVE</span><span>YOUTUBE</span><span>TIKTOK</span><span>TWITCH</span><span>VIMEO</span><span>DAILYMOTION</span><span>PEERTUBE</span>
+  <span><i></i> WATCH HUB ACTIVE</span><span>YOUTUBE</span><span>TIKTOK</span><span>TWITCH</span><span>VIMEO</span><span>DAILYMOTION</span><span>PEERTUBE</span>
+</div></div>
 
 <main class="shell">
 <section class="hero">
-  <div class="livepill"><span class="pulse"></span> VIDEO FEED</div>
-  <div class="eyebrow">Shorts-style viewing</div>
+  <div class="livepill"><span class="pulse"></span> MULTI-PLATFORM VIDEO HUB</div>
+  <div class="eyebrow">Watch without leaving Think Exist</div>
   <h1>Think Exist <span class="grad">Watch</span></h1>
-  <p>Scroll through a vertical video feed and watch selected YouTube uploads without leaving Think Exist Studios.</p>
-  <div class="row"><a class="btn primary" href="#feed">Start watching ↓</a><a class="btn" href="discover.html">Back to Discover</a></div>
+  <p>One place for playable video from multiple platforms. YouTube is a rotating channel feed; the other tabs use verified embeddable videos that play directly on this website.</p>
+  <div class="row"><a class="btn primary" href="#watch-hub">Start watching ↓</a><a class="btn" href="discover.html">Back to Discover</a></div>
 </section>
 
-<section class="section watch-shell" id="feed">
-  <div class="sectionhead" style="width:100%"><div><div class="eyebrow">Fresh clips</div><h2>Watch feed</h2></div><p>Tap a card to load the YouTube player. Scroll down for the next video.</p></div>
-  <p class="watch-note">This is a YouTube-powered video feed. It does not require you to sign into YouTube on Think Exist Studios.</p>
-  <div class="watch-feed" id="watchFeed"><article class="card skeleton-card"><p>Loading the video feed…</p></article></div>
-  <div class="statusline" id="watchStatus">Connecting to video feed…</div>
-  <div class="row"><button class="btn" id="refreshWatch" type="button">Refresh feed ↻</button></div>
+<section class="section" id="watch-hub">
+  <div class="sectionhead"><div><div class="eyebrow">Choose a source</div><h2>Video hub</h2></div><p>No fake feeds: tabs are included only when the platform supports playback inside this site.</p></div>
+
+  <div class="watch-tabs" role="tablist" aria-label="Video platforms">
+    <button class="watch-tab active" type="button" data-panel="youtube">YouTube</button>
+    <button class="watch-tab" type="button" data-panel="tiktok">TikTok</button>
+    <button class="watch-tab" type="button" data-panel="twitch">Twitch</button>
+    <button class="watch-tab" type="button" data-panel="vimeo">Vimeo</button>
+    <button class="watch-tab" type="button" data-panel="dailymotion">Dailymotion</button>
+    <button class="watch-tab" type="button" data-panel="peertube">PeerTube</button>
+  </div>
+
+  <div class="watch-panel active" data-watch-panel="youtube">
+    <div class="watch-panel-head"><div><small>ROTATING FEED</small><h3>YouTube</h3></div><p>Recent uploads from selected tech, science and developer channels.</p></div>
+    <div class="watch-feed" id="watchFeed"><article class="card skeleton-card"><p>Loading the YouTube feed…</p></article></div>
+    <div class="statusline" id="watchStatus">Connecting to YouTube feed…</div>
+    <div class="row"><button class="btn" id="refreshWatch" type="button">Refresh YouTube feed ↻</button></div>
+  </div>
+
+  <div class="watch-panel" data-watch-panel="tiktok">
+    <div class="watch-panel-head"><div><small>PLAYABLE EMBED</small><h3>TikTok</h3></div><p>This is an official TikTok embedded player, not a link-out preview.</p></div>
+    <div class="embed-stage vertical">
+      <iframe loading="lazy" src="https://www.tiktok.com/player/v1/6718335390845095173?autoplay=0&loop=0&controls=1&progress_bar=1&play_button=1&volume_control=1&fullscreen_button=1" title="TikTok embedded video" allow="fullscreen; autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <div class="watch-panel" data-watch-panel="twitch">
+    <div class="watch-panel-head"><div><small>PLAYABLE CLIP</small><h3>Twitch</h3></div><p>Twitch requires this site domain to be passed to its player. This clip is embedded with thinkexiststudios.com as the approved parent.</p></div>
+    <div class="embed-stage twitch-stage">
+      <iframe loading="lazy" src="https://clips.twitch.tv/embed?clip=IncredulousAbstemiousFennelImGlitch&parent=thinkexiststudios.com&preload=metadata&autoplay=false" title="Twitch embedded clip" allow="fullscreen; autoplay" allowfullscreen></iframe>
+    </div>
+    <p class="watch-note compact">On very narrow phones, Twitch may require a wider viewport because its official embed has a minimum player size.</p>
+  </div>
+
+  <div class="watch-panel" data-watch-panel="vimeo">
+    <div class="watch-panel-head"><div><small>PLAYABLE EMBED</small><h3>Vimeo</h3></div><p>Vimeo playback stays inside the Think Exist Watch page.</p></div>
+    <div class="embed-stage landscape">
+      <iframe loading="lazy" src="https://player.vimeo.com/video/286898202?title=1&byline=1&portrait=0" title="Vimeo embedded video" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <div class="watch-panel" data-watch-panel="dailymotion">
+    <div class="watch-panel-head"><div><small>PLAYABLE EMBED</small><h3>Dailymotion</h3></div><p>Dailymotion uses its current default embedded player directly on this page.</p></div>
+    <div class="embed-stage landscape">
+      <iframe loading="lazy" src="https://geo.dailymotion.com/player.html?video=x7tgad0" title="Dailymotion embedded video" allow="autoplay; fullscreen; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <div class="watch-panel" data-watch-panel="peertube">
+    <div class="watch-panel-head"><div><small>DECENTRALIZED VIDEO</small><h3>PeerTube</h3></div><p>PeerTube gives the site an independent, decentralized video source alongside the major platforms.</p></div>
+    <div class="embed-stage landscape">
+      <iframe loading="lazy" src="https://framatube.org/videos/embed/9db9f3f1-9b54-44ed-9e91-461d262d2205?autoplay=0&p2p=0" title="PeerTube embedded video" allow="fullscreen; autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="callout">
+    <div class="eyebrow">How this page works</div>
+    <h2>Playable here means playable here.</h2>
+    <p>YouTube provides the rotating feed. TikTok, Twitch, Vimeo, Dailymotion and PeerTube are presented as featured embedded videos because they can play inside Think Exist Studios. They are not labeled as live personalized feeds unless that capability is actually connected.</p>
+  </div>
 </section>
 </main>
 
@@ -36,6 +95,12 @@
 
 <script>
 (()=>{
+ const tabs=[...document.querySelectorAll('.watch-tab')],panels=[...document.querySelectorAll('.watch-panel')];
+ tabs.forEach(tab=>tab.addEventListener('click',()=>{
+   tabs.forEach(x=>x.classList.toggle('active',x===tab));
+   panels.forEach(p=>p.classList.toggle('active',p.dataset.watchPanel===tab.dataset.panel));
+ }));
+
  const feed=document.getElementById('watchFeed'),status=document.getElementById('watchStatus'),refresh=document.getElementById('refreshWatch');
  const fallbackChannels=[
   {name:'MKBHD',playlist:'UUBJycsmduvYEL83R_U4JriQ'},
@@ -64,7 +129,7 @@
    wirePlayers();
  }
  async function load(){
-   status.textContent='Refreshing video feed…';
+   status.textContent='Refreshing YouTube feed…';
    try{
      const r=await fetch('/api/tech-videos',{cache:'no-store'});
      if(!r.ok)throw new Error();
@@ -74,11 +139,11 @@
        status.textContent='Updated '+new Date().toLocaleTimeString()+' · YouTube channel feeds';
      }else{
        paintFallback();
-       status.textContent='Showing live YouTube channel feeds.';
+       status.textContent='Showing playable YouTube channel feeds.';
      }
    }catch(e){
      paintFallback();
-     status.textContent='Showing live YouTube channel feeds.';
+     status.textContent='Showing playable YouTube channel feeds.';
    }
  }
  refresh.addEventListener('click',load);

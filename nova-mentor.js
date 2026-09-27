@@ -58,6 +58,8 @@
 
   function renderReview(r){
     const box=$('novaReview');
+    const progressMetric=$('metricNovaReview');
+    if(progressMetric)progressMetric.textContent=r?(Number(r.overall_score||0)+'%'):'—';
     if(!r){box.innerHTML='<p class="statusline">No NOVA professional review yet.</p>';return;}
     const dims=[['Craft',r.craft_score],['Storytelling',r.storytelling_score],['Consistency',r.consistency_score],['Presentation',r.presentation_score],['Business',r.business_readiness_score]];
     const priorities=Array.isArray(r.priorities)?r.priorities:[];

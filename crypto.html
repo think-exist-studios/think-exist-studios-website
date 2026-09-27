@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#070b16">
-<meta name="description" content="Think Exist Crypto — live markets, DEX Screener, wallet news, beginner crypto education and studio projects.">
+<meta name="description" content="Think Exist Crypto — live markets, the MOSES Report, DEX Screener, wallet news, beginner crypto education and studio projects.">
 <title>Think Exist Crypto | Think Exist Studios</title>
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -17,8 +17,8 @@
 <section class="hero">
   <div class="eyebrow">Web3 · market watch · wallet safety · beginner guide</div>
   <h1>Think Exist <span class="grad">Crypto</span></h1>
-  <p>A practical crypto hub: live prices, DEX Screener charts, whale and wallet headlines, studio projects, and a beginner path for buying and storing crypto safely.</p>
-  <div class="row"><a class="btn primary" href="#markets">Live market →</a><a class="btn" href="#dexscreener">DEX Screener</a><a class="btn" href="#learn">Start here</a><a class="btn" href="#beginner-checklist">Checklist</a><a class="btn" href="#blockchain-101">Blockchain 101</a><a class="btn" href="#wallet-news">Wallet news</a></div>
+  <p>A practical crypto hub: live prices, the MOSES market intelligence report, DEX Screener charts, whale and wallet headlines, studio projects, and a beginner path for buying and storing crypto safely.</p>
+  <div class="row"><a class="btn primary" href="#markets">Live market →</a><a class="btn" href="#moses-report">MOSES Report</a><a class="btn" href="#dexscreener">DEX Screener</a><a class="btn" href="#learn">Start here</a><a class="btn" href="#beginner-checklist">Checklist</a><a class="btn" href="#blockchain-101">Blockchain 101</a><a class="btn" href="#wallet-news">Wallet news</a></div>
 </section>
 
 <section class="section" id="markets">
@@ -30,6 +30,47 @@
   </div>
   <div class="statusline" id="marketStatus">Connecting to market data…</div>
 </section>
+
+<section class="section moses-report-section" id="moses-report">
+  <div class="sectionhead"><div><div class="eyebrow">Market Observation & Strategy Evaluation Specialist</div><h2>MOSES Report</h2></div><p>MOSES watches broad crypto conditions, unusual moves, protocol upgrades and market catalysts, then explains what he sees. Research only — not a promise of profit.</p></div>
+
+  <div class="moses-report-banner">
+    <div>
+      <div class="tagrow"><span class="tag live-tag">Live intelligence</span><span class="tag">MOSES</span></div>
+      <h3 id="mosesCondition">Loading market condition…</h3>
+      <p id="mosesConditionText">MOSES is reading the market.</p>
+    </div>
+    <div class="moses-report-stats">
+      <div><small>POSITIVE BREADTH</small><strong id="mosesBreadth">—</strong></div>
+      <div><small>MEDIAN 24H</small><strong id="mosesMedian">—</strong></div>
+      <div><small>BTC 24H</small><strong id="mosesBtc">—</strong></div>
+    </div>
+  </div>
+
+  <div class="sectionhead moses-subhead"><div><div class="eyebrow">Research watchlist</div><h3>Most Lucrative Potential</h3></div><p>Coins currently showing the strongest combination of liquidity, activity, momentum and opportunity profile in MOSES's model. A high score is not a guarantee of future returns.</p></div>
+  <div class="moses-potential-grid" id="mosesPotential"><article class="card"><p>Building research watchlist…</p></article></div>
+
+  <div class="grid2 moses-report-grid">
+    <article class="card">
+      <div class="eyebrow">Movement radar</div>
+      <h3>Unusual rallies & drops</h3>
+      <div class="moses-list" id="mosesMoves"><p>Scanning unusual moves…</p></div>
+    </article>
+    <article class="card">
+      <div class="eyebrow">Technology & catalysts</div>
+      <h3>Upgrade radar</h3>
+      <div class="moses-list" id="mosesCatalysts"><p>Checking protocol and project developments…</p></div>
+    </article>
+  </div>
+
+  <article class="card moses-news-card">
+    <div class="eyebrow">Market intelligence</div>
+    <h3>What MOSES is watching</h3>
+    <div class="moses-news-grid" id="mosesMarketNews"><p>Connecting to market news…</p></div>
+  </article>
+  <div class="statusline" id="mosesReportStatus">MOSES report is connecting…</div>
+</section>
+
 
 <section class="section" id="dexscreener">
   <div class="sectionhead"><div><div class="eyebrow">On-chain market view</div><h2>DEX Screener</h2></div><p>Live decentralized-exchange charting inside Think Exist. The default view is a Solana market; you can load another supported pair by address.</p></div>
@@ -217,6 +258,73 @@ Write one word after each number.
   const names={bitcoin:'Bitcoin',ethereum:'Ethereum',solana:'Solana'};
   const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:n<1?4:2}).format(n);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  const mosesEls={
+    condition:document.getElementById('mosesCondition'),
+    conditionText:document.getElementById('mosesConditionText'),
+    breadth:document.getElementById('mosesBreadth'),
+    median:document.getElementById('mosesMedian'),
+    btc:document.getElementById('mosesBtc'),
+    potential:document.getElementById('mosesPotential'),
+    moves:document.getElementById('mosesMoves'),
+    catalysts:document.getElementById('mosesCatalysts'),
+    news:document.getElementById('mosesMarketNews'),
+    status:document.getElementById('mosesReportStatus')
+  };
+  const signed=n=>{const v=Number(n)||0;return (v>=0?'+':'')+v.toFixed(2)+'%';};
+  const compactUsd=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',notation:'compact',maximumFractionDigits:2}).format(Number(n)||0);
+
+  async function loadMosesReport(){
+    if(!mosesEls.condition)return;
+    try{
+      const r=await fetchWithTimeout('/api/moses-report',{cache:'no-store'},9500);
+      if(!r.ok)throw new Error('MOSES report unavailable');
+      const d=await r.json();
+      const m=d.market||{};
+      mosesEls.condition.textContent=m.condition||'Market scan';
+      mosesEls.condition.dataset.tone=m.tone||'neutral';
+      mosesEls.conditionText.textContent=m.explanation||'MOSES is evaluating current market conditions.';
+      mosesEls.breadth.textContent=(Number(m.breadth_positive_pct)||0).toFixed(1)+'%';
+      mosesEls.median.textContent=signed(m.median_24h_change_pct);
+      mosesEls.btc.textContent=signed(m.bitcoin_24h_change_pct);
+
+      const potential=(d.most_lucrative_potential||[]).slice(0,6);
+      mosesEls.potential.innerHTML=potential.length?potential.map((x,i)=>{
+        const reasons=(x.reasons||[]).map(r=>'<span class="moses-reason">'+esc(r)+'</span>').join('');
+        return '<article class="card moses-potential-card">'+
+          '<div class="moses-rank">#'+(i+1)+'</div>'+
+          '<div class="tagrow"><span class="tag">'+esc(x.symbol||'')+'</span><span class="tag">'+esc(x.label||'Research watchlist')+'</span></div>'+
+          '<h3>'+esc(x.name||'')+'</h3>'+
+          '<div class="moses-score"><strong>'+Number(x.opportunity_score||0).toFixed(1)+'</strong><span>/100 opportunity score</span></div>'+
+          '<div class="moses-metrics"><span>24h <b class="'+(Number(x.change_24h_pct)>=0?'up':'down')+'">'+signed(x.change_24h_pct)+'</b></span><span>7d <b class="'+(Number(x.change_7d_pct)>=0?'up':'down')+'">'+signed(x.change_7d_pct)+'</b></span><span>30d <b class="'+(Number(x.change_30d_pct)>=0?'up':'down')+'">'+signed(x.change_30d_pct)+'</b></span></div>'+
+          '<div class="moses-reasons">'+reasons+'</div>'+
+          '<p class="moses-risk">'+esc(x.risk_note||'Crypto-market risk remains high.')+'</p>'+
+        '</article>';
+      }).join(''):'<article class="card"><p>No watchlist candidates are available from the current snapshot.</p></article>';
+
+      const moves=(d.unusual_moves||[]).slice(0,8);
+      mosesEls.moves.innerHTML=moves.length?moves.map(x=>
+        '<div class="moses-list-row"><div><strong>'+esc(x.name)+' <small>'+esc(x.symbol)+'</small></strong><span>'+esc(x.flag)+'</span></div><b class="'+(Number(x.change_24h_pct)>=0?'up':'down')+'">'+signed(x.change_24h_pct)+'</b></div>'
+      ).join(''):'<p>No unusually large moves crossed MOSES thresholds in this snapshot.</p>';
+
+      const catalysts=(d.catalyst_radar||[]).slice(0,7);
+      mosesEls.catalysts.innerHTML=catalysts.length?catalysts.map(x=>
+        '<a class="moses-headline" href="'+esc(x.url)+'" target="_blank" rel="noopener"><div><small>'+esc(x.source||'Source')+'</small><strong>'+esc(x.title||'Crypto development')+'</strong></div><b>↗</b></a>'
+      ).join(''):'<p>No upgrade headlines are available right now.</p>';
+
+      const news=(d.market_news||[]).slice(0,6);
+      mosesEls.news.innerHTML=news.length?news.map(x=>
+        '<a class="moses-news-item" href="'+esc(x.url)+'" target="_blank" rel="noopener"><small>'+esc(x.source||'News')+'</small><strong>'+esc(x.title||'Market update')+'</strong><span>'+esc(x.published||'Recent')+'</span></a>'
+      ).join(''):'<p>Market-news feed is temporarily quiet.</p>';
+
+      mosesEls.status.textContent='Updated '+new Date(d.updated||Date.now()).toLocaleTimeString()+' · MOSES Report · Market rankings are research signals, not profit guarantees.';
+    }catch(e){
+      mosesEls.condition.textContent='MOSES is reconnecting';
+      mosesEls.conditionText.textContent='The live intelligence feed could not refresh, but the rest of the Crypto page is available.';
+      mosesEls.status.textContent='MOSES Report could not refresh. It will retry automatically.';
+    }
+  }
+
   async function loadMarket(){
     try{
       const r=await fetchWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true',{cache:'no-store'},6500);
@@ -344,8 +452,9 @@ Write one word after each number.
     }
   }
   document.getElementById('loadDex').addEventListener('click',loadDex);
-  loadMarket(); loadTrending(); loadWalletNews(); loadDex();
+  loadMarket(); loadMosesReport(); loadTrending(); loadWalletNews(); loadDex();
   setInterval(loadMarket,120000);
+  setInterval(loadMosesReport,300000);
   setInterval(loadTrending,300000);
   setInterval(loadWalletNews,600000);
 })();

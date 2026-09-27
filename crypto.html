@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#070b16">
-<meta name="description" content="Think Exist Crypto — live markets, the MOSES Report, DEX Screener, wallet news, beginner crypto education and studio projects.">
+<meta name="description" content="Think Exist Crypto — live markets, the MOSES Report, DEX Screener, NFT radar, wallet news, beginner crypto education and studio projects.">
 <title>Think Exist Crypto | Think Exist Studios</title>
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -17,8 +17,8 @@
 <section class="hero">
   <div class="eyebrow">Web3 · market watch · wallet safety · beginner guide</div>
   <h1>Think Exist <span class="grad">Crypto</span></h1>
-  <p>A practical crypto hub: live prices, the MOSES market intelligence report, DEX Screener charts, whale and wallet headlines, studio projects, and a beginner path for buying and storing crypto safely.</p>
-  <div class="row"><a class="btn primary" href="#markets">Live market →</a><a class="btn" href="#moses-report">MOSES Report</a><a class="btn" href="#dexscreener">DEX Screener</a><a class="btn" href="#learn">Start here</a><a class="btn" href="#beginner-checklist">Checklist</a><a class="btn" href="#blockchain-101">Blockchain 101</a><a class="btn" href="#wallet-news">Wallet news</a></div>
+  <p>A practical crypto hub: live prices, the MOSES market intelligence report, DEX Screener charts, NFT radar, whale and wallet headlines, studio projects, and a beginner path for buying and storing crypto safely.</p>
+  <div class="row"><a class="btn primary" href="#markets">Live market →</a><a class="btn" href="#moses-report">MOSES Report</a><a class="btn" href="#dexscreener">DEX Screener</a><a class="btn nft-btn" href="#nft-radar">NFT Radar</a><a class="btn" href="#learn">Start here</a><a class="btn" href="#beginner-checklist">Checklist</a><a class="btn" href="#blockchain-101">Blockchain 101</a><a class="btn" href="#wallet-news">Wallet news</a></div>
 </section>
 
 <section class="section" id="markets">
@@ -97,6 +97,39 @@
 <section class="section">
   <div class="sectionhead"><div><div class="eyebrow">What's moving</div><h2>Trending on CoinGecko</h2></div><p>Live trending searches, not a recommendation to buy or sell.</p></div>
   <div class="grid3" id="trending"><article class="card"><p>Loading trends…</p></article></div>
+</section>
+
+
+<section class="section nft-district" id="nft-radar">
+  <div class="nft-district-glow" aria-hidden="true"></div>
+  <div class="nft-district-head">
+    <div>
+      <div class="livepill nft-livepill"><span class="pulse"></span> NFT RADAR ACTIVE</div>
+      <div class="eyebrow">Digital ownership · collectibles · on-chain art</div>
+      <h2>NFT <span class="grad">District</span></h2>
+      <p>Trending NFT collections and recent public reporting now live inside the Crypto hub, where market context, wallets and on-chain activity belong.</p>
+    </div>
+    <div class="nft-district-badge">
+      <span>LIVE</span>
+      <strong>DISCOVERY</strong>
+      <small>Not a buy signal</small>
+    </div>
+  </div>
+
+  <div class="nft-radar-strip">
+    <div><span>COLLECTION PULSE</span><strong id="nftPulseCount">—</strong></div>
+    <div><span>DATA SOURCE</span><strong>CoinGecko</strong></div>
+    <div><span>REFRESH</span><strong>10 min</strong></div>
+  </div>
+
+  <div class="sectionhead nft-subhead"><div><div class="eyebrow">Collection pulse</div><h3>Trending NFTs</h3></div><p>Search activity and floor movement can change quickly. Trending does not mean recommended.</p></div>
+  <div class="nft-grid nft-crypto-grid" id="nftGrid"><article class="card skeleton-card"><p>Loading NFT trends…</p></article></div>
+  <div class="statusline" id="nftStatus">Connecting to NFT trend data…</div>
+
+  <div class="sectionhead nft-subhead"><div><div class="eyebrow">NFT + digital art headlines</div><h3>What the market is talking about</h3></div><p>Recent public reporting around NFT art, digital collectibles, creators, collections and marketplaces.</p></div>
+  <div class="news-grid nft-news-grid" id="nftNews"><article class="card skeleton-card"><p>Loading NFT headlines…</p></article></div>
+
+  <div class="nft-safety-line"><strong>Discovery only.</strong> Think Exist Studios does not treat a trending collection, floor price, marketplace mention or headline as a recommendation to buy.</div>
 </section>
 
 <section class="section" id="wallet-news">
@@ -265,6 +298,7 @@ Write one word after each number.
   const cards=document.getElementById('marketCards'), status=document.getElementById('marketStatus'), trend=document.getElementById('trending');
   const names={bitcoin:'Bitcoin',ethereum:'Ethereum',solana:'Solana'};
   const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:n<1?4:2}).format(n);
+  const media=u=>'/api/media?url='+encodeURIComponent(u);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   const mosesEls={
@@ -364,6 +398,41 @@ Write one word after each number.
       }).join('') || '<article class="card"><p>No trend data available.</p></article>';
     }catch(e){trend.innerHTML='<article class="card"><p>Trending feed is temporarily unavailable.</p></article>';}
   }
+
+  async function loadNftRadar(){
+    const grid=document.getElementById('nftGrid');
+    const news=document.getElementById('nftNews');
+    const status=document.getElementById('nftStatus');
+    const count=document.getElementById('nftPulseCount');
+    if(!grid||!news||!status||!count)return;
+    try{
+      const r=await fetchWithTimeout('/api/nft-feed',{cache:'no-store'},8000);
+      if(!r.ok)throw new Error('NFT feed unavailable');
+      const d=await r.json();
+      const items=(d.nfts||[]).slice(0,8);
+      const headlines=(d.nftNews||[]).slice(0,8);
+      count.textContent=items.length?String(items.length):'—';
+      grid.innerHTML=items.length?items.map((x,i)=>{
+        const ch=x.change;
+        const movement=(ch!==null&&ch!==undefined)
+          ?'<span class="'+(Number(ch)>=0?'up':'down')+'">'+(Number(ch)>=0?'+':'')+Number(ch).toFixed(2)+'% 24h</span>'
+          :'<span>24h unavailable</span>';
+        return '<a class="nft-card nft-crypto-card" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+
+          (x.thumb?'<img loading="lazy" referrerpolicy="no-referrer" src="'+media(x.thumb)+'" alt="'+esc(x.name||'NFT collection')+'" onerror="this.style.display=\'none\'">':'')+
+          '<div><small>TRENDING #'+(i+1)+'</small><h3>'+esc(x.name||'NFT collection')+'</h3><p>'+(x.symbol?esc(x.symbol)+' · ':'')+(x.floor?esc(x.floor):'Floor unavailable')+'</p>'+movement+'</div></a>';
+      }).join(''):'<article class="card"><p>NFT trends are temporarily unavailable.</p></article>';
+      news.innerHTML=headlines.length?headlines.map((n,i)=>
+        '<a class="news-card nft-news-card" href="'+esc(n.url)+'" target="_blank" rel="noopener"><span class="news-num">'+String(i+1).padStart(2,'0')+'</span><div><small>'+esc(n.source||'News')+'</small><h3>'+esc(n.title||'NFT market update')+'</h3><p>'+esc(n.published||'Recent')+'</p></div><b>↗</b></a>'
+      ).join(''):'<article class="card"><p>NFT headlines are reconnecting.</p></article>';
+      status.textContent='Updated '+new Date(d.updated||Date.now()).toLocaleTimeString()+' · CoinGecko trends + public NFT headlines';
+    }catch(e){
+      count.textContent='—';
+      grid.innerHTML='<article class="card"><p>NFT radar is reconnecting.</p></article>';
+      news.innerHTML='<article class="card"><p>NFT headlines are reconnecting.</p></article>';
+      status.textContent='NFT radar could not refresh. It will retry automatically.';
+    }
+  }
+
   async function loadWalletNews(){
     const box=document.getElementById('walletNews'), s=document.getElementById('walletNewsStatus');
     try{
@@ -467,10 +536,11 @@ Write one word after each number.
     }
   }
   document.getElementById('loadDex').addEventListener('click',loadDex);
-  loadMarket(); loadMosesReport(); loadTrending(); loadWalletNews(); loadDex();
+  loadMarket(); loadMosesReport(); loadTrending(); loadNftRadar(); loadWalletNews(); loadDex();
   setInterval(loadMarket,120000);
   setInterval(loadMosesReport,300000);
   setInterval(loadTrending,300000);
+  setInterval(loadNftRadar,600000);
   setInterval(loadWalletNews,600000);
 })();
 </script>

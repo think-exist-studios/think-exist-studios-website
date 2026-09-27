@@ -18,7 +18,7 @@
   <div class="eyebrow">Web3 · market watch · wallet safety · beginner guide</div>
   <h1>Think Exist <span class="grad">Crypto</span></h1>
   <p>A practical crypto hub: live prices, DEX Screener charts, whale and wallet headlines, studio projects, and a beginner path for buying and storing crypto safely.</p>
-  <div class="row"><a class="btn primary" href="#markets">Live market →</a><a class="btn" href="#dexscreener">DEX Screener</a><a class="btn" href="#learn">Start here</a><a class="btn" href="#wallet-news">Wallet news</a></div>
+  <div class="row"><a class="btn primary" href="#markets">Live market →</a><a class="btn" href="#dexscreener">DEX Screener</a><a class="btn" href="#learn">Start here</a><a class="btn" href="#beginner-checklist">Checklist</a><a class="btn" href="#wallet-news">Wallet news</a></div>
 </section>
 
 <section class="section" id="markets">
@@ -66,6 +66,66 @@
     <article class="card"><b>04</b><h3>Match the network</h3><p>Before withdrawing, confirm the receiving wallet supports the exact network you selected. Sending an asset on the wrong network or to an incompatible address can cause permanent loss.</p></article>
     <article class="card"><b>05</b><h3>Test before sending more</h3><p>For a first transfer, send a small test amount. Confirm it arrives, then send the rest. Copy-and-paste the address and compare the beginning and end before you approve the transaction.</p></article>
     <article class="card"><b>06</b><h3>Keep records</h3><p>Save transaction history, purchase prices, transfers and sales. Crypto activity can have tax consequences depending on your jurisdiction.</p></article>
+  </div>
+</section>
+
+<section class="section" id="beginner-checklist">
+  <div class="sectionhead"><div><div class="eyebrow">Copy-ready beginner tool</div><h2>Crypto setup checklist</h2></div><p>Copy this checklist into Notes, a password manager note, or print it. Do not put seed phrases or private keys into the checklist.</p></div>
+  <div class="crypto-checklist card">
+    <div class="checklist-head"><div><h3>My crypto setup checklist</h3><p>Use this before buying or moving crypto.</p></div><button class="btn primary" id="copyCryptoChecklist" type="button">Copy checklist</button></div>
+    <pre id="cryptoChecklistText">CRYPTO BEGINNER CHECKLIST
+
+ACCOUNT SECURITY
+[ ] I used a unique password
+[ ] I turned on 2-factor authentication
+[ ] I saved official support links
+[ ] I will never share verification codes
+
+BEFORE I BUY
+[ ] I checked the asset name and symbol
+[ ] I reviewed fees and spread
+[ ] I am only using money I can afford to lose
+
+MY WALLET
+[ ] I downloaded the wallet from the official source
+[ ] I wrote my recovery phrase down OFFLINE
+[ ] I did not screenshot or email the recovery phrase
+[ ] I know which network this wallet uses
+[ ] I know my public wallet address is safe to share
+[ ] I know my private key / recovery phrase is NEVER safe to share
+
+BEFORE I SEND
+[ ] I checked the receiving address
+[ ] I checked the network
+[ ] I compared the beginning and end of the address
+[ ] I am sending a small test transaction first
+[ ] I checked the fee before confirming
+
+BEFORE I CONNECT A WALLET
+[ ] I verified the official website
+[ ] I checked the contract / mint address
+[ ] I read what the wallet is asking me to sign
+[ ] I am using a separate wallet for risky or experimental sites
+
+RECORDS
+[ ] I saved transaction history
+[ ] I recorded purchases, transfers, and sales
+[ ] I know crypto activity may have tax consequences</pre>
+    <div class="statusline" id="checklistStatus">Nothing from this checklist is sent to Think Exist Studios.</div>
+  </div>
+</section>
+
+<section class="section" id="recovery-backup">
+  <div class="sectionhead"><div><div class="eyebrow">Offline recovery backup</div><h2>Seed phrase worksheet</h2></div><p>For safety, this website does <strong>not</strong> provide a box for entering a real seed phrase or private key.</p></div>
+  <div class="recovery-safe card danger-card">
+    <h3>Use this only as a blank template</h3>
+    <p>Copy or print the blank worksheet, then fill the words in <strong>offline</strong> on paper or another secure offline method. Never paste your actual seed phrase into this website, a chat, email, Discord, Telegram, or an unknown app.</p>
+    <div class="recovery-actions"><button class="btn primary" id="copySeedTemplate" type="button">Copy 12-word blank template</button><button class="btn" id="copySeedTemplate24" type="button">Copy 24-word blank template</button></div>
+    <pre id="seedTemplatePreview">1. __________   2. __________   3. __________   4. __________
+5. __________   6. __________   7. __________   8. __________
+9. __________  10. __________  11. __________  12. __________</pre>
+    <p class="seed-warning"><strong>Think Exist Studios will never ask for your recovery phrase or private key.</strong></p>
+    <div class="statusline" id="seedTemplateStatus">Blank template only — no secret information is stored here.</div>
   </div>
 </section>
 
@@ -157,6 +217,20 @@
       s.textContent='Could not refresh wallet headlines.';
     }
   }
+  const copyText=async(text,statusEl,msg)=>{
+    try{await navigator.clipboard.writeText(text);statusEl.textContent=msg;}
+    catch(e){
+      const ta=document.createElement('textarea');ta.value=text;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+      document.execCommand('copy');ta.remove();statusEl.textContent=msg;
+    }
+  };
+  const checklist=document.getElementById('cryptoChecklistText'),checkStatus=document.getElementById('checklistStatus');
+  document.getElementById('copyCryptoChecklist').addEventListener('click',()=>copyText(checklist.textContent,checkStatus,'Checklist copied. Keep seed phrases and private keys out of it.'));
+  const makeSeedTemplate=n=>Array.from({length:n},(_,i)=>String(i+1).padStart(2,' ') + '. __________').reduce((rows,x,i)=>{const r=Math.floor(i/4);(rows[r]||(rows[r]=[])).push(x);return rows;},[]).map(r=>r.join('   ')).join('\n');
+  const seedPreview=document.getElementById('seedTemplatePreview'),seedStatus=document.getElementById('seedTemplateStatus');
+  document.getElementById('copySeedTemplate').addEventListener('click',()=>{const t=makeSeedTemplate(12);seedPreview.textContent=t;copyText(t,seedStatus,'Blank 12-word worksheet copied. Fill it offline only.');});
+  document.getElementById('copySeedTemplate24').addEventListener('click',()=>{const t=makeSeedTemplate(24);seedPreview.textContent=t;copyText(t,seedStatus,'Blank 24-word worksheet copied. Fill it offline only.');});
+
   const dexFrame=document.getElementById('dexFrame'),dexChain=document.getElementById('dexChain'),dexAddress=document.getElementById('dexAddress');
   document.getElementById('loadDex').addEventListener('click',()=>{
     const chain=dexChain.value;

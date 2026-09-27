@@ -104,3 +104,12 @@
 .danger-card{border-color:#ff8e8e45;background:linear-gradient(145deg,#2a151c,#111725)}
 @media(max-width:920px){.crypto-steps,.wallet-rules{grid-template-columns:repeat(2,minmax(0,1fr))}.dex-tools{grid-template-columns:1fr 1fr}.dex-tools .btn{grid-column:1/-1}}
 @media(max-width:620px){.crypto-steps,.wallet-rules{grid-template-columns:1fr}.dex-tools{grid-template-columns:1fr}.dex-tools .btn{grid-column:auto}.dex-frame{height:62vh;min-height:420px}}
+
+.crypto-checklist,.recovery-safe{max-width:900px;margin:auto}
+.checklist-head{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:16px}
+.checklist-head h3{margin:0 0 4px}.checklist-head p{margin:0;color:var(--muted)}
+.crypto-checklist pre,.recovery-safe pre{white-space:pre-wrap;word-break:break-word;margin:0;padding:18px;border:1px solid #ffffff1a;border-radius:14px;background:#070d18;color:#dce7f8;font:600 .88rem/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
+.recovery-actions{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0}
+.seed-warning{margin:14px 0 0;color:#ffd0d0}
+.live-x-box{max-width:900px;margin:auto}
+@media(max-width:680px){.checklist-head{display:block}.checklist-head .btn{margin-top:12px;width:100%}.crypto-checklist pre,.recovery-safe pre{font-size:.77rem;padding:13px}.recovery-actions .btn{width:100%}}

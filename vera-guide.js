@@ -17,7 +17,8 @@
    'The word robot entered popular culture through Karel Čapek’s 1920 play R.U.R.',
    'Anime is simply the Japanese word used for animation.',
    'A feed can be live without being noisy. Fresh data plus good pacing beats clutter.',
-   'Try the video shuffle button. I approve of controlled chaos.'
+   'Try the video shuffle button. I approve of controlled chaos.',
+   'The Discover page also carries the official @ThinkExistHQ Live X feed.'
   ],
   watch:[
    'Think Exist Watch now supports playable video from YouTube, TikTok, Twitch, Vimeo, Dailymotion and PeerTube.',
@@ -27,7 +28,8 @@
   crypto:[
    'Quick safety fact: a legitimate website never needs your wallet seed phrase.',
    'New to crypto? The Start Here guide explains buying, custody, transfers and wallet safety step by step.',
-   'DEX Screener charts are third-party market data. A chart appearing on the page is not an endorsement.'
+   'DEX Screener charts are third-party market data. A chart appearing on the page is not an endorsement.',
+   'Use the copyable beginner checklist, but never type a real seed phrase or private key into the website.',
    'Market prices can move faster than a page refresh, so treat snapshots as informational.',
    'Official links matter. Verify the destination before connecting a wallet.'
   ],

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#070b16">
-<meta name="description" content="Think Exist Art Radar — live art, artist headlines and NFT trends.">
-<title>Art + NFT Radar | Think Exist Studios</title><link rel="stylesheet" href="styles.css">
+<meta name="description" content="Think Exist Art Radar — live artwork and artist headlines.">
+<title>Art Radar | Think Exist Studios</title><link rel="stylesheet" href="styles.css">
 </head>
 <body data-page="art">
 <header class="top"><div class="topin shell">
@@ -13,19 +13,19 @@
 </div></header>
 
 <div class="signalbar"><div class="signaltrack">
-  <span><i></i> ART RADAR ACTIVE</span><span>PUBLIC-DOMAIN ARTWORKS</span><span>ARTIST HEADLINES</span><span>NFT TRENDS</span><span>DIGITAL ART</span>
-  <span><i></i> ART RADAR ACTIVE</span><span>PUBLIC-DOMAIN ARTWORKS</span><span>ARTIST HEADLINES</span><span>NFT TRENDS</span><span>DIGITAL ART</span>
+  <span><i></i> ART RADAR ACTIVE</span><span>PUBLIC-DOMAIN ARTWORKS</span><span>ARTIST HEADLINES</span><span>DIGITAL ART</span><span>CREATIVE DISCOVERY</span>
+  <span><i></i> ART RADAR ACTIVE</span><span>PUBLIC-DOMAIN ARTWORKS</span><span>ARTIST HEADLINES</span><span>DIGITAL ART</span><span>CREATIVE DISCOVERY</span>
 </div></div>
 
 <main class="shell">
 <div class="page-back"><button class="btn" type="button" onclick="history.length>1?history.back():location.href='index.html'">← Back</button></div>
 
 <section class="hero">
-  <div class="livepill"><span class="pulse"></span> ART + ARTISTS + NFTS</div>
+  <div class="livepill"><span class="pulse"></span> ART + ARTISTS</div>
   <div class="eyebrow">Live discovery feed</div>
   <h1>Art is always <span class="grad">moving.</span></h1>
-  <p>A changing feed of public-domain artwork, current artist headlines, digital-art coverage, and trending NFT collections. The feeds refresh automatically while the page is open.</p>
-  <div class="row"><a class="btn primary" href="#art-stream">Art stream ↓</a><a class="btn" href="#artists">Artists</a><a class="btn" href="#nfts">NFT radar</a></div>
+  <p>A changing feed of public-domain artwork, current artist headlines, illustration, exhibitions, and digital-art coverage. The feeds refresh automatically while the page is open.</p>
+  <div class="row"><a class="btn primary" href="#art-stream">Art stream ↓</a><a class="btn" href="#artists">Artists</a><a class="btn" href="crypto.html#nft-radar">NFT Radar → Crypto</a></div>
 </section>
 
 <section class="section" id="art-stream">
@@ -40,29 +40,18 @@
   <div class="statusline" id="artistStatus">Connecting to artist news…</div>
 </section>
 
-<section class="section" id="nfts">
-  <div class="sectionhead"><div><div class="eyebrow">Digital ownership radar</div><h2>Trending NFTs</h2></div><p>Current NFT trends from CoinGecko search activity. Trending does not mean recommended.</p></div>
-  <div class="nft-grid" id="nftGrid"><article class="card skeleton-card"><p>Loading NFT trends…</p></article></div>
-  <div class="statusline" id="nftStatus">Connecting to NFT trend data…</div>
-</section>
-
-<section class="section">
-  <div class="sectionhead"><div><div class="eyebrow">NFT + digital art headlines</div><h2>What's being talked about</h2></div><p>Recent public reporting around NFT art, digital collectibles, creators, and marketplaces.</p></div>
-  <div class="news-grid" id="nftNews"><article class="card skeleton-card"><p>Loading NFT headlines…</p></article></div>
-</section>
-
 <section class="section">
   <div class="callout">
     <div class="eyebrow">Feed transparency</div>
     <h2>Discovery, not endorsement.</h2>
-    <p>Artwork shown in the visual feed is limited to public-domain collection images. Artist and NFT headlines come from public news sources, and NFT trends come from CoinGecko. Think Exist Studios does not treat a trending collection, headline, floor price, or marketplace mention as a recommendation to buy.</p>
+    <p>Artwork shown in the visual feed is limited to public-domain collection images, while artist headlines come from public news sources. NFT discovery now lives in the Think Exist Crypto hub so the Art page can stay focused on art and artists.</p>
   </div>
 </section>
 
 <div class="row"><button class="btn" id="refreshArt" type="button">Refresh all feeds ↻</button></div>
 </main>
 
-<footer class="footer shell">Art + NFT Radar · Think Exist Studios</footer>
+<footer class="footer shell">Art Radar · Think Exist Studios</footer>
 
 <script>
 (()=>{
@@ -72,11 +61,9 @@
  const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch{return 'source'}};
  async function load(){
   const art=document.getElementById('artGrid'),artStatus=document.getElementById('artStatus'),
-        artists=document.getElementById('artistNews'),artistStatus=document.getElementById('artistStatus'),
-        nft=document.getElementById('nftGrid'),nftStatus=document.getElementById('nftStatus'),
-        nftNews=document.getElementById('nftNews');
+        artists=document.getElementById('artistNews'),artistStatus=document.getElementById('artistStatus');
   art.innerHTML='<article class="card"><h3>Artwork feed</h3><p>Loading fresh artwork…</p></article>';
- artistStatus.textContent='Refreshing artist news…'; nftStatus.textContent='Refreshing NFT radar…'; artStatus.textContent='Refreshing art feed…';
+ artistStatus.textContent='Refreshing artist news…'; artStatus.textContent='Refreshing art feed…';
   try{
    const r=await fetchWithTimeout('/api/art-feed',{cache:'no-store'},8000); if(!r.ok)throw new Error();
    const d=await r.json();
@@ -88,18 +75,10 @@
    artists.innerHTML=news.length?news.map((n,i)=>'<a class="news-card" href="'+esc(n.url)+'" target="_blank" rel="noopener"><span class="news-num">'+String(i+1).padStart(2,'0')+'</span><div><small>'+esc(n.source||host(n.url))+'</small><h3>'+esc(n.title)+'</h3><p>'+esc(n.published||'Recent')+'</p></div><b>↗</b></a>').join(''):'<article class="card"><p>Artist headlines are reconnecting.</p></article>';
    artistStatus.textContent='Updated '+new Date().toLocaleTimeString()+' · public artist headlines';
 
-   const nfts=d.nfts||[];
-   nft.innerHTML=nfts.length?nfts.map((x,i)=>'<a class="nft-card" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+(x.thumb?'<img loading="lazy" referrerpolicy="no-referrer" src="'+media(x.thumb)+'" alt="'+esc(x.name||'NFT thumbnail')+'" onerror="this.style.display=\'none\'">':'')+'<div><small>TRENDING #'+(i+1)+'</small><h3>'+esc(x.name||'NFT collection')+'</h3><p>'+(x.symbol?esc(x.symbol)+' · ':'')+(x.floor?esc(x.floor):'Floor unavailable')+(x.change!==null&&x.change!==undefined?' · '+(Number(x.change)>=0?'+':'')+Number(x.change).toFixed(2)+'% 24h':'')+'</p></div></a>').join(''):'<article class="card"><p>NFT trends are temporarily unavailable.</p></article>';
-   nftStatus.textContent='Updated '+new Date().toLocaleTimeString()+' · CoinGecko trending NFT data';
-
-   const nn=d.nftNews||[];
-   nftNews.innerHTML=nn.length?nn.map((n,i)=>'<a class="news-card" href="'+esc(n.url)+'" target="_blank" rel="noopener"><span class="news-num">'+String(i+1).padStart(2,'0')+'</span><div><small>'+esc(n.source||host(n.url))+'</small><h3>'+esc(n.title)+'</h3><p>'+esc(n.published||'Recent')+'</p></div><b>↗</b></a>').join(''):'<article class="card"><p>NFT headlines are reconnecting.</p></article>';
   }catch(e){
    art.innerHTML='<article class="card"><p>Art feed is reconnecting.</p></article>';
    artists.innerHTML='<article class="card"><p>Artist news is reconnecting.</p></article>';
-   nft.innerHTML='<article class="card"><p>NFT trends are reconnecting.</p></article>';
-   nftNews.innerHTML='<article class="card"><p>NFT headlines are reconnecting.</p></article>';
-   artStatus.textContent=artistStatus.textContent=nftStatus.textContent='Feed temporarily unavailable.';
+   artStatus.textContent=artistStatus.textContent='Feed temporarily unavailable.';
   }
  }
  document.getElementById('refreshArt').addEventListener('click',load);

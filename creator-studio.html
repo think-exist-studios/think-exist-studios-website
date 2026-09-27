@@ -85,6 +85,60 @@
     <div class="statusline" id="saveStatus"></div>
   </form>
 
+  <div class="section" id="progressReport" style="padding-top:35px">
+    <div class="sectionhead"><div><div class="eyebrow">Portfolio progress</div><h2>Creator Progress Report</h2></div><p>A private working report that tracks portfolio setup, publishing activity, goals, and your next steps. The progress score measures completeness and maintenance — not artistic quality.</p></div>
+
+    <div class="progress-report-grid">
+      <article class="progress-score-card">
+        <div class="progress-ring" id="progressRing"><span id="progressScore">0%</span></div>
+        <div><small>PORTFOLIO PROGRESS</small><h3 id="progressLabel">Getting started</h3><p id="progressUpdated">Calculating your current report…</p></div>
+      </article>
+      <div class="progress-metrics">
+        <article><small>Total work</small><strong id="metricTotal">0</strong></article>
+        <article><small>Published</small><strong id="metricPublished">0</strong></article>
+        <article><small>Drafts</small><strong id="metricDrafts">0</strong></article>
+        <article><small>Recent updates</small><strong id="metricRecent">0</strong></article>
+        <article><small>Avg. rating</small><strong id="metricRating">—</strong></article>
+        <article><small>Comments</small><strong id="metricComments">0</strong></article>
+      </div>
+    </div>
+
+    <div class="progress-two-col">
+      <article class="card">
+        <div class="toolbar" style="justify-content:space-between;align-items:center"><div><div class="eyebrow">Keep moving</div><h3>Recommended next steps</h3></div><button class="btn" id="copyProgressReport" type="button">Copy report</button></div>
+        <div class="progress-actions" id="progressActions"><p class="statusline">Building recommendations…</p></div>
+        <div class="statusline" id="copyProgressStatus"></div>
+      </article>
+
+      <article class="card">
+        <div class="eyebrow">Goals</div><h3>What are you working toward?</h3>
+        <form id="goalForm">
+          <div class="field"><label for="goalTitle">Goal</label><input id="goalTitle" maxlength="160" required placeholder="Example: Publish three new character designs"></div>
+          <div class="field"><label for="goalDate">Target date <span class="statusline">(optional)</span></label><input id="goalDate" type="date"></div>
+          <button class="btn primary" type="submit">Add goal</button>
+          <div class="statusline" id="goalStatus"></div>
+        </form>
+        <div id="goalList" class="goal-list"></div>
+      </article>
+    </div>
+
+    <div class="progress-two-col">
+      <article class="card">
+        <div class="eyebrow">Progress check-in</div><h3>Record what moved forward</h3>
+        <form id="checkinForm">
+          <div class="field"><label for="checkinWin">What moved forward?</label><textarea id="checkinWin" maxlength="500" placeholder="A win, completed piece, new idea, revision, client response…"></textarea></div>
+          <div class="field"><label for="checkinNext">What is your next step?</label><textarea id="checkinNext" maxlength="500" placeholder="The next concrete thing you want to finish."></textarea></div>
+          <button class="btn primary" type="submit">Save check-in</button>
+          <div class="statusline" id="checkinStatus"></div>
+        </form>
+      </article>
+      <article class="card">
+        <div class="eyebrow">Progress history</div><h3>Recent check-ins</h3>
+        <div id="checkinHistory"><p class="statusline">No check-ins yet.</p></div>
+      </article>
+    </div>
+  </div>
+
   <div class="section" style="padding-top:35px">
     <div class="sectionhead"><div><div class="eyebrow">Your work</div><h2>Portfolio entries</h2></div><p>Edit the content, replace artwork, publish, unpublish or remove anything on your page.</p></div>
     <div id="items"></div>
@@ -111,7 +165,7 @@
   const accountLabel=document.getElementById('accountLabel'), accountDetail=document.getElementById('accountDetail'), accountDot=document.getElementById('accountDot');
   const accountSignIn=document.getElementById('accountSignIn'), accountSignOut=document.getElementById('accountSignOut');
   const feedbackManager=document.getElementById('feedbackManager'), feedbackItems=document.getElementById('feedbackItems'), feedbackSummary=document.getElementById('feedbackSummary');
-  let session=null, contributor=null, editingItem=null, currentItems=[];
+  let session=null, contributor=null, editingItem=null, currentItems=[], currentGoals=[], currentCheckins=[], currentProgress=null, currentFeedbackStats={rating:null,ratings:0,comments:0};
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const setAuthMessage=(m)=>authStatus.textContent=m;
 
@@ -135,6 +189,7 @@
     if(data.slug==='cash-cassius-miller'){publicLink.classList.remove('hide');publicLink.href='people/cash.html';}
     else{publicLink.classList.add('hide');}
     await loadItems();
+    await loadProgressReport();
     if(data.slug==='cash-cassius-miller'){feedbackManager.classList.remove('hide');await loadFeedbackManager();}
     else{feedbackManager.classList.add('hide');}
   }
@@ -231,6 +286,169 @@
     const message=editingItem?'Changes saved and your page will reflect the current publish setting.':'Added to your portfolio.';
     resetWorkForm(message);
     await loadItems();
+    await loadProgressReport();
+  });
+
+  function calculateProgressReport(){
+    const total=currentItems.length;
+    const published=currentItems.filter(x=>x.published).length;
+    const drafts=total-published;
+    const recentCutoff=Date.now()-(30*24*60*60*1000);
+    const recent=currentItems.filter(x=>new Date(x.updated_at||x.created_at||0).getTime()>=recentCutoff).length;
+    const ratio=fn=>total?currentItems.filter(fn).length/total:0;
+    let score=0;
+    if(total>0)score+=10;
+    score+=Math.min(published/4,1)*25;
+    score+=ratio(x=>Boolean(x.image_url))*15;
+    score+=ratio(x=>Boolean((x.description||'').trim()))*15;
+    score+=ratio(x=>Boolean(x.project_url))*10;
+    score+=ratio(x=>Array.isArray(x.tags)&&x.tags.length>0)*10;
+    if(recent>0)score+=15;
+    score=Math.round(Math.min(100,score));
+
+    const actions=[];
+    if(total===0)actions.push('Add your first portfolio piece so visitors can see what you create.');
+    if(published<4)actions.push('Build toward at least four published pieces. You currently have '+published+'.');
+    const noImage=currentItems.filter(x=>!x.image_url).length;
+    if(noImage)actions.push('Add artwork/images to '+noImage+' portfolio entr'+(noImage===1?'y':'ies')+'.');
+    const noDesc=currentItems.filter(x=>!String(x.description||'').trim()).length;
+    if(noDesc)actions.push('Add a short description to '+noDesc+' entr'+(noDesc===1?'y':'ies')+' so visitors understand the work.');
+    const noLink=currentItems.filter(x=>!x.project_url).length;
+    if(noLink)actions.push('Add a project or destination link where it makes sense for '+noLink+' entr'+(noLink===1?'y':'ies')+'.');
+    const noTags=currentItems.filter(x=>!Array.isArray(x.tags)||!x.tags.length).length;
+    if(noTags)actions.push('Tag '+noTags+' entr'+(noTags===1?'y':'ies')+' to make the portfolio easier to scan.');
+    if(recent===0&&total>0)actions.push('Refresh or publish something this month so the portfolio keeps moving.');
+    if(drafts>0)actions.push('Review your '+drafts+' draft'+(drafts===1?'':'s')+' and decide what is ready to publish.');
+    if(!currentGoals.some(g=>g.status==='active'))actions.push('Set one concrete goal with a target date.');
+    if(!actions.length)actions.push('Your portfolio basics are covered. Focus on new work, stronger case studies, and regular updates.');
+
+    let label='Getting started';
+    if(score>=85)label='Strong momentum';
+    else if(score>=65)label='Building steadily';
+    else if(score>=40)label='Taking shape';
+
+    return {score,label,total,published,drafts,recent,actions};
+  }
+
+  function renderProgressReport(){
+    currentProgress=calculateProgressReport();
+    const p=currentProgress;
+    document.getElementById('progressScore').textContent=p.score+'%';
+    document.getElementById('progressRing').style.setProperty('--progress',p.score+'%');
+    document.getElementById('progressLabel').textContent=p.label;
+    document.getElementById('progressUpdated').textContent='Updated '+new Date().toLocaleString()+' · private creator report';
+    document.getElementById('metricTotal').textContent=p.total;
+    document.getElementById('metricPublished').textContent=p.published;
+    document.getElementById('metricDrafts').textContent=p.drafts;
+    document.getElementById('metricRecent').textContent=p.recent;
+    document.getElementById('metricRating').textContent=currentFeedbackStats.rating===null?'—':currentFeedbackStats.rating.toFixed(1);
+    document.getElementById('metricComments').textContent=currentFeedbackStats.comments;
+    document.getElementById('progressActions').innerHTML=p.actions.map((a,i)=>'<div class="progress-action"><b>'+String(i+1).padStart(2,'0')+'</b><span>'+esc(a)+'</span></div>').join('');
+  }
+
+  async function loadProgressReport(){
+    if(!contributor)return;
+    const [goalsRes,checkinsRes,feedbackRes]=await Promise.all([
+      sb.from('creator_progress_goals').select('*').eq('contributor_slug',contributor.slug).order('created_at',{ascending:false}).limit(50),
+      sb.from('creator_progress_checkins').select('*').eq('contributor_slug',contributor.slug).order('created_at',{ascending:false}).limit(12),
+      sb.from('profile_feedback').select('rating,comment,approved').eq('profile_slug',contributor.slug).eq('approved',true).limit(200)
+    ]);
+    currentGoals=goalsRes.data||[];
+    currentCheckins=checkinsRes.data||[];
+    const fb=feedbackRes.data||[];
+    currentFeedbackStats={
+      rating:fb.length?fb.reduce((s,x)=>s+Number(x.rating||0),0)/fb.length:null,
+      ratings:fb.length,
+      comments:fb.filter(x=>String(x.comment||'').trim()).length
+    };
+    renderGoals();
+    renderCheckins();
+    renderProgressReport();
+  }
+
+  function renderGoals(){
+    const box=document.getElementById('goalList');
+    if(!currentGoals.length){box.innerHTML='<p class="statusline">No goals yet. Add one small, concrete target.</p>';return;}
+    box.innerHTML=currentGoals.map(g=>{
+      const date=g.target_date?new Date(g.target_date+'T12:00:00').toLocaleDateString():'No target date';
+      return '<article class="goal-row" data-id="'+esc(g.id)+'"><div><strong class="'+(g.status==='completed'?'goal-done':'')+'">'+esc(g.title)+'</strong><span>'+esc(date)+' · '+esc(g.status)+'</span></div><div class="toolbar"><button class="btn goal-toggle" type="button" data-state="'+esc(g.status)+'">'+(g.status==='completed'?'Reopen':'Complete')+'</button><button class="btn goal-delete" type="button">Delete</button></div></article>';
+    }).join('');
+    box.querySelectorAll('.goal-toggle').forEach(btn=>btn.addEventListener('click',async()=>{
+      const row=btn.closest('.goal-row'), status=btn.dataset.state==='completed'?'active':'completed';
+      const {error}=await sb.from('creator_progress_goals').update({status,updated_at:new Date().toISOString()}).eq('id',row.dataset.id);
+      if(error){document.getElementById('goalStatus').textContent='Could not update goal: '+error.message;return;}
+      await loadProgressReport();
+    }));
+    box.querySelectorAll('.goal-delete').forEach(btn=>btn.addEventListener('click',async()=>{
+      const row=btn.closest('.goal-row');
+      if(!confirm('Delete this progress goal?'))return;
+      const {error}=await sb.from('creator_progress_goals').delete().eq('id',row.dataset.id);
+      if(error){document.getElementById('goalStatus').textContent='Could not delete goal: '+error.message;return;}
+      await loadProgressReport();
+    }));
+  }
+
+  function renderCheckins(){
+    const box=document.getElementById('checkinHistory');
+    if(!currentCheckins.length){box.innerHTML='<p class="statusline">No check-ins yet. Save one when something moves forward.</p>';return;}
+    box.innerHTML=currentCheckins.map(c=>{
+      const date=new Date(c.created_at).toLocaleString();
+      const win=c.win?'<p><b>Win:</b> '+esc(c.win)+'</p>':'';
+      const next=c.next_step?'<p><b>Next:</b> '+esc(c.next_step)+'</p>':'';
+      return '<article class="checkin-row"><div class="checkin-head"><strong>'+esc(date)+'</strong><span>'+Number(c.progress_score||0)+'%</span></div>'+win+next+'<small>'+Number(c.published_count||0)+' published · '+Number(c.draft_count||0)+' drafts</small></article>';
+    }).join('');
+  }
+
+  document.getElementById('goalForm').addEventListener('submit',async e=>{
+    e.preventDefault(); if(!contributor)return;
+    const title=document.getElementById('goalTitle').value.trim(), target=document.getElementById('goalDate').value||null;
+    const status=document.getElementById('goalStatus'); status.textContent='Saving goal…';
+    const {error}=await sb.from('creator_progress_goals').insert({contributor_slug:contributor.slug,title,target_date:target,status:'active'});
+    if(error){status.textContent='Could not save goal: '+error.message;return;}
+    e.target.reset();status.textContent='Goal added.';await loadProgressReport();
+  });
+
+  document.getElementById('checkinForm').addEventListener('submit',async e=>{
+    e.preventDefault(); if(!contributor)return;
+    const win=document.getElementById('checkinWin').value.trim(), next_step=document.getElementById('checkinNext').value.trim();
+    const status=document.getElementById('checkinStatus');
+    if(!win&&!next_step){status.textContent='Add a win, a next step, or both.';return;}
+    renderProgressReport();
+    status.textContent='Saving check-in…';
+    const {error}=await sb.from('creator_progress_checkins').insert({
+      contributor_slug:contributor.slug,win:win||null,next_step:next_step||null,
+      progress_score:currentProgress.score,published_count:currentProgress.published,draft_count:currentProgress.drafts
+    });
+    if(error){status.textContent='Could not save check-in: '+error.message;return;}
+    e.target.reset();status.textContent='Check-in saved.';await loadProgressReport();
+  });
+
+  document.getElementById('copyProgressReport').addEventListener('click',async()=>{
+    if(!currentProgress)return;
+    const p=currentProgress;
+    const active=currentGoals.filter(g=>g.status==='active');
+    const report=[
+      'THINK EXIST STUDIOS — CREATOR PROGRESS REPORT',
+      'Creator: '+(contributor?.display_name||'Creator'),
+      'Date: '+new Date().toLocaleDateString(),
+      '',
+      'Portfolio progress: '+p.score+'% ('+p.label+')',
+      'Total work: '+p.total,
+      'Published: '+p.published,
+      'Drafts: '+p.drafts,
+      'Updated in last 30 days: '+p.recent,
+      'Average profile rating: '+(currentFeedbackStats.rating===null?'No ratings yet':currentFeedbackStats.rating.toFixed(1)+'/5'),
+      'Public comments: '+currentFeedbackStats.comments,
+      '',
+      'NEXT STEPS',
+      ...p.actions.map((a,i)=>(i+1)+'. '+a),
+      '',
+      'ACTIVE GOALS',
+      ...(active.length?active.map(g=>'- '+g.title+(g.target_date?' · target '+g.target_date:'')):['- No active goals yet'])
+    ].join('\n');
+    const status=document.getElementById('copyProgressStatus');
+    try{await navigator.clipboard.writeText(report);status.textContent='Progress report copied.';}
+    catch{status.textContent='Copy was blocked by the browser.';}
   });
 
   async function loadFeedbackManager(){
@@ -284,6 +502,7 @@
       if(editingItem&&String(editingItem.id)===String(row.dataset.id))resetWorkForm();
       saveStatus.textContent=state?'Unpublished. It is now hidden from your public page.':'Published. It is now visible on your public page.';
       await loadItems();
+      await loadProgressReport();
     }));
     items.querySelectorAll('.delete').forEach(btn=>btn.addEventListener('click',async()=>{
       const row=btn.closest('.itemrow');
@@ -293,6 +512,7 @@
       if(editingItem&&String(editingItem.id)===String(row.dataset.id))resetWorkForm();
       saveStatus.textContent='Portfolio item removed.';
       await loadItems();
+      await loadProgressReport();
     }));
   }
 

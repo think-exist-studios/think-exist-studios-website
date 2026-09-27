@@ -1,3 +1,5 @@
 # Think Exist Studios Website
 
-Source for the Think Exist Studios website, creator profiles, creator portfolio tools, and Think Exist Crypto page.
+Source for the Think Exist Studios website, creator profiles, creator portfolio tools, Think Exist Crypto, Game Lab, and Discover.
+
+Production: https://thinkexiststudios.com

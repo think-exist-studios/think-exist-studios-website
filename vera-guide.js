@@ -36,6 +36,7 @@
    'The feed refreshes from selected YouTube channels without exposing your private account data.'
   ],
   crypto:[
+   'The MOSES Report watches broad crypto conditions, unusual moves, upgrade news and research watchlists without promising future profit.',
    'Quick safety fact: a legitimate website never needs your wallet seed phrase.',
    'New to crypto? The Start Here guide explains buying, custody, transfers and wallet safety step by step.',
    'DEX Screener charts are third-party market data. A chart appearing on the page is not an endorsement.',

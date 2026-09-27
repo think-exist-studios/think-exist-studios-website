@@ -63,3 +63,14 @@
 .watch-channel-play{display:grid;place-items:center;width:70px;height:70px;border-radius:50%;background:white;color:#0b1020;font-size:1.7rem;padding-left:4px;box-shadow:0 14px 40px #0008}
 .watch-channel-copy strong{font-size:1.2rem}
 .watch-channel-copy small{color:#c2d1eb;text-transform:uppercase;letter-spacing:.1em;font-size:.68rem}
+
+.vera-profile{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(280px,.95fr);gap:28px;align-items:center;padding:54px 0 18px}
+.vera-profile-copy h1{font-size:clamp(2.6rem,7vw,5rem);line-height:1.02;letter-spacing:-.055em;margin:10px 0 14px}
+.vera-profile-copy p{color:var(--muted);font-size:1.06rem;max-width:720px}
+.vera-portrait{min-height:430px;display:grid;place-items:center;border:1px solid #aa9cff35;border-radius:28px;background:radial-gradient(circle at 50% 35%,#5b43a544,transparent 48%),linear-gradient(145deg,#10182a,#0b1220);overflow:hidden}
+.vera-portrait img{width:min(330px,78%);max-height:430px;object-fit:contain;object-position:center bottom}
+.vera-cap-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.vera-cap-grid .card{min-height:180px}
+.vera-status{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid #82e6b744;background:#82e6b70d;color:#c8ffe3;font-size:.75rem;font-weight:800}
+.vera-status:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+@media(max-width:820px){.vera-profile{grid-template-columns:1fr}.vera-portrait{min-height:320px}.vera-cap-grid{grid-template-columns:1fr}}

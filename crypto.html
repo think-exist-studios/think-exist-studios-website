@@ -116,28 +116,33 @@ RECORDS
 </section>
 
 <section class="section" id="recovery-backup">
-  <div class="sectionhead"><div><div class="eyebrow">Offline recovery backup</div><h2>Seed phrase worksheet</h2></div><p>For safety, this website does <strong>not</strong> provide a box for entering a real seed phrase or private key.</p></div>
+  <div class="sectionhead"><div><div class="eyebrow">Offline recovery backup</div><h2>Seed phrase worksheet</h2></div><p>This page only gives you a <strong>blank template</strong>. There is no field here to type or paste recovery words, and the site does not collect or store them.</p></div>
   <div class="recovery-safe card danger-card">
-    <h3>Use this only as a blank template</h3>
-    <p>Choose a 12-word or 24-word format, tap <strong>Copy template</strong>, then paste the whole blank form into your own <strong>offline/local Notepad</strong> and type one recovery word after each number. A paper backup is safer than a digital note. <span class="seed-danger-text">*Do not use a cloud-synced note for a real seed phrase, and never paste your seed phrase into this website, chat, email, Discord, Telegram, or an unknown app.*</span></p>
-    <div class="recovery-actions"><button class="btn primary" id="copySeedTemplate" type="button">Copy 12-word Notepad template</button><button class="btn" id="copySeedTemplate24" type="button">Copy 24-word Notepad template</button></div>
-    <pre id="seedTemplatePreview">SEED PHRASE — 12-WORD TEMPLATE
-Type one word after each number.
+    <h3>Copy or print the blank template only</h3>
+    <p>Choose a 12-word or 24-word format. Copy the blank layout to your own device, or print the blank sheet and fill it out away from this website. <span class="seed-danger-text">*Never paste your real seed phrase into this website, chat, email, Discord, Telegram, a cloud-synced note, or an unknown app.*</span></p>
+    <div class="recovery-actions">
+      <button class="btn primary" id="copySeedTemplate" type="button">Copy 12-word template</button>
+      <button class="btn" id="copySeedTemplate24" type="button">Copy 24-word template</button>
+      <button class="btn" id="printSeedTemplate12" type="button">Print 12-word template</button>
+      <button class="btn" id="printSeedTemplate24" type="button">Print 24-word template</button>
+    </div>
+    <pre id="seedTemplatePreview" aria-label="Static blank 12-word seed phrase template">SEED PHRASE — 12-WORD TEMPLATE
+Write one word after each number.
 
-01. 
-02. 
-03. 
-04. 
-05. 
-06. 
-07. 
-08. 
-09. 
-10. 
-11. 
-12. </pre>
+01. ____________________
+02. ____________________
+03. ____________________
+04. ____________________
+05. ____________________
+06. ____________________
+07. ____________________
+08. ____________________
+09. ____________________
+10. ____________________
+11. ____________________
+12. ____________________</pre>
     <p class="seed-warning"><strong>Think Exist Studios will never ask for your recovery phrase or private key.</strong></p>
-    <div class="statusline" id="seedTemplateStatus">Blank template only — no secret information is stored here.</div>
+    <div class="statusline" id="seedTemplateStatus">Blank template only — this page never accepts recovery words.</div>
   </div>
 </section>
 
@@ -258,10 +263,24 @@ Type one word after each number.
   };
   const checklist=document.getElementById('cryptoChecklistText'),checkStatus=document.getElementById('checklistStatus');
   document.getElementById('copyCryptoChecklist').addEventListener('click',()=>copyText(checklist.textContent,checkStatus,'Checklist copied. Keep seed phrases and private keys out of it.'));
-  const makeSeedTemplate=n=>'SEED PHRASE — '+n+'-WORD TEMPLATE\nType one word after each number.\n\n'+Array.from({length:n},(_,i)=>String(i+1).padStart(2,'0')+'. ').join('\n');
+  const makeSeedTemplate=n=>'SEED PHRASE — '+n+'-WORD TEMPLATE\nWrite one word after each number.\n\n'+Array.from({length:n},(_,i)=>String(i+1).padStart(2,'0')+'. ____________________').join('\n');
   const seedPreview=document.getElementById('seedTemplatePreview'),seedStatus=document.getElementById('seedTemplateStatus');
-  document.getElementById('copySeedTemplate').addEventListener('click',()=>{const t=makeSeedTemplate(12);seedPreview.textContent=t;copyText(t,seedStatus,'12-word Notepad template copied. Paste it into a secure offline/local note and type after each number.');});
-  document.getElementById('copySeedTemplate24').addEventListener('click',()=>{const t=makeSeedTemplate(24);seedPreview.textContent=t;copyText(t,seedStatus,'24-word Notepad template copied. Paste it into a secure offline/local note and type after each number.');});
+  const showSeedTemplate=n=>{const t=makeSeedTemplate(n);seedPreview.textContent=t;return t;};
+  document.getElementById('copySeedTemplate').addEventListener('click',()=>{const t=showSeedTemplate(12);copyText(t,seedStatus,'Blank 12-word template copied. Fill it out away from this website.');});
+  document.getElementById('copySeedTemplate24').addEventListener('click',()=>{const t=showSeedTemplate(24);copyText(t,seedStatus,'Blank 24-word template copied. Fill it out away from this website.');});
+  const printSeedTemplate=n=>{
+    const t=showSeedTemplate(n);
+    const win=window.open('','_blank','noopener,noreferrer');
+    if(!win){seedStatus.textContent='Printing was blocked by your browser. Copy the blank template instead.';return;}
+    const escaped=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    win.document.write('<!doctype html><html><head><title>'+n+'-word seed phrase blank template</title><style>body{font-family:Arial,sans-serif;padding:32px;color:#111}h1{font-size:22px}p{font-size:13px}pre{font:18px/1.8 ui-monospace,Consolas,monospace;white-space:pre-wrap;border:1px solid #bbb;padding:20px}strong{color:#a00}</style></head><body><h1>Seed Phrase — '+n+'-Word Blank Template</h1><p><strong>Blank template only.</strong> This printed page contains no recovery words.</p><pre>'+escaped+'</pre></body></html>');
+    win.document.close();
+    win.focus();
+    setTimeout(()=>win.print(),150);
+    seedStatus.textContent='Opened a blank '+n+'-word template for printing.';
+  };
+  document.getElementById('printSeedTemplate12').addEventListener('click',()=>printSeedTemplate(12));
+  document.getElementById('printSeedTemplate24').addEventListener('click',()=>printSeedTemplate(24));
 
 
   const blockchainLessons=[

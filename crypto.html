@@ -287,44 +287,25 @@ RECORDS
       const r=await fetchWithTimeout('/api/dex-pair?chain='+encodeURIComponent(chain)+'&address='+encodeURIComponent(addr),{cache:'no-store'},8000);
       if(!r.ok)throw new Error();
       const d=await r.json(),p=d.pair;
-      if(!p){dexNative.innerHTML='<div class="dex-loading"><strong>No supported pair found.</strong><span>Try a token or pair address from DEX Screener.</span></div>';dexStatus.textContent='No pair returned. The page is still working.';return;}
+      if(!p){
+        dexNative.innerHTML='<div class="dex-loading"><strong>No supported pair found.</strong><span>Try a token or pair address from DEX Screener.</span></div>';
+        dexStatus.textContent='No pair returned. The page is still working.';
+        return;
+      }
       const ch=Number(p.priceChange?.h24);
       const chClass=Number.isFinite(ch)?(ch>=0?'up':'down'):'';
+      const price=p.priceUsd?'$'+fmt(p.priceUsd,8):'—';
+      const volume='$'+fmt(p.volume?.h24,0);
+      const liquidity='$'+fmt(p.liquidity?.usd,0);
+      const marketCap='$'+fmt(p.marketCap||p.fdv,0);
+      const txns=fmt((Number(p.txns?.h24?.buys)||0)+(Number(p.txns?.h24?.sells)||0),0);
       dexNative.innerHTML='<div class="dex-native-head"><div><small>'+esc((p.chainId||chain).toUpperCase())+' · '+esc(p.dexId||'DEX')+'</small><h3>'+esc(p.baseToken?.symbol||'Token')+' / '+esc(p.quoteToken?.symbol||'Pair')+'</h3><p>'+esc(p.baseToken?.name||'')+'</p></div><a class="btn" href="'+esc(p.url||'https://dexscreener.com/')+'" target="_blank" rel="noopener">Open chart ↗</a></div>'+
-      '<div class="dex-native-grid"><article><small>PRICE USD</small><strong>'+(p.priceUsd?'
-  setInterval(loadMarket,120000);
-  setInterval(loadTrending,300000);
-  setInterval(loadWalletNews,600000);
-})();
-</script>
-<script src="vera-guide.js" defer></script>
-</body></html>+fmt(p.priceUsd,8):'—')+'</strong></article>'+
+      '<div class="dex-native-grid"><article><small>PRICE USD</small><strong>'+price+'</strong></article>'+
       '<article><small>24H CHANGE</small><strong class="'+chClass+'">'+(Number.isFinite(ch)?(ch>=0?'+':'')+fmt(ch,2)+'%':'—')+'</strong></article>'+
-      '<article><small>24H VOLUME</small><strong>
-  setInterval(loadMarket,120000);
-  setInterval(loadTrending,300000);
-  setInterval(loadWalletNews,600000);
-})();
-</script>
-<script src="vera-guide.js" defer></script>
-</body></html>+fmt(p.volume?.h24,0)+'</strong></article>'+
-      '<article><small>LIQUIDITY</small><strong>
-  setInterval(loadMarket,120000);
-  setInterval(loadTrending,300000);
-  setInterval(loadWalletNews,600000);
-})();
-</script>
-<script src="vera-guide.js" defer></script>
-</body></html>+fmt(p.liquidity?.usd,0)+'</strong></article>'+
-      '<article><small>MARKET CAP</small><strong>
-  setInterval(loadMarket,120000);
-  setInterval(loadTrending,300000);
-  setInterval(loadWalletNews,600000);
-})();
-</script>
-<script src="vera-guide.js" defer></script>
-</body></html>+fmt(p.marketCap||p.fdv,0)+'</strong></article>'+
-      '<article><small>24H TXNS</small><strong>'+fmt((Number(p.txns?.h24?.buys)||0)+(Number(p.txns?.h24?.sells)||0),0)+'</strong></article></div>';
+      '<article><small>24H VOLUME</small><strong>'+volume+'</strong></article>'+
+      '<article><small>LIQUIDITY</small><strong>'+liquidity+'</strong></article>'+
+      '<article><small>MARKET CAP</small><strong>'+marketCap+'</strong></article>'+
+      '<article><small>24H TXNS</small><strong>'+txns+'</strong></article></div>';
       dexStatus.textContent='Updated '+new Date().toLocaleTimeString()+' · DEX Screener data via Think Exist';
     }catch(e){
       dexNative.innerHTML='<div class="dex-loading"><strong>DEX feed timed out.</strong><span>Nothing is stuck — use the full DEX Screener link below or try again.</span></div>';

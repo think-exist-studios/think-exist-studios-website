@@ -47,8 +47,8 @@
 
 <section class="editor hide" id="editor">
   <div class="toolbar" style="justify-content:space-between;align-items:center">
-    <div><div class="eyebrow">Portfolio manager</div><h2 style="margin:.2rem 0">Add new work</h2></div>
-    <button class="btn" id="signOut" type="button">Sign out</button>
+    <div><div class="eyebrow">Portfolio manager</div><h2 id="formHeading" style="margin:.2rem 0">Add new work</h2></div>
+    <div class="toolbar"><a class="btn hide" id="publicPageLink" href="people/cash.html" target="_blank" rel="noopener">View public page ↗</a><button class="btn" id="signOut" type="button">Sign out</button></div>
   </div>
   <p class="statusline" id="who"></p>
 
@@ -66,12 +66,16 @@
       <div class="field"><label for="sortOrder">Display order</label><input id="sortOrder" type="number" value="0"></div>
       <div class="field"><label><input id="published" type="checkbox" checked> Publish immediately</label></div>
     </div>
-    <button class="btn primary" type="submit">Add to portfolio</button>
+    <div class="creator-savebar">
+      <button class="btn primary" id="saveWorkButton" type="submit">Add to portfolio</button>
+      <button class="btn hide" id="cancelEdit" type="button">Cancel edit</button>
+    </div>
+    <div class="statusline" id="imageNote"></div>
     <div class="statusline" id="saveStatus"></div>
   </form>
 
   <div class="section" style="padding-top:35px">
-    <div class="sectionhead"><div><div class="eyebrow">Your work</div><h2>Portfolio entries</h2></div><p>Publish, unpublish or remove items here.</p></div>
+    <div class="sectionhead"><div><div class="eyebrow">Your work</div><h2>Portfolio entries</h2></div><p>Edit the content, replace artwork, publish, unpublish or remove anything on your page.</p></div>
     <div id="items"></div>
   </div>
 </section>
@@ -87,7 +91,7 @@
   );
   const authBox=document.getElementById('authBox'), editor=document.getElementById('editor');
   const authStatus=document.getElementById('authStatus'), saveStatus=document.getElementById('saveStatus'), items=document.getElementById('items');
-  let session=null, contributor=null;
+  let session=null, contributor=null, editingItem=null, currentItems=[];
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const setAuthMessage=(m)=>authStatus.textContent=m;
 
@@ -97,7 +101,10 @@
     const {data,error}=await sb.from('studio_contributors').select('slug,email,display_name,role_title').single();
     if(error||!data){await sb.auth.signOut();setAuthMessage('This account is not approved for Creator Studio.');return;}
     contributor=data; authBox.classList.add('hide'); editor.classList.remove('hide');
-    document.getElementById('who').textContent='Signed in as '+data.display_name+' · '+data.email;
+    document.getElementById('who').textContent='Signed in as '+data.display_name+' · '+data.email+' · You control what is published on your page.';
+    const publicLink=document.getElementById('publicPageLink');
+    if(data.slug==='cash-cassius-miller'){publicLink.classList.remove('hide');publicLink.href='people/cash.html';}
+    else{publicLink.classList.add('hide');}
     await loadItems();
   }
 
@@ -123,12 +130,43 @@
     if(error){setAuthMessage(error.message);return;} await refresh();
   });
 
-  document.getElementById('signOut').addEventListener('click',async()=>{await sb.auth.signOut();contributor=null;session=null;await refresh();});
+  function resetWorkForm(message=''){
+    editingItem=null;
+    const form=document.getElementById('workForm');
+    form.reset();
+    document.getElementById('published').checked=true;
+    document.getElementById('sortOrder').value='0';
+    document.getElementById('formHeading').textContent='Add new work';
+    document.getElementById('saveWorkButton').textContent='Add to portfolio';
+    document.getElementById('cancelEdit').classList.add('hide');
+    document.getElementById('imageNote').textContent='';
+    if(message)saveStatus.textContent=message;
+  }
+
+  function beginEdit(item){
+    editingItem=item;
+    document.getElementById('title').value=item.title||'';
+    document.getElementById('projectUrl').value=item.project_url||'';
+    document.getElementById('description').value=item.description||'';
+    document.getElementById('tags').value=(item.tags||[]).join(', ');
+    document.getElementById('sortOrder').value=Number(item.sort_order)||0;
+    document.getElementById('published').checked=Boolean(item.published);
+    document.getElementById('artFile').value='';
+    document.getElementById('formHeading').textContent='Edit work';
+    document.getElementById('saveWorkButton').textContent='Save changes';
+    document.getElementById('cancelEdit').classList.remove('hide');
+    document.getElementById('imageNote').textContent=item.image_url?'Current artwork stays unless you choose a replacement image.':'No artwork is attached yet.';
+    saveStatus.textContent='Editing “'+item.title+'”.';
+    document.getElementById('workForm').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  document.getElementById('cancelEdit').addEventListener('click',()=>resetWorkForm('Edit cancelled.'));
+  document.getElementById('signOut').addEventListener('click',async()=>{resetWorkForm();await sb.auth.signOut();contributor=null;session=null;await refresh();});
 
   document.getElementById('workForm').addEventListener('submit',async e=>{
     e.preventDefault(); if(!session||!contributor)return;
     saveStatus.textContent='Saving…';
-    let imageUrl=null;
+    let imageUrl=editingItem?.image_url||null;
     const file=document.getElementById('artFile').files[0];
     if(file){
       const clean=file.name.replace(/[^a-zA-Z0-9._-]/g,'-');
@@ -147,25 +185,46 @@
       sort_order:Number(document.getElementById('sortOrder').value)||0,
       published:document.getElementById('published').checked
     };
-    const {error}=await sb.from('portfolio_items').insert(payload);
-    if(error){saveStatus.textContent='Could not save: '+error.message;return;}
-    e.target.reset(); document.getElementById('published').checked=true; document.getElementById('sortOrder').value='0';
-    saveStatus.textContent='Added to your portfolio.'; await loadItems();
+    let result;
+    if(editingItem){
+      const updatePayload={...payload,updated_at:new Date().toISOString()};
+      delete updatePayload.contributor_slug;
+      result=await sb.from('portfolio_items').update(updatePayload).eq('id',editingItem.id);
+    }else{
+      result=await sb.from('portfolio_items').insert(payload);
+    }
+    if(result.error){saveStatus.textContent='Could not save: '+result.error.message;return;}
+    const message=editingItem?'Changes saved and your page will reflect the current publish setting.':'Added to your portfolio.';
+    resetWorkForm(message);
+    await loadItems();
   });
 
   async function loadItems(){
     const {data,error}=await sb.from('portfolio_items').select('*').eq('contributor_slug',contributor.slug).order('sort_order',{ascending:true}).order('created_at',{ascending:false});
     if(error){items.textContent='Could not load portfolio items.';return;}
-    if(!data?.length){items.innerHTML='<p class="statusline">No portfolio items yet.</p>';return;}
-    items.innerHTML=data.map(i=>'<div class="itemrow" data-id="'+esc(i.id)+'"><div class="toolbar" style="justify-content:space-between"><div><strong>'+esc(i.title)+'</strong><div class="statusline">'+(i.published?'Published':'Draft')+'</div></div><div class="toolbar"><button class="btn toggle" type="button" data-state="'+i.published+'">'+(i.published?'Unpublish':'Publish')+'</button><button class="btn delete" type="button">Delete</button></div></div></div>').join('');
+    currentItems=data||[];
+    if(!currentItems.length){items.innerHTML='<p class="statusline">No portfolio items yet.</p>';return;}
+    items.innerHTML=currentItems.map(i=>'<div class="itemrow" data-id="'+esc(i.id)+'"><div class="toolbar" style="justify-content:space-between"><div><strong>'+esc(i.title)+'</strong><div class="statusline">'+(i.published?'Published on your page':'Draft · hidden from your page')+'</div></div><div class="toolbar"><button class="btn edit" type="button">Edit</button><button class="btn toggle" type="button" data-state="'+i.published+'">'+(i.published?'Unpublish':'Publish')+'</button><button class="btn delete" type="button">Delete</button></div></div></div>').join('');
+    items.querySelectorAll('.edit').forEach(btn=>btn.addEventListener('click',()=>{
+      const row=btn.closest('.itemrow'), item=currentItems.find(x=>String(x.id)===String(row.dataset.id));
+      if(item)beginEdit(item);
+    }));
     items.querySelectorAll('.toggle').forEach(btn=>btn.addEventListener('click',async()=>{
       const row=btn.closest('.itemrow'), state=btn.dataset.state==='true';
-      await sb.from('portfolio_items').update({published:!state,updated_at:new Date().toISOString()}).eq('id',row.dataset.id); await loadItems();
+      const {error}=await sb.from('portfolio_items').update({published:!state,updated_at:new Date().toISOString()}).eq('id',row.dataset.id);
+      if(error){saveStatus.textContent='Could not change publish status: '+error.message;return;}
+      if(editingItem&&String(editingItem.id)===String(row.dataset.id))resetWorkForm();
+      saveStatus.textContent=state?'Unpublished. It is now hidden from your public page.':'Published. It is now visible on your public page.';
+      await loadItems();
     }));
     items.querySelectorAll('.delete').forEach(btn=>btn.addEventListener('click',async()=>{
       const row=btn.closest('.itemrow');
       if(!confirm('Remove this portfolio item?'))return;
-      await sb.from('portfolio_items').delete().eq('id',row.dataset.id); await loadItems();
+      const {error}=await sb.from('portfolio_items').delete().eq('id',row.dataset.id);
+      if(error){saveStatus.textContent='Could not delete: '+error.message;return;}
+      if(editingItem&&String(editingItem.id)===String(row.dataset.id))resetWorkForm();
+      saveStatus.textContent='Portfolio item removed.';
+      await loadItems();
     }));
   }
 

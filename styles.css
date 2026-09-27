@@ -158,3 +158,9 @@
 .dex-native-grid small{display:block;color:var(--muted);font-size:.66rem;letter-spacing:.08em;font-weight:800}
 .dex-native-grid strong{display:block;margin-top:6px;font-size:1.1rem}
 @media(max-width:700px){.dex-native-head{display:block}.dex-native-head .btn{margin-top:12px}.dex-native-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.creator-savebar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:15px}
+.itemrow .toolbar{align-items:center}
+.itemrow .edit{border-color:#8bdcff44}
+#workForm{scroll-margin-top:105px}
+@media(max-width:560px){.creator-savebar .btn,.itemrow>.toolbar>.toolbar .btn{width:100%}.itemrow>.toolbar{align-items:stretch}.itemrow>.toolbar>.toolbar{width:100%;display:grid;grid-template-columns:1fr}}

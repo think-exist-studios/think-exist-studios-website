@@ -63,6 +63,48 @@
   </div>
   <p class="statusline" id="who"></p>
 
+  <div class="section creator-profile-tools" style="padding-top:20px">
+    <div class="sectionhead"><div><div class="eyebrow">Profile designer</div><h2>Make your page yours.</h2></div><p>Change your public profile picture, background, creator bio, brand identity, and watermark without editing website code.</p></div>
+    <div class="creator-profile-layout">
+      <form class="card" id="creatorProfileForm">
+        <div class="grid2">
+          <div class="field"><label for="creatorHeadline">Headline</label><input id="creatorHeadline" maxlength="140" placeholder="Comic artist · writer · worldbuilder"></div>
+          <div class="field"><label for="creatorBrandName">Brand / studio name</label><input id="creatorBrandName" maxlength="100" placeholder="Your brand name"></div>
+        </div>
+        <div class="field"><label for="creatorBio">Public bio</label><textarea id="creatorBio" maxlength="1200" placeholder="Tell visitors what you create and what your work is about."></textarea></div>
+        <div class="grid2">
+          <div class="field"><label for="creatorProfileImage">Profile picture</label><input id="creatorProfileImage" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></div>
+          <div class="field"><label for="creatorBackgroundImage">Page background</label><input id="creatorBackgroundImage" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label for="creatorWatermarkImage">Watermark image / logo</label><input id="creatorWatermarkImage" type="file" accept="image/png,image/webp,image/gif,image/jpeg"></div>
+          <div class="field"><label for="creatorWatermarkText">Watermark text</label><input id="creatorWatermarkText" maxlength="80" placeholder="© Your Brand"></div>
+        </div>
+        <div class="field"><label for="creatorWatermarkOpacity">Watermark opacity <span id="creatorWatermarkOpacityValue">28%</span></label><input id="creatorWatermarkOpacity" type="range" min="5" max="80" value="28"></div>
+        <div class="creator-watermark-preview" id="creatorWatermarkPreview"><span>YOUR WATERMARK</span></div>
+        <div class="creator-savebar"><button class="btn primary" type="submit">Save profile design</button><a class="btn hide" id="creatorPublicPreview" href="people/cash.html" target="_blank" rel="noopener">Preview public page ↗</a></div>
+        <div class="statusline" id="creatorProfileStatus">Profile changes are private until you save them.</div>
+      </form>
+
+      <div class="creator-profile-side">
+        <article class="card">
+          <div class="eyebrow">Personal account reference</div><h3 id="creatorAccountRef">—</h3>
+          <p>Keep this reference for your own account records or if you need support with Creator Studio.</p>
+          <div class="account-reference-full" id="creatorAccountRefFull">—</div>
+          <div class="member-ref-meta"><span>Creator slug</span><strong id="creatorAccountSlug">—</strong></div>
+          <div class="member-ref-meta"><span>Role</span><strong id="creatorAccountRole">—</strong></div>
+          <button class="btn" id="copyCreatorAccountRef" type="button">Copy account reference</button>
+          <div class="statusline" id="creatorAccountRefStatus"></div>
+        </article>
+        <article class="card">
+          <div class="eyebrow">Messages & updates</div><h3>Creator inbox</h3>
+          <p>Studio feature updates and account notices appear here.</p>
+          <div class="member-notification-list" id="creatorNotificationList"><p class="statusline">Loading updates…</p></div>
+        </article>
+      </div>
+    </div>
+  </div>
+
   <form id="workForm">
     <div class="split">
       <div class="field"><label for="title">Title</label><input id="title" required maxlength="120"></div>
@@ -238,7 +280,7 @@
   const accountLabel=document.getElementById('accountLabel'), accountDetail=document.getElementById('accountDetail'), accountDot=document.getElementById('accountDot');
   const accountSignIn=document.getElementById('accountSignIn'), accountSignOut=document.getElementById('accountSignOut');
   const feedbackManager=document.getElementById('feedbackManager'), feedbackItems=document.getElementById('feedbackItems'), feedbackSummary=document.getElementById('feedbackSummary');
-  let session=null, contributor=null, editingItem=null, currentItems=[], currentGoals=[], currentCheckins=[], currentProgress=null, currentFeedbackStats={rating:null,ratings:0,comments:0};
+  let session=null, contributor=null, editingItem=null, creatorProfileSettings=null, currentItems=[], currentGoals=[], currentCheckins=[], currentProgress=null, currentFeedbackStats={rating:null,ratings:0,comments:0};
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const setAuthMessage=(m)=>authStatus.textContent=m;
 
@@ -251,6 +293,74 @@
     accountSignOut.classList.toggle('hide',!signedIn);
   }
 
+  const shortAccountRef=id=>id?('TE-'+id.split('-')[0].toUpperCase()):'—';
+
+  async function uploadCreatorProfileAsset(file,prefix){
+    if(!file||!session?.user)return null;
+    const clean=file.name.replace(/[^a-zA-Z0-9._-]/g,'-');
+    const path=session.user.id+'/profile/'+prefix+'-'+Date.now()+'-'+clean;
+    const up=await sb.storage.from('creator-portfolio').upload(path,file,{upsert:false});
+    if(up.error)throw up.error;
+    return sb.storage.from('creator-portfolio').getPublicUrl(path).data.publicUrl;
+  }
+
+  function paintCreatorProfileForm(){
+    const p=creatorProfileSettings||{};
+    document.getElementById('creatorHeadline').value=p.headline||'';
+    document.getElementById('creatorBio').value=p.bio||'';
+    document.getElementById('creatorBrandName').value=p.brand_name||'';
+    document.getElementById('creatorWatermarkText').value=p.watermark_text||'';
+    document.getElementById('creatorWatermarkOpacity').value=Number(p.watermark_opacity)||28;
+    document.getElementById('creatorWatermarkOpacityValue').textContent=(Number(p.watermark_opacity)||28)+'%';
+    paintWatermarkPreview();
+    const preview=document.getElementById('creatorPublicPreview');
+    if(contributor?.slug==='cash-cassius-miller'){preview.classList.remove('hide');preview.href='people/cash.html';}
+    else preview.classList.add('hide');
+  }
+
+  function paintWatermarkPreview(){
+    const box=document.getElementById('creatorWatermarkPreview');
+    if(!box)return;
+    const text=document.getElementById('creatorWatermarkText').value.trim()||creatorProfileSettings?.brand_name||contributor?.display_name||'YOUR WATERMARK';
+    const opacity=(Number(document.getElementById('creatorWatermarkOpacity').value)||28)/100;
+    box.innerHTML='';
+    if(creatorProfileSettings?.watermark_image_url){
+      const img=document.createElement('img');img.src=creatorProfileSettings.watermark_image_url;img.alt='Watermark preview';img.style.opacity=String(opacity);box.appendChild(img);
+    }
+    const span=document.createElement('span');span.textContent=text;span.style.opacity=String(opacity);box.appendChild(span);
+  }
+
+  async function loadCreatorProfileSettings(){
+    if(!contributor)return;
+    const {data,error}=await sb.from('creator_profile_settings').select('*').eq('contributor_slug',contributor.slug).maybeSingle();
+    if(error){document.getElementById('creatorProfileStatus').textContent='Could not load profile settings: '+error.message;return;}
+    creatorProfileSettings=data||{contributor_slug:contributor.slug,watermark_opacity:28};
+    paintCreatorProfileForm();
+  }
+
+  async function loadCreatorNotifications(){
+    const box=document.getElementById('creatorNotificationList');
+    if(!box||!session?.user)return;
+    const {data,error}=await sb.from('member_notifications').select('id,title,message,kind,link_url,read_at,created_at').order('created_at',{ascending:false}).limit(20);
+    if(error){box.innerHTML='<p class="statusline">Updates are temporarily unavailable.</p>';return;}
+    const rows=data||[];
+    if(!rows.length){box.innerHTML='<p class="statusline">No updates yet.</p>';return;}
+    box.innerHTML=rows.map(n=>'<article class="member-notice'+(n.read_at?'':' unread')+'" data-id="'+esc(n.id)+'"><div><small>'+esc(String(n.kind||'update').toUpperCase())+'</small><strong>'+esc(n.title)+'</strong><p>'+esc(n.message)+'</p><span>'+new Date(n.created_at).toLocaleString()+'</span></div><div class="member-notice-actions">'+(n.link_url?'<a class="feature-link" href="'+esc(n.link_url)+'">Open update →</a>':'')+(n.read_at?'':'<button class="btn creator-mark-read" type="button">Mark read</button>')+'</div></article>').join('');
+    box.querySelectorAll('.creator-mark-read').forEach(btn=>btn.addEventListener('click',async()=>{
+      const row=btn.closest('.member-notice');
+      await sb.rpc('mark_member_notification_read',{notification_id:row.dataset.id});
+      await loadCreatorNotifications();
+    }));
+  }
+
+  function paintCreatorAccountReference(){
+    if(!session?.user||!contributor)return;
+    document.getElementById('creatorAccountRef').textContent=shortAccountRef(session.user.id);
+    document.getElementById('creatorAccountRefFull').textContent=session.user.id;
+    document.getElementById('creatorAccountSlug').textContent=contributor.slug;
+    document.getElementById('creatorAccountRole').textContent=contributor.role_title||'Creator';
+  }
+
   async function refresh(){
     const {data:{session:s}}=await sb.auth.getSession(); session=s;
     if(!session){contributor=null;authBox.classList.remove('hide');editor.classList.add('hide');feedbackManager.classList.add('hide');paintAccountState();return;}
@@ -258,6 +368,8 @@
     if(error||!data){await sb.auth.signOut();setAuthMessage('This account is not approved for Creator Studio.');return;}
     contributor=data; authBox.classList.add('hide'); editor.classList.remove('hide'); paintAccountState();
     document.getElementById('who').textContent='Signed in as '+data.display_name+' · '+data.email+' · You control what is published on your page.';
+    paintCreatorAccountReference();
+    await Promise.all([loadCreatorProfileSettings(),loadCreatorNotifications()]);
     const publicLink=document.getElementById('publicPageLink');
     if(data.slug==='cash-cassius-miller'){publicLink.classList.remove('hide');publicLink.href='people/cash.html';}
     else{publicLink.classList.add('hide');}
@@ -324,6 +436,47 @@
   const signOutAll=async()=>{resetWorkForm();await sb.auth.signOut();contributor=null;session=null;await refresh();};
   document.getElementById('signOut').addEventListener('click',signOutAll);
   accountSignOut.addEventListener('click',signOutAll);
+
+  document.getElementById('creatorWatermarkOpacity').addEventListener('input',e=>{document.getElementById('creatorWatermarkOpacityValue').textContent=e.target.value+'%';paintWatermarkPreview();});
+  document.getElementById('creatorWatermarkText').addEventListener('input',paintWatermarkPreview);
+  document.getElementById('copyCreatorAccountRef').addEventListener('click',async()=>{
+    if(!session?.user)return;
+    try{await navigator.clipboard.writeText(session.user.id);document.getElementById('creatorAccountRefStatus').textContent='Account reference copied.';}
+    catch(e){document.getElementById('creatorAccountRefStatus').textContent='Could not copy automatically.';}
+  });
+  document.getElementById('creatorProfileForm').addEventListener('submit',async e=>{
+    e.preventDefault(); if(!session||!contributor)return;
+    const status=document.getElementById('creatorProfileStatus');status.textContent='Saving profile design…';
+    try{
+      const profileFile=document.getElementById('creatorProfileImage').files[0];
+      const backgroundFile=document.getElementById('creatorBackgroundImage').files[0];
+      const watermarkFile=document.getElementById('creatorWatermarkImage').files[0];
+      const [profileUrl,backgroundUrl,watermarkUrl]=await Promise.all([
+        profileFile?uploadCreatorProfileAsset(profileFile,'avatar'):Promise.resolve(null),
+        backgroundFile?uploadCreatorProfileAsset(backgroundFile,'background'):Promise.resolve(null),
+        watermarkFile?uploadCreatorProfileAsset(watermarkFile,'watermark'):Promise.resolve(null)
+      ]);
+      const payload={
+        contributor_slug:contributor.slug,
+        headline:document.getElementById('creatorHeadline').value.trim()||null,
+        bio:document.getElementById('creatorBio').value.trim()||null,
+        brand_name:document.getElementById('creatorBrandName').value.trim()||null,
+        profile_image_url:profileUrl||creatorProfileSettings?.profile_image_url||null,
+        background_image_url:backgroundUrl||creatorProfileSettings?.background_image_url||null,
+        watermark_image_url:watermarkUrl||creatorProfileSettings?.watermark_image_url||null,
+        watermark_text:document.getElementById('creatorWatermarkText').value.trim()||null,
+        watermark_opacity:Number(document.getElementById('creatorWatermarkOpacity').value)||28,
+        is_public:true,
+        updated_at:new Date().toISOString()
+      };
+      const {data,error}=await sb.from('creator_profile_settings').upsert(payload,{onConflict:'contributor_slug'}).select().single();
+      if(error)throw error;
+      creatorProfileSettings=data;
+      e.target.querySelectorAll('input[type=file]').forEach(x=>x.value='');
+      paintCreatorProfileForm();
+      status.textContent='Profile design saved. Your public page will use the new settings.';
+    }catch(err){status.textContent='Could not save profile design: '+(err.message||err);}
+  });
 
   document.getElementById('workForm').addEventListener('submit',async e=>{
     e.preventDefault(); if(!session||!contributor)return;

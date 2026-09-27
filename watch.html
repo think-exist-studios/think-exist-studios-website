@@ -130,7 +130,7 @@
    wirePlayers();
  }
  function paintFallback(){
-   feed.innerHTML=fallbackChannels.map((v,i)=>'<article class="watch-card"><div class="watch-player watch-channel" data-playlist="'+esc(v.playlist)+'"><button class="watch-play" type="button" aria-label="Open '+esc(v.name)+' video feed"><div class="watch-channel-copy"><span class="watch-channel-play">▶</span><strong>'+esc(v.name)+'</strong><small>Recent YouTube uploads</small></div></button></div><div class="watch-meta"><small>CHANNEL FEED · '+String(i+1).padStart(2,'0')+'</small><h3>'+esc(v.name)+'</h3><p>Tap to open the channel's latest uploads here.</p></div></article>').join('');
+   feed.innerHTML=fallbackChannels.map((v,i)=>'<article class="watch-card"><div class="watch-player watch-channel" data-playlist="'+esc(v.playlist)+'"><button class="watch-play" type="button" aria-label="Open '+esc(v.name)+' video feed"><div class="watch-channel-copy"><span class="watch-channel-play">▶</span><strong>'+esc(v.name)+'</strong><small>Recent YouTube uploads</small></div></button></div><div class="watch-meta"><small>CHANNEL FEED · '+String(i+1).padStart(2,'0')+'</small><h3>'+esc(v.name)+'</h3><p>Tap to open the channel&#39;s latest uploads here.</p></div></article>').join('');
    wirePlayers();
  }
  async function load(){

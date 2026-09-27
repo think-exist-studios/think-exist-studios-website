@@ -121,3 +121,17 @@
 .quiz-answers{display:grid;gap:10px;margin-top:16px}
 .quiz-answer{justify-content:flex-start;text-align:left;width:100%}
 @media(max-width:760px){.blockchain-daily{grid-template-columns:1fr}.page-back{padding-top:12px}}
+
+.art-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.art-card,.nft-card{display:block;text-decoration:none;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#0d1625;transition:.24s ease}
+.art-card:hover,.nft-card:hover{transform:translateY(-4px);border-color:#b0a0ff66;box-shadow:0 22px 55px #0005}
+.art-card img{width:100%;aspect-ratio:4/5;object-fit:cover;background:#090e18}
+.art-card div,.nft-card div{padding:13px}
+.art-card small,.nft-card small{display:block;color:var(--violet);font-size:.64rem;letter-spacing:.09em;font-weight:900}
+.art-card h3,.nft-card h3{font-size:.96rem;line-height:1.28;margin:6px 0}
+.art-card p,.nft-card p{font-size:.76rem;color:var(--muted);margin:0}
+.nft-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.nft-card{display:grid;grid-template-columns:78px 1fr;align-items:center}
+.nft-card img{width:78px;height:78px;object-fit:cover;margin-left:13px;border-radius:13px;background:#080d18}
+@media(max-width:920px){.art-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nft-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.art-grid,.nft-grid{grid-template-columns:1fr}.art-card{display:grid;grid-template-columns:108px 1fr}.art-card img{width:108px;height:138px;aspect-ratio:auto}.art-card div{align-self:center}.nft-card{grid-template-columns:70px 1fr}.nft-card img{width:70px;height:70px}}

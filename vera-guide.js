@@ -21,6 +21,12 @@
    'Try the video shuffle button. I approve of controlled chaos.',
    'The Discover page also carries the official @ThinkExistHQ Live X feed.'
   ],
+  art:[
+   'The Art Radar mixes public-domain museum artwork, artist headlines, and current NFT trends.',
+   'Artwork images on this page are limited to public-domain collection items from the Art Institute of Chicago feed.',
+   'Trending NFT data is discovery information, not a recommendation to buy.',
+   'Use the refresh button whenever you want a new snapshot of the art and NFT feeds.'
+  ],
   watch:[
    'Think Exist Watch now supports playable video from YouTube, TikTok, Twitch, Vimeo, Dailymotion and PeerTube.',
    'Use the source tabs on Watch to switch platforms without leaving the Think Exist site.',

@@ -66,6 +66,8 @@
 
 <script>
 (()=>{
+ function fetchWithTimeout(url,opts={},ms=7500){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),ms);return fetch(url,{...opts,signal:controller.signal}).finally(()=>clearTimeout(timer));}
+ const media=u=>'/api/media?url='+encodeURIComponent(u);
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch{return 'source'}};
  async function load(){
@@ -73,12 +75,13 @@
         artists=document.getElementById('artistNews'),artistStatus=document.getElementById('artistStatus'),
         nft=document.getElementById('nftGrid'),nftStatus=document.getElementById('nftStatus'),
         nftNews=document.getElementById('nftNews');
-  artStatus.textContent='Refreshing art feed…'; artistStatus.textContent='Refreshing artist news…'; nftStatus.textContent='Refreshing NFT radar…';
+  art.innerHTML='<article class="card"><h3>Artwork feed</h3><p>Loading fresh artwork…</p></article>';
+ artistStatus.textContent='Refreshing artist news…'; nftStatus.textContent='Refreshing NFT radar…'; artStatus.textContent='Refreshing art feed…';
   try{
-   const r=await fetch('/api/art-feed',{cache:'no-store'}); if(!r.ok)throw new Error();
+   const r=await fetchWithTimeout('/api/art-feed',{cache:'no-store'},8000); if(!r.ok)throw new Error();
    const d=await r.json();
    const works=d.artworks||[];
-   art.innerHTML=works.length?works.map(w=>'<a class="art-card" href="'+esc(w.url)+'" target="_blank" rel="noopener"><img loading="lazy" src="'+esc(w.image)+'" alt="'+esc(w.title)+'"><div><small>PUBLIC DOMAIN · ART INSTITUTE OF CHICAGO</small><h3>'+esc(w.title||'Untitled')+'</h3><p>'+esc(w.artist||'Artist unknown')+(w.date?' · '+esc(w.date):'')+'</p></div></a>').join(''):'<article class="card"><p>Artwork feed is temporarily unavailable.</p></article>';
+   art.innerHTML=works.length?works.map(w=>'<a class="art-card" href="'+esc(w.url)+'" target="_blank" rel="noopener"><img loading="lazy" referrerpolicy="no-referrer" src="'+media(w.image)+'" alt="'+esc(w.title)+'" onerror="this.style.display=\'none\'"><div><small>PUBLIC DOMAIN · ART INSTITUTE OF CHICAGO</small><h3>'+esc(w.title||'Untitled')+'</h3><p>'+esc(w.artist||'Artist unknown')+(w.date?' · '+esc(w.date):'')+'</p></div></a>').join(''):'<article class="card"><p>Artwork feed is temporarily unavailable.</p></article>';
    artStatus.textContent='Updated '+new Date().toLocaleTimeString()+' · '+works.length+' artworks';
 
    const news=d.artistNews||[];
@@ -86,7 +89,7 @@
    artistStatus.textContent='Updated '+new Date().toLocaleTimeString()+' · public artist headlines';
 
    const nfts=d.nfts||[];
-   nft.innerHTML=nfts.length?nfts.map((x,i)=>'<a class="nft-card" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+(x.thumb?'<img loading="lazy" src="'+esc(x.thumb)+'" alt="">':'')+'<div><small>TRENDING #'+(i+1)+'</small><h3>'+esc(x.name||'NFT collection')+'</h3><p>'+(x.symbol?esc(x.symbol)+' · ':'')+(x.floor?esc(x.floor):'Floor unavailable')+(x.change!==null&&x.change!==undefined?' · '+(Number(x.change)>=0?'+':'')+Number(x.change).toFixed(2)+'% 24h':'')+'</p></div></a>').join(''):'<article class="card"><p>NFT trends are temporarily unavailable.</p></article>';
+   nft.innerHTML=nfts.length?nfts.map((x,i)=>'<a class="nft-card" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+(x.thumb?'<img loading="lazy" referrerpolicy="no-referrer" src="'+media(x.thumb)+'" alt="'+esc(x.name||'NFT thumbnail')+'" onerror="this.style.display=\'none\'">':'')+'<div><small>TRENDING #'+(i+1)+'</small><h3>'+esc(x.name||'NFT collection')+'</h3><p>'+(x.symbol?esc(x.symbol)+' · ':'')+(x.floor?esc(x.floor):'Floor unavailable')+(x.change!==null&&x.change!==undefined?' · '+(Number(x.change)>=0?'+':'')+Number(x.change).toFixed(2)+'% 24h':'')+'</p></div></a>').join(''):'<article class="card"><p>NFT trends are temporarily unavailable.</p></article>';
    nftStatus.textContent='Updated '+new Date().toLocaleTimeString()+' · CoinGecko trending NFT data';
 
    const nn=d.nftNews||[];

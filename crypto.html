@@ -239,11 +239,12 @@ Write one word after each number.
       <p id="lessonBody"></p>
       <div class="lesson-example" id="lessonExample"></div>
     </article>
-    <article class="card quiz-card">
+    <article class="card quiz-card" id="dailyQuizCard">
       <div class="eyebrow">Quick quiz</div>
       <h3 id="quizQuestion">Loading question…</h3>
+      <p class="quiz-help">Tap an answer. Your choice stays highlighted until you scroll away from this quiz or the daily lesson changes.</p>
       <div id="quizAnswers" class="quiz-answers"></div>
-      <div class="statusline" id="quizStatus">Choose one answer.</div>
+      <div class="statusline quiz-status" id="quizStatus" aria-live="polite">Choose one answer.</div>
     </article>
   </div>
 </section>
@@ -492,13 +493,39 @@ Write one word after each number.
   document.getElementById('lessonBody').textContent=lesson.body;
   document.getElementById('lessonExample').textContent='Example: '+lesson.example;
   document.getElementById('quizQuestion').textContent=lesson.q;
-  const quizBox=document.getElementById('quizAnswers'),quizStatus=document.getElementById('quizStatus');
-  quizBox.innerHTML=lesson.a.map((a,i)=>'<button class="btn quiz-answer" type="button" data-i="'+i+'">'+esc(a)+'</button>').join('');
+  const quizBox=document.getElementById('quizAnswers'),quizStatus=document.getElementById('quizStatus'),quizCard=document.getElementById('dailyQuizCard');
+  quizBox.innerHTML=lesson.a.map((a,i)=>'<button class="btn quiz-answer" type="button" data-i="'+i+'" aria-pressed="false">'+esc(a)+'</button>').join('');
+
+  const resetQuizFeedback=()=>{
+    quizBox.querySelectorAll('.quiz-answer').forEach(btn=>{
+      btn.classList.remove('quiz-correct','quiz-wrong','quiz-selected');
+      btn.setAttribute('aria-pressed','false');
+    });
+    quizStatus.textContent='Choose one answer.';
+    quizStatus.className='statusline quiz-status';
+  };
+
   quizBox.querySelectorAll('.quiz-answer').forEach(btn=>btn.addEventListener('click',()=>{
+    quizBox.querySelectorAll('.quiz-answer').forEach(x=>{
+      x.classList.remove('quiz-correct','quiz-wrong','quiz-selected');
+      x.setAttribute('aria-pressed','false');
+    });
     const ok=Number(btn.dataset.i)===lesson.correct;
-    quizStatus.textContent=ok?'Correct. Nice work.':'Not quite. Review today’s lesson and try again.';
-    quizStatus.className='statusline '+(ok?'up':'down');
+    btn.classList.add('quiz-selected',ok?'quiz-correct':'quiz-wrong');
+    btn.setAttribute('aria-pressed','true');
+    quizStatus.textContent=ok?'Correct — nice work.':'Not quite — review the lesson and try again.';
+    quizStatus.className='statusline quiz-status '+(ok?'up':'down');
   }));
+
+  if('IntersectionObserver' in window&&quizCard){
+    let hasEntered=false;
+    const quizObserver=new IntersectionObserver(entries=>{
+      const entry=entries[0];
+      if(entry.isIntersecting&&entry.intersectionRatio>=0.18){hasEntered=true;return;}
+      if(hasEntered&&!entry.isIntersecting)resetQuizFeedback();
+    },{threshold:[0,.18,.5,1]});
+    quizObserver.observe(quizCard);
+  }
 
   const dexNative=document.getElementById('dexNative'),dexStatus=document.getElementById('dexStatus'),dexChain=document.getElementById('dexChain'),dexAddress=document.getElementById('dexAddress');
   const fmt=(n,d=2)=>Number.isFinite(Number(n))?Number(n).toLocaleString(undefined,{maximumFractionDigits:d}):'—';

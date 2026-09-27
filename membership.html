@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070b16">
+<meta name="description" content="Think Exist Studios free membership and member account access.">
+<title>Membership | Think Exist Studios</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body data-page="membership">
+<header class="top"><div class="topin shell">
+  <a class="brand" href="index.html">Think <b>Exist</b> Studios</a>
+  <nav class="nav"><a href="index.html">Home</a><a href="projects.html">Projects</a><a href="games.html">Games</a><a href="discover.html">Discover</a><a href="watch.html">Watch</a><a href="art.html">Art</a><a href="crypto.html">Crypto</a><a href="creator-studio.html">Creator Studio</a><a href="membership.html">Membership</a></nav>
+</div></header>
+
+<main class="shell">
+<div class="page-back"><a class="btn" href="index.html">← Home</a></div>
+
+<section class="hero">
+  <div class="livepill"><span class="pulse"></span> FREE MEMBERSHIP</div>
+  <div class="eyebrow">Think Exist member access</div>
+  <h1>Join the <span class="grad">studio universe.</span></h1>
+  <p>Membership is free while the program grows. One account gives you member access, an account reference, updates, and a place for future member-only features.</p>
+</section>
+
+<section class="member-account-card">
+  <div>
+    <div class="eyebrow">Account status</div>
+    <h2 id="memberStateLabel">Checking membership…</h2>
+    <p id="memberStateDetail">Connecting securely…</p>
+  </div>
+  <div class="toolbar">
+    <button class="btn hide" id="membershipLogoutBtn" type="button">Log out</button>
+  </div>
+</section>
+
+<section class="section" id="membershipForms">
+  <div class="grid2">
+    <form class="card" id="memberSignupForm">
+      <div class="eyebrow">New member</div><h3>Create free membership</h3>
+      <p>There is no paid tier required right now.</p>
+      <div class="field"><label for="memberSignupName">Display name</label><input id="memberSignupName" maxlength="60" autocomplete="name" required></div>
+      <div class="field"><label for="memberSignupEmail">Email</label><input id="memberSignupEmail" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="memberSignupPassword">Password</label><input id="memberSignupPassword" type="password" minlength="10" autocomplete="new-password" required></div>
+      <button class="btn primary" type="submit">Join free</button>
+    </form>
+
+    <form class="card" id="memberLoginForm">
+      <div class="eyebrow">Returning member</div><h3 id="login">Log in</h3>
+      <div class="field"><label for="memberLoginEmail">Email</label><input id="memberLoginEmail" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="memberLoginPassword">Password</label><input id="memberLoginPassword" type="password" autocomplete="current-password" required></div>
+      <button class="btn primary" type="submit">Log in</button>
+    </form>
+  </div>
+  <div class="statusline" id="membershipStatusLine"></div>
+</section>
+
+<section class="section hide" id="memberHub">
+  <div class="sectionhead"><div><div class="eyebrow">Member profile</div><h2>Welcome, <span id="membershipAccountName">Member</span>.</h2></div><p>Your private account reference and studio updates live here.</p></div>
+
+  <div class="grid3">
+    <article class="card"><div class="eyebrow">Tier</div><h3 id="membershipTier">FREE</h3><p>The current membership program is free.</p></article>
+    <article class="card"><div class="eyebrow">Status</div><h3 id="membershipStatus">ACTIVE</h3><p id="membershipAccountEmail"></p></article>
+    <article class="card"><div class="eyebrow">Creator access</div><h3 id="creatorAccess">Regular member</h3><p>Creator publishing access is approved separately.</p><a class="feature-link hide" id="creatorAccessLink" href="creator-studio.html">Open Creator Studio →</a></article>
+  </div>
+
+  <div class="section member-dashboard-grid">
+    <article class="card">
+      <div class="eyebrow">Personal account reference</div><h3 id="accountReference">—</h3>
+      <p>Use this reference when discussing your account with Think Exist support. Your full internal account ID is shown below only to you.</p>
+      <div class="account-reference-full" id="accountReferenceFull">—</div>
+      <div class="member-ref-meta"><span>Joined</span><strong id="accountJoined">—</strong></div>
+      <button class="btn" id="copyAccountReference" type="button">Copy full account reference</button>
+      <div class="statusline" id="accountReferenceStatus"></div>
+    </article>
+
+    <article class="card">
+      <div class="eyebrow">Messages & updates</div><h3>Member inbox</h3>
+      <p>Important studio notices, account updates, and feature announcements appear here.</p>
+      <div class="member-notification-list" id="memberNotificationList"><p class="statusline">Loading updates…</p></div>
+    </article>
+  </div>
+</section>
+
+<section class="section">
+  <div class="callout glowcall">
+    <div class="eyebrow">Free route first</div>
+    <h2>Membership starts simple.</h2>
+    <p>More member-only tools, community features, and benefits can be added without charging members while Think Exist Studios develops the program.</p>
+  </div>
+</section>
+</main>
+
+<footer class="footer shell">Membership · Think Exist Studios</footer>
+<script src="membership.js" defer></script>
+<script src="vera-guide.js" defer></script>
+</body></html>

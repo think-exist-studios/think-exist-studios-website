@@ -4,12 +4,12 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#070b16">
 <meta name="description" content="Think Exist Studios — original worlds, games, creators, AI, anime, tech and digital projects.">
-<title>Think Exist Studios</title><link rel="stylesheet" href="styles.css">
+<title>Think Exist Studios</title><link rel="stylesheet" href="styles.css">\n<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body data-page="home">
 <header class="top"><div class="topin shell">
   <a class="brand" href="index.html">Think <b>Exist</b> Studios</a>
-  <nav class="nav"><a href="projects.html">Projects</a><a href="games.html">Games</a><a href="discover.html">Discover</a><a href="watch.html">Watch</a><a href="art.html">Art</a><a href="people.html">People</a><a href="crypto.html">Crypto</a><a href="creator-studio.html">Creator Studio</a><a href="vera.html">VERA</a><a href="https://x.com/ThinkExistHQ" target="_blank" rel="noopener">X ↗</a></nav>
+  <nav class="nav"><a href="projects.html">Projects</a><a href="games.html">Games</a><a href="discover.html">Discover</a><a href="watch.html">Watch</a><a href="art.html">Art</a><a href="people.html">People</a><a href="crypto.html">Crypto</a><a href="creator-studio.html">Creator Studio</a><a href="membership.html">Membership</a><a href="vera.html">VERA</a><a href="https://x.com/ThinkExistHQ" target="_blank" rel="noopener">X ↗</a></nav>
 </div></header>
 
 <div class="signalbar" aria-label="Studio pulse">
@@ -18,6 +18,19 @@
     <span><i></i> STUDIO ONLINE</span><span>VERA // SYSTEMS GUARDIAN</span><span>THE UNFINISHED // IN DEVELOPMENT</span><span>DISCOVER // TECH + ANIME FEEDS</span><span>CREATOR STUDIO // ACTIVE</span><span>THINK EXIST // BUILDING IN PUBLIC</span>
   </div>
 </div>
+
+<section class="home-memberbar shell" aria-label="Member access">
+  <div class="home-member-state">
+    <span class="account-dot" id="homeMemberDot"></span>
+    <div><strong id="memberStateLabel">Guest</strong><span id="memberStateDetail">Free Think Exist membership is available.</span></div>
+  </div>
+  <div class="toolbar">
+    <a class="btn" id="memberJoinBtn" href="membership.html">Join free</a>
+    <button class="btn primary" id="memberLoginBtn" type="button">Log in</button>
+    <a class="btn hide" id="memberAccountBtn" href="membership.html">My account</a>
+    <button class="btn hide" id="memberLogoutBtn" type="button">Log out</button>
+  </div>
+</section>
 
 <main class="shell">
 <section class="hero hero-live">
@@ -53,5 +66,5 @@
 <script>
 (()=>{const c=document.getElementById('liveClock'); const tick=()=>c.textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});tick();setInterval(tick,1000);})();
 </script>
-<script src="vera-guide.js" defer></script>
+<script src="membership.js" defer></script>\n<script src="vera-guide.js" defer></script>
 </body></html>

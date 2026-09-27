@@ -203,10 +203,11 @@ RECORDS
     <h3>Copy or print the blank template only</h3>
     <p>Choose a 12-word or 24-word format. Copy the blank layout to your own device, or print the blank sheet and fill it out away from this website. <span class="seed-danger-text">*Never paste your real seed phrase into this website, chat, email, Discord, Telegram, a cloud-synced note, or an unknown app.*</span></p>
     <div class="recovery-actions">
-      <button class="btn primary" id="copySeedTemplate" type="button">Copy 12-word template</button>
-      <button class="btn" id="copySeedTemplate24" type="button">Copy 24-word template</button>
-      <button class="btn" id="printSeedTemplate12" type="button">Print 12-word template</button>
-      <button class="btn" id="printSeedTemplate24" type="button">Print 24-word template</button>
+      <button class="btn primary" id="copySeedTemplate" type="button">Copy 12-word worksheet</button>
+      <button class="btn" id="copySeedTemplate24" type="button">Copy 24-word worksheet</button>
+      <button class="btn" id="copySeedCurrent" type="button">Copy displayed worksheet</button>
+      <button class="btn" id="printSeedTemplate12" type="button">Print 12-word worksheet</button>
+      <button class="btn" id="printSeedTemplate24" type="button">Print 24-word worksheet</button>
     </div>
     <pre id="seedTemplatePreview" aria-label="Static blank 12-word seed phrase template">SEED PHRASE — 12-WORD TEMPLATE
 Write one word after each number.
@@ -224,7 +225,7 @@ Write one word after each number.
 11. ____________________
 12. ____________________</pre>
     <p class="seed-warning"><strong>Think Exist Studios will never ask for your recovery phrase or private key.</strong></p>
-    <div class="statusline" id="seedTemplateStatus">Blank template only — this page never accepts recovery words.</div>
+    <div class="statusline" id="seedTemplateStatus">Blank worksheet only — copy it to your own device or print it. This page never accepts recovery words.</div>
   </div>
 </section>
 
@@ -238,11 +239,12 @@ Write one word after each number.
       <p id="lessonBody"></p>
       <div class="lesson-example" id="lessonExample"></div>
     </article>
-    <article class="card quiz-card">
+    <article class="card quiz-card" id="dailyQuizCard">
       <div class="eyebrow">Quick quiz</div>
       <h3 id="quizQuestion">Loading question…</h3>
+      <p class="quiz-help">Tap an answer. Your choice stays highlighted until you scroll away from this quiz or the daily lesson changes.</p>
       <div id="quizAnswers" class="quiz-answers"></div>
-      <div class="statusline" id="quizStatus">Choose one answer.</div>
+      <div class="statusline quiz-status" id="quizStatus" aria-live="polite">Choose one answer.</div>
     </article>
   </div>
 </section>
@@ -458,8 +460,9 @@ Write one word after each number.
   const makeSeedTemplate=n=>'SEED PHRASE — '+n+'-WORD TEMPLATE\nWrite one word after each number.\n\n'+Array.from({length:n},(_,i)=>String(i+1).padStart(2,'0')+'. ____________________').join('\n');
   const seedPreview=document.getElementById('seedTemplatePreview'),seedStatus=document.getElementById('seedTemplateStatus');
   const showSeedTemplate=n=>{const t=makeSeedTemplate(n);seedPreview.textContent=t;return t;};
-  document.getElementById('copySeedTemplate').addEventListener('click',()=>{const t=showSeedTemplate(12);copyText(t,seedStatus,'Blank 12-word template copied. Fill it out away from this website.');});
-  document.getElementById('copySeedTemplate24').addEventListener('click',()=>{const t=showSeedTemplate(24);copyText(t,seedStatus,'Blank 24-word template copied. Fill it out away from this website.');});
+  document.getElementById('copySeedTemplate').addEventListener('click',()=>{const t=showSeedTemplate(12);copyText(t,seedStatus,'Blank 12-word worksheet copied to your clipboard. Paste it into your own local note, document, or text file.');});
+  document.getElementById('copySeedTemplate24').addEventListener('click',()=>{const t=showSeedTemplate(24);copyText(t,seedStatus,'Blank 24-word worksheet copied to your clipboard. Paste it into your own local note, document, or text file.');});
+  document.getElementById('copySeedCurrent').addEventListener('click',()=>copyText(seedPreview.textContent,seedStatus,'The displayed blank worksheet was copied to your clipboard for your own use.'));
   const printSeedTemplate=n=>{
     const t=showSeedTemplate(n);
     const win=window.open('','_blank','noopener,noreferrer');
@@ -490,13 +493,39 @@ Write one word after each number.
   document.getElementById('lessonBody').textContent=lesson.body;
   document.getElementById('lessonExample').textContent='Example: '+lesson.example;
   document.getElementById('quizQuestion').textContent=lesson.q;
-  const quizBox=document.getElementById('quizAnswers'),quizStatus=document.getElementById('quizStatus');
-  quizBox.innerHTML=lesson.a.map((a,i)=>'<button class="btn quiz-answer" type="button" data-i="'+i+'">'+esc(a)+'</button>').join('');
+  const quizBox=document.getElementById('quizAnswers'),quizStatus=document.getElementById('quizStatus'),quizCard=document.getElementById('dailyQuizCard');
+  quizBox.innerHTML=lesson.a.map((a,i)=>'<button class="btn quiz-answer" type="button" data-i="'+i+'" aria-pressed="false">'+esc(a)+'</button>').join('');
+
+  const resetQuizFeedback=()=>{
+    quizBox.querySelectorAll('.quiz-answer').forEach(btn=>{
+      btn.classList.remove('quiz-correct','quiz-wrong','quiz-selected');
+      btn.setAttribute('aria-pressed','false');
+    });
+    quizStatus.textContent='Choose one answer.';
+    quizStatus.className='statusline quiz-status';
+  };
+
   quizBox.querySelectorAll('.quiz-answer').forEach(btn=>btn.addEventListener('click',()=>{
+    quizBox.querySelectorAll('.quiz-answer').forEach(x=>{
+      x.classList.remove('quiz-correct','quiz-wrong','quiz-selected');
+      x.setAttribute('aria-pressed','false');
+    });
     const ok=Number(btn.dataset.i)===lesson.correct;
-    quizStatus.textContent=ok?'Correct. Nice work.':'Not quite. Review today’s lesson and try again.';
-    quizStatus.className='statusline '+(ok?'up':'down');
+    btn.classList.add('quiz-selected',ok?'quiz-correct':'quiz-wrong');
+    btn.setAttribute('aria-pressed','true');
+    quizStatus.textContent=ok?'Correct — nice work.':'Not quite — review the lesson and try again.';
+    quizStatus.className='statusline quiz-status '+(ok?'up':'down');
   }));
+
+  if('IntersectionObserver' in window&&quizCard){
+    let hasEntered=false;
+    const quizObserver=new IntersectionObserver(entries=>{
+      const entry=entries[0];
+      if(entry.isIntersecting&&entry.intersectionRatio>=0.18){hasEntered=true;return;}
+      if(hasEntered&&!entry.isIntersecting)resetQuizFeedback();
+    },{threshold:[0,.18,.5,1]});
+    quizObserver.observe(quizCard);
+  }
 
   const dexNative=document.getElementById('dexNative'),dexStatus=document.getElementById('dexStatus'),dexChain=document.getElementById('dexChain'),dexAddress=document.getElementById('dexAddress');
   const fmt=(n,d=2)=>Number.isFinite(Number(n))?Number(n).toLocaleString(undefined,{maximumFractionDigits:d}):'—';

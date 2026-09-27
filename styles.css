@@ -135,3 +135,26 @@
 .nft-card img{width:78px;height:78px;object-fit:cover;margin-left:13px;border-radius:13px;background:#080d18}
 @media(max-width:920px){.art-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nft-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.art-grid,.nft-grid{grid-template-columns:1fr}.art-card{display:grid;grid-template-columns:108px 1fr}.art-card img{width:108px;height:138px;aspect-ratio:auto}.art-card div{align-self:center}.nft-card{grid-template-columns:70px 1fr}.nft-card img{width:70px;height:70px}}
+
+
+/* Resilient live-feed visuals */
+.video-thumb{position:relative;display:block;overflow:hidden;text-decoration:none}
+.video-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.video-thumb-play{position:absolute;inset:0;display:grid;place-items:center;margin:auto;width:58px;height:58px;border-radius:50%;background:#ffffffeb;color:#081020;font-size:1.35rem;box-shadow:0 12px 32px #0008}
+.video-fallback{display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#334b83,#10182b 55%,#070b16)}
+.video-fallback-link{width:100%;height:100%;display:grid;place-items:center;align-content:center;gap:10px;text-decoration:none;color:white;text-align:center;padding:20px}
+.video-fallback-link span{display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:white;color:#081020;font-size:1.3rem}
+.video-fallback-link strong{font-size:1rem}
+
+.dex-native{height:auto!important;min-height:320px!important;padding:18px;display:grid;align-content:start;gap:16px}
+.dex-loading{min-height:280px;display:grid;place-items:center;align-content:center;gap:8px;text-align:center;color:var(--muted)}
+.dex-loading strong{color:white;font-size:1.12rem}
+.dex-native-head{display:flex;justify-content:space-between;gap:18px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:14px}
+.dex-native-head small{color:var(--cyan);font-size:.68rem;letter-spacing:.1em;font-weight:900}
+.dex-native-head h3{margin:4px 0 0;font-size:1.45rem}
+.dex-native-head p{margin:4px 0 0;color:var(--muted);font-size:.82rem}
+.dex-native-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.dex-native-grid article{border:1px solid var(--line);border-radius:14px;padding:15px;background:#0a1220}
+.dex-native-grid small{display:block;color:var(--muted);font-size:.66rem;letter-spacing:.08em;font-weight:800}
+.dex-native-grid strong{display:block;margin-top:6px;font-size:1.1rem}
+@media(max-width:700px){.dex-native-head{display:block}.dex-native-head .btn{margin-top:12px}.dex-native-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}

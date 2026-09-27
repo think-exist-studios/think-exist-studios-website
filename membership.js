@@ -66,8 +66,10 @@
    toggle('memberLoginBtn',!signed);
    toggle('memberLogoutBtn',signed);
    toggle('memberJoinBtn',!signed);
+   toggle('memberAccountBtn',signed);
    toggle('membershipForms',!signed);
    toggle('memberHub',signed);
+   const dot=$('homeMemberDot'); if(dot)dot.classList.toggle('online',signed);
 
    if(!signed){
      text('memberStateLabel','Guest');
@@ -126,7 +128,7 @@
    const display_name=$('memberSignupName').value.trim();
    const email=$('memberSignupEmail').value.trim();
    const password=$('memberSignupPassword').value;
-   const {data,error}=await sb.auth.signUp({email,password,options:{data:{display_name}}});
+   const {data,error}=await sb.auth.signUp({email,password,options:{data:{display_name},emailRedirectTo:location.origin+'/membership.html'}});
    if(error){text('membershipStatusLine',error.message);return;}
    if(data.session){
      text('membershipStatusLine','Membership created. You are logged in.');

@@ -500,3 +500,49 @@
 .creator-watermark-mark span{font-weight:900;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#fff}\n.work.creator-watermarked>.creator-watermark-mark{top:12px;bottom:auto}
 @media(max-width:860px){.creator-profile-layout{grid-template-columns:1fr}}
 @media(max-width:620px){.creator-watermark-preview{min-height:100px}.creator-watermark-mark{right:8px;bottom:8px}.creator-watermark-mark img{max-width:86px;max-height:36px}}
+
+
+/* MOSES Report */
+.moses-report-section{scroll-margin-top:78px}
+.moses-report-banner{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:center;padding:24px;border:1px solid #5fddc94d;border-radius:22px;background:radial-gradient(circle at 10% 20%,#13d6ba20,transparent 42%),linear-gradient(145deg,#0b1720,#10182a);box-shadow:0 24px 70px #0005}
+.moses-report-banner h3{font-size:clamp(1.65rem,4vw,2.45rem);margin:8px 0 6px}
+.moses-report-banner h3[data-tone="positive"]{color:#9fffd5}
+.moses-report-banner h3[data-tone="negative"]{color:#ffadad}
+.moses-report-banner p{margin:0;color:var(--muted);max-width:760px}
+.moses-report-stats{display:grid;grid-template-columns:repeat(3,minmax(104px,1fr));gap:10px}
+.moses-report-stats>div{min-width:104px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#07111bcc;text-align:center}
+.moses-report-stats small{display:block;color:var(--muted);font-size:.62rem;letter-spacing:.09em;font-weight:900}
+.moses-report-stats strong{display:block;margin-top:7px;font-size:1.08rem}
+.moses-subhead{margin-top:30px}
+.moses-potential-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.moses-potential-card{position:relative;overflow:hidden;min-height:260px}
+.moses-potential-card:before{content:"";position:absolute;inset:-40% auto auto -15%;width:180px;height:180px;border-radius:50%;background:#19e6c016;filter:blur(12px)}
+.moses-rank{position:absolute;right:14px;top:12px;font-size:1.35rem;font-weight:1000;color:#ffffff22}
+.moses-score{display:flex;align-items:baseline;gap:6px;margin:14px 0 10px}
+.moses-score strong{font-size:2rem;color:#baffea}
+.moses-score span{color:var(--muted);font-size:.72rem}
+.moses-metrics{display:flex;gap:10px;flex-wrap:wrap;font-size:.75rem;color:var(--muted)}
+.moses-metrics span{padding:5px 8px;border:1px solid #ffffff12;border-radius:999px;background:#ffffff05}
+.moses-reasons{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.moses-reason{padding:5px 8px;border-radius:999px;background:#55e5c313;border:1px solid #55e5c32e;color:#bff8ea;font-size:.67rem}
+.moses-risk{margin:12px 0 0;color:#d7c8a0;font-size:.73rem}
+.moses-report-grid{margin-top:16px}
+.moses-list{display:grid;gap:8px;margin-top:12px}
+.moses-list-row{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #ffffff10}
+.moses-list-row:last-child{border-bottom:0}
+.moses-list-row strong{display:block;font-size:.85rem}
+.moses-list-row strong small{color:var(--muted);font-size:.7rem}
+.moses-list-row span{display:block;margin-top:3px;color:var(--muted);font-size:.7rem}
+.moses-headline{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #ffffff10;color:white;text-decoration:none}
+.moses-headline:last-child{border-bottom:0}
+.moses-headline small{display:block;color:var(--cyan);font-size:.61rem;letter-spacing:.08em}
+.moses-headline strong{display:block;margin-top:3px;font-size:.78rem;line-height:1.35}
+.moses-headline>b{color:var(--cyan)}
+.moses-news-card{margin-top:16px}
+.moses-news-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.moses-news-item{display:grid;gap:5px;padding:12px;border:1px solid #ffffff12;border-radius:12px;background:#08111e;color:white;text-decoration:none}
+.moses-news-item small{color:var(--violet);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em}
+.moses-news-item strong{font-size:.8rem;line-height:1.35}
+.moses-news-item span{color:var(--muted);font-size:.66rem}
+@media(max-width:960px){.moses-report-banner{grid-template-columns:1fr}.moses-report-stats{grid-template-columns:repeat(3,1fr)}.moses-potential-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.moses-report-banner{padding:18px}.moses-report-stats{grid-template-columns:1fr}.moses-potential-grid,.moses-news-grid{grid-template-columns:1fr}.moses-report-stats>div{text-align:left}.moses-score strong{font-size:1.7rem}}

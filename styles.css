@@ -215,3 +215,225 @@
 .vera-launcher{position:fixed;right:16px;bottom:max(16px,env(safe-area-inset-bottom));z-index:70;display:none;min-width:58px;height:38px;padding:0 12px;border:1px solid #aa9cff66;border-radius:999px;background:linear-gradient(120deg,#111a2c,#252040);color:#fff;font:900 .68rem/1 system-ui,sans-serif;letter-spacing:.08em;cursor:pointer;box-shadow:0 14px 36px #0008}
 .vera-launcher.show{display:block}
 @media(max-width:760px){.vera-launcher{right:10px;bottom:max(10px,env(safe-area-inset-bottom));height:34px;min-width:52px;font-size:.62rem}}
+
+
+/* === Think Exist mobile-first refinement 2026-09-27 === */
+@media (max-width: 1024px){
+  .shell{width:min(1160px,calc(100% - 28px))}
+  .topin{gap:12px}
+  .nav{gap:4px}
+  .hero{padding-top:54px}
+  .section{padding-top:48px}
+  .card{padding:21px}
+  .feature-band,.game-stage{padding:24px}
+}
+
+@media (max-width: 760px){
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{font-size:15px}
+  .shell{width:calc(100% - 24px)}
+  .top{position:sticky;top:0}
+  .topin{
+    min-height:auto;
+    display:grid;
+    grid-template-columns:1fr;
+    align-items:stretch;
+    gap:8px;
+    padding:10px 0 8px;
+  }
+  .brand{
+    display:block;
+    width:max-content;
+    max-width:100%;
+    font-size:.98rem;
+    line-height:1.2;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .nav{
+    width:100%;
+    max-width:none;
+    display:flex;
+    flex-wrap:nowrap;
+    justify-content:flex-start;
+    gap:7px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding:1px 1px 4px;
+    margin:0;
+    scrollbar-width:none;
+    overscroll-behavior-inline:contain;
+    scroll-snap-type:x proximity;
+    -webkit-overflow-scrolling:touch;
+  }
+  .nav::-webkit-scrollbar{display:none}
+  .nav a{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+    min-height:38px;
+    padding:8px 12px;
+    border:1px solid #ffffff16;
+    background:#ffffff08;
+    border-radius:999px;
+    font-size:.8rem;
+    white-space:nowrap;
+    scroll-snap-align:start;
+  }
+  .nav a:nth-last-child(1),.nav a:nth-last-child(2){display:inline-flex}
+  .signalbar{font-size:.63rem}
+  .hero{padding:38px 0 24px}
+  .hero-live{min-height:auto;padding-bottom:12px}
+  .hero h1,
+  .vera-profile-copy h1{
+    font-size:clamp(2.15rem,12vw,3.45rem);
+    line-height:1.04;
+    letter-spacing:-.045em;
+  }
+  .hero p,.vera-profile-copy p{font-size:1rem}
+  .livepill{
+    max-width:100%;
+    flex-wrap:wrap;
+    justify-content:center;
+    text-align:center;
+    line-height:1.25;
+  }
+  .section{padding-top:40px}
+  .sectionhead{margin-bottom:15px}
+  .sectionhead h2,.feature-band h2{
+    font-size:clamp(1.65rem,8vw,2.25rem);
+    line-height:1.08;
+  }
+  .card,.callout,.feature-band,.game-stage{
+    border-radius:16px;
+    padding:18px;
+  }
+  .grid2,.grid3,.portfolio,.market,.links,.profilehero,.news-grid,.video-grid,
+  .vera-cap-grid,.crypto-steps,.wallet-rules,.feedback-layout,.progress-report-grid,
+  .progress-two-col,.nova-shell{
+    gap:13px;
+  }
+  .row{gap:9px;margin-top:18px}
+  .row .btn{flex:1 1 150px}
+  .btn{
+    min-height:44px;
+    padding:10px 13px;
+    line-height:1.2;
+  }
+  .tagrow{gap:6px}
+  .tag{font-size:.71rem}
+  .person-card{grid-template-columns:72px 1fr;gap:14px}
+  .person-card img{width:72px;height:72px;border-radius:15px}
+  .news-card{grid-template-columns:36px minmax(0,1fr) 18px;gap:10px;padding:13px}
+  .news-num{font-size:1.05rem}
+  .anime-grid{gap:10px}
+  .anime-card div{padding:10px}
+  .profilehero,.vera-profile{padding-top:34px}
+  .vera-portrait{min-height:270px;border-radius:20px}
+  .vera-portrait img{max-height:340px}
+  .watch-feed{width:100%}
+  .watch-card{border-radius:16px}
+  .watch-panel-head{margin-bottom:12px}
+  .embed-stage{width:100%;border-radius:14px}
+  .embed-stage.twitch-stage{min-height:220px}
+  .dex-frame{border-radius:14px;min-height:380px}
+  .authbox,.editor{margin:24px auto;padding:18px;border-radius:16px}
+  .field input,.field textarea,.dex-tools input,.dex-tools select,.nova-compose textarea{
+    font-size:16px;
+  }
+  .creator-accountbar,.profile-accountbar{padding:12px;border-radius:14px}
+  .progress-ring{width:96px;height:96px}
+  .nova-chat-card{border-radius:16px}
+  .nova-messages{padding:12px}
+  .nova-msg{max-width:92%}
+  .footer{
+    margin-top:50px;
+    padding:24px 0 calc(34px + env(safe-area-inset-bottom));
+    text-align:center;
+  }
+  table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  pre{max-width:100%;overflow:auto}
+  iframe,video,canvas,svg{max-width:100%}
+  .card,.callout,.sectionhead,.hero,.feature-band,.game-stage{overflow-wrap:anywhere}
+
+  /* Keep VERA helpful without covering the center of a phone screen. */
+  .vera-guide{
+    left:auto;
+    right:max(8px,env(safe-area-inset-right));
+    bottom:max(8px,env(safe-area-inset-bottom));
+    width:96px;
+    height:126px;
+    transform:none;
+    max-width:calc(100vw - 16px);
+  }
+  .vera-bubble{
+    left:auto;
+    right:0;
+    bottom:calc(100% - 2px);
+    width:min(230px,calc(100vw - 20px));
+    max-width:calc(100vw - 20px);
+    transform:scale(.92) translateY(7px);
+    transform-origin:bottom right;
+  }
+  .vera-bubble:after{left:auto;right:28px;transform:none}
+  .vera-bubble.show{transform:scale(1) translateY(0)}
+  .vera-launcher{
+    right:max(8px,env(safe-area-inset-right));
+    bottom:max(8px,env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 520px){
+  .shell{width:calc(100% - 20px)}
+  .brand{font-size:.94rem}
+  .nav a{min-height:36px;padding:7px 11px;font-size:.76rem}
+  .hero{padding-top:30px}
+  .hero h1,.vera-profile-copy h1{font-size:clamp(2rem,12.5vw,3rem)}
+  .hero p,.vera-profile-copy p{font-size:.95rem}
+  .eyebrow{font-size:.68rem;letter-spacing:.14em}
+  .section{padding-top:34px}
+  .card,.callout,.feature-band,.game-stage{padding:16px}
+  .row{display:grid;grid-template-columns:1fr}
+  .row .btn{width:100%;flex:none}
+  .leftrow{justify-content:stretch}
+  .sectionhead h2,.feature-band h2{font-size:1.7rem}
+  .pulse-card{padding:14px}
+  .anime-grid{grid-template-columns:1fr 1fr}
+  .art-card{grid-template-columns:92px minmax(0,1fr)}
+  .art-card img{width:92px;height:124px}
+  .market .price{font-size:1.45rem}
+  .watch-play span{width:54px;height:54px;font-size:1.35rem}
+  .watch-meta{padding:11px 12px 13px}
+  .watch-tabs{margin-inline:-2px}
+  .embed-stage.twitch-stage{min-height:190px}
+  .dex-frame{height:58vh;min-height:340px}
+  .nova-compose{padding:10px}
+  .nova-compose-actions{grid-template-columns:1fr}
+  .progress-metrics{grid-template-columns:1fr}
+  .vera-guide{width:88px;height:116px}
+  .vera-bubble{
+    width:min(210px,calc(100vw - 16px));
+    max-width:calc(100vw - 16px);
+    max-height:min(118px,calc(100dvh - 145px));
+  }
+}
+
+@media (max-width: 380px){
+  .shell{width:calc(100% - 16px)}
+  .brand{font-size:.88rem}
+  .nav{gap:5px}
+  .nav a{padding:7px 9px;font-size:.72rem}
+  .hero h1,.vera-profile-copy h1{font-size:1.95rem}
+  .card,.callout,.feature-band,.game-stage{padding:14px}
+  .anime-grid{grid-template-columns:1fr}
+  .person-card{grid-template-columns:60px minmax(0,1fr)}
+  .person-card img{width:60px;height:60px}
+}
+
+@media (max-height: 520px) and (orientation: landscape){
+  .hero-live{min-height:auto}
+  .hero{padding-top:24px}
+  .vera-guide{width:74px;height:96px}
+  .vera-bubble{max-height:92px}
+}

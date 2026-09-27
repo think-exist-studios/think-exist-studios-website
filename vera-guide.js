@@ -19,6 +19,11 @@
    'A feed can be live without being noisy. Fresh data plus good pacing beats clutter.',
    'Try the video shuffle button. I approve of controlled chaos.'
   ],
+  watch:[
+   'This watch page uses YouTube embeds so you can view clips without leaving the studio site.',
+   'Tap a video to load the player, then scroll down for the next one.',
+   'The feed refreshes from selected YouTube channels without exposing your private account data.'
+  ],
   crypto:[
    'Quick safety fact: a legitimate website never needs your wallet seed phrase.',
    'Market prices can move faster than a page refresh, so treat snapshots as informational.',

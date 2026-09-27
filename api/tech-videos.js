@@ -1,7 +1,10 @@
 const channels=[
   {name:'MKBHD',id:'UCBJycsmduvYEL83R_U4JriQ'},
   {name:'Linus Tech Tips',id:'UCXuqSBlHAE6Xw-yeJA0Tunw'},
-  {name:'The Verge',id:'UCddiUEpeqJcYeBxX1IVBKvQ'}
+  {name:'The Verge',id:'UCddiUEpeqJcYeBxX1IVBKvQ'},
+  {name:'CNET',id:'UCYBzNzkwFRJgF_pWcR9fmcA'},
+  {name:'NASA',id:'UCA_DiR1FfKNvjuUpBHmylQw'},
+  {name:'Google Developers',id:'UC_x5XG1OV2P6uZZ5FSM9Ttw'}
 ];
 const clean=s=>String(s||'').replace(/<!\[CDATA\[|\]\]>/g,'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 module.exports=async function handler(req,res){

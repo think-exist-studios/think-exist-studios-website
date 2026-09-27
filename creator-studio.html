@@ -139,6 +139,78 @@
     </div>
   </div>
 
+
+  <div class="section" id="novaMentor" style="padding-top:35px">
+    <div class="sectionhead">
+      <div><div class="eyebrow">Private creator mentor</div><h2>NOVA <span class="grad">Creator Mentor</span></h2></div>
+      <p><strong>N.O.V.A. — Natural Originality, Vision & Advancement.</strong> NOVA learns how you create, teaches at your level, critiques imagery, helps you develop ideas, and supports the business side of your work. Your NOVA workspace is private to your creator account.</p>
+    </div>
+
+    <div class="nova-shell">
+      <section class="nova-chat-card">
+        <div class="nova-chat-head">
+          <div class="nova-identity">
+            <div class="nova-orb" aria-hidden="true">N</div>
+            <div><strong>NOVA</strong><span id="novaCreatorStatus">Connecting to your private mentor workspace…</span></div>
+          </div>
+          <span class="nova-private-badge">Private mentor</span>
+        </div>
+
+        <div class="nova-modes" id="novaModes">
+          <button class="nova-mode active" type="button" data-mode="mentor">Mentor</button>
+          <button class="nova-mode" type="button" data-mode="critique">Critique</button>
+          <button class="nova-mode" type="button" data-mode="lesson">Art Coach</button>
+          <button class="nova-mode" type="button" data-mode="idea">Idea Room</button>
+          <button class="nova-mode" type="button" data-mode="business">Business</button>
+          <button class="nova-mode" type="button" data-mode="visual">Visual Lesson</button>
+        </div>
+
+        <div class="nova-starters" id="novaStarters">
+          <button type="button" data-prompt="Review my portfolio and tell me the most important thing I should improve next.">Review my portfolio</button>
+          <button type="button" data-mode="lesson" data-prompt="Teach me one drawing skill that fits my current level, with a short practice exercise.">Teach me something</button>
+          <button type="button" data-mode="idea" data-prompt="Help me bounce around ideas for the project I care about most right now. Ask me what I am working on.">Bounce ideas</button>
+          <button type="button" data-mode="business" data-prompt="Help me find realistic ways to make money from my creative work without compromising my style.">Creator business</button>
+        </div>
+
+        <div class="nova-messages" id="novaMessages" role="log" aria-live="polite">
+          <div class="nova-empty">NOVA is loading your private conversation.</div>
+        </div>
+
+        <div class="nova-attachment hide" id="novaAttachment">
+          <img id="novaAttachmentPreview" alt="Artwork ready for NOVA">
+          <div><strong id="novaAttachmentName"></strong><span>Private image · NOVA can analyze and remember the creative lessons from it.</span></div>
+          <button class="btn" id="novaRemoveAttachment" type="button">Remove</button>
+        </div>
+
+        <form class="nova-compose" id="novaForm">
+          <textarea id="novaInput" maxlength="5000" placeholder="Ask NOVA about your art, project, portfolio, ideas, or creator business…"></textarea>
+          <div class="nova-compose-actions">
+            <label class="btn nova-upload">Add artwork<input id="novaImage" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden></label>
+            <button class="btn primary" id="novaSend" type="submit">Send to NOVA</button>
+          </div>
+        </form>
+        <div class="nova-statusline" id="novaStatus">Your messages, creator memory, and image-learning records stay separated from other creators.</div>
+      </section>
+
+      <aside class="nova-side">
+        <article class="card nova-memory-card">
+          <div class="eyebrow">Creator memory</div><h3>What NOVA is learning</h3>
+          <p id="novaProfileSummary">NOVA will build a creator profile naturally as you talk.</p>
+          <div class="nova-memory-chips" id="novaMemoryChips"></div>
+          <div class="statusline" id="novaOfflineStatus">Offline snapshot preparing…</div>
+        </article>
+
+        <article class="card nova-review-card">
+          <div class="eyebrow">Private professional review</div><h3>Portfolio readiness</h3>
+          <p class="statusline">NOVA benchmarks professional readiness against documented practices used by recognized comics, illustration, and design educators and organizations. This scores the portfolio evidence — not your worth or talent.</p>
+          <div id="novaReview"><p class="statusline">No NOVA professional review yet.</p></div>
+          <button class="btn primary" id="novaRunReview" type="button">Run honest private review</button>
+          <div class="statusline" id="novaReviewStatus">Benchmarks include Scott McCloud, Society of Illustrators, and professional Adobe portfolio guidance.</div>
+        </article>
+      </aside>
+    </div>
+  </div>
+
   <div class="section" style="padding-top:35px">
     <div class="sectionhead"><div><div class="eyebrow">Your work</div><h2>Portfolio entries</h2></div><p>Edit the content, replace artwork, publish, unpublish or remove anything on your page.</p></div>
     <div id="items"></div>
@@ -520,5 +592,6 @@
   refresh();
 })();
 </script>
+<script src="nova-mentor.js" defer></script>
 <script src="vera-guide.js" defer></script>
 </body></html>

@@ -437,3 +437,7 @@
   .vera-guide{width:74px;height:96px}
   .vera-bubble{max-height:92px}
 }
+
+
+/* Seed phrase warning emphasis */
+.seed-danger-text{color:#ff6b6b;font-weight:800}

@@ -19,7 +19,7 @@ const getNews=async q=>{
 
 module.exports=async function handler(req,res){
  res.setHeader('Cache-Control','s-maxage=600, stale-while-revalidate=1800');
- const out={artworks:[],artistNews:[],nfts:[],nftNews:[],updated:new Date().toISOString()};
+ const out={artworks:[],artistNews:[],updated:new Date().toISOString()};
  try{
    const day=Math.floor(Date.now()/86400000), page=(day%40)+1;
    const ar=await fetchWithTimeout('https://api.artic.edu/api/v1/artworks/search?query%5Bterm%5D%5Bis_public_domain%5D=true&limit=8&page='+page+'&fields=id,title,artist_display,date_display,image_id,is_public_domain',{},6500);
@@ -32,22 +32,7 @@ module.exports=async function handler(req,res){
      }));
    }
  }catch(e){}
- try{
-   const cr=await fetchWithTimeout('https://api.coingecko.com/api/v3/search/trending',{headers:{accept:'application/json'}},6500);
-   if(cr.ok){
-     const d=await cr.json();
-     out.nfts=(d.nfts||[]).slice(0,7).map(raw=>{
-       const x=raw.item||raw;
-       const floor=x.floor_price_in_native_currency;
-       const native=x.native_currency_symbol||'';
-       return {id:x.id,name:x.name,symbol:x.symbol,thumb:x.thumb||x.small||'',floor:floor!==undefined&&floor!==null?(Number(floor).toLocaleString(undefined,{maximumFractionDigits:4})+' '+native).trim():'',change:x.floor_price_24h_percentage_change??null,url:'https://www.coingecko.com/en/nft/'+encodeURIComponent(x.id||'')};
-     });
-   }
- }catch(e){}
- const [artistNews,nftNews]=await Promise.all([
-   getNews('(artist OR illustrator OR painter OR sculptor OR "digital artist") (exhibition OR gallery OR interview OR artwork)').catch(()=>[]),
-   getNews('(NFT OR "digital collectible") (artist OR art OR creator OR marketplace)').catch(()=>[])
- ]);
- out.artistNews=artistNews; out.nftNews=nftNews;
+ const artistNews=await getNews('(artist OR illustrator OR painter OR sculptor OR "digital artist") (exhibition OR gallery OR interview OR artwork)').catch(()=>[]);
+ out.artistNews=artistNews;
  res.status(200).json(out);
 };

@@ -1,5 +1,5 @@
 (()=>{
- const VERA_IMAGE='/assets/vera.webp';
+ const VERA_IMAGE='/assets/vera.webp?v=4';
  const facts={
   home:[
    'VERA here. I stand for Versatile Ethical Reasoning Assistant.',
@@ -42,75 +42,20 @@
  document.body.appendChild(root);
  const bubble=root.querySelector('.vera-bubble'), text=bubble.querySelector('p'), char=root.querySelector('.vera-character'), close=root.querySelector('.vera-close');
  char.querySelector('img').src=VERA_IMAGE;
- const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
- const clamp=(n,min,max)=>Math.min(Math.max(n,min),max);
- function placeBubble(){
-   if(!bubble.classList.contains('show')) return;
-   const w=innerWidth,h=innerHeight,r=root.getBoundingClientRect();
-   const bw=Math.min(260,Math.max(210,w-24));
-   bubble.style.width=bw+'px';
-   bubble.style.left='12px';
-   bubble.style.top='12px';
-   const bh=bubble.offsetHeight||120;
-   let left,top,side='right';
-   if(w<=760){
-     left=clamp((w-bw)/2,12,Math.max(12,w-bw-12));
-     top=clamp(r.top-bh-14,12,Math.max(12,h-bh-12));
-     side='center';
-   }else{
-     const leftSpace=r.left-18;
-     const rightSpace=w-r.right-18;
-     if(leftSpace>=bw || leftSpace>=rightSpace){
-       left=r.left-bw-16;
-       side='left';
-     }else{
-       left=r.right+16;
-       side='right';
-     }
-     left=clamp(left,12,Math.max(12,w-bw-12));
-     top=clamp(r.top+18,12,Math.max(12,h-bh-12));
-   }
-   bubble.style.left=left+'px';
-   bubble.style.top=top+'px';
-   bubble.dataset.side=side;
- }
+ const img=char.querySelector('img');
+ img.src=VERA_IMAGE;
+ img.addEventListener('load',()=>char.classList.add('vera-image-ready'),{once:true});
+ img.addEventListener('error',()=>{
+   img.hidden=true;
+   char.classList.add('vera-image-fallback');
+ },{once:true});
  function say(){
    text.textContent=pool[idx++%pool.length];
    bubble.classList.add('show');
-   requestAnimationFrame(placeBubble);
-   clearTimeout(timer);timer=setTimeout(()=>bubble.classList.remove('show'),9000);
+   clearTimeout(timer);
+   timer=setTimeout(()=>bubble.classList.remove('show'),10000);
  }
- function move(){
-   const w=innerWidth,h=innerHeight;
-   const rw=root.offsetWidth||170,rh=root.offsetHeight||220;
-   if(reduced || w<=760){
-     const x=clamp(w-rw-10,8,Math.max(8,w-rw-8));
-     const y=clamp(h-rh-10,76,Math.max(76,h-rh-8));
-     root.style.left=x+'px';
-     root.style.top=y+'px';
-     root.style.right='auto';
-     root.style.bottom='auto';
-     requestAnimationFrame(placeBubble);
-     return;
-   }
-   const margin=16,topMin=92;
-   const maxX=Math.max(margin,w-rw-margin);
-   const maxY=Math.max(topMin,h-rh-margin);
-   const pts=[[margin,maxY],[maxX,maxY],[maxX,topMin],[margin,topMin],[clamp(w*.55,margin,maxX),maxY]];
-   const p=pts[Math.floor(Math.random()*pts.length)];
-   root.style.left=clamp(p[0],margin,maxX)+'px';
-   root.style.top=clamp(p[1],topMin,maxY)+'px';
-   root.style.right='auto';
-   root.style.bottom='auto';
-   requestAnimationFrame(placeBubble);
- }
- function roam(){
-   move();if(Math.random()>.25)say();
-   clearTimeout(moveTimer);moveTimer=setTimeout(roam,15000+Math.random()*9000);
- }
- char.addEventListener('click',()=>{say();if(!reduced&&innerWidth>760)move()});
+ char.addEventListener('click',()=>say());
  close.addEventListener('click',e=>{e.stopPropagation();bubble.classList.remove('show')});
- setTimeout(()=>{move();say();},900);
- if(!reduced&&innerWidth>760)moveTimer=setTimeout(roam,14000);
- addEventListener('resize',()=>{move();requestAnimationFrame(placeBubble)},{passive:true});
+ setTimeout(()=>say(),900);
 })();

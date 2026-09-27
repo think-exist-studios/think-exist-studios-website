@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#070b16">
-<meta name="description" content="Think Exist Crypto — live market snapshots, studio crypto projects and Think Exist HQ updates.">
+<meta name="description" content="Think Exist Crypto — live markets, DEX Screener, wallet news, beginner crypto education and studio projects.">
 <title>Think Exist Crypto | Think Exist Studios</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body data-page="crypto">
 <header class="top"><div class="topin shell">
   <a class="brand" href="index.html">Think <b>Exist</b> Studios</a>
-  <nav class="nav"><a href="index.html#projects">Projects</a><a href="games.html">Games</a><a href="discover.html">Discover</a><a href="index.html#people">People</a><a href="creator-studio.html">Creator Studio</a><a href="https://x.com/ThinkExistHQ" target="_blank" rel="noopener">X ↗</a></nav>
+  <nav class="nav"><a href="index.html#projects">Projects</a><a href="games.html">Games</a><a href="discover.html">Discover</a><a href="watch.html">Watch</a><a href="index.html#people">People</a><a href="creator-studio.html">Creator Studio</a></nav>
 </div></header>
 
 <main class="shell">
 <section class="hero">
-  <div class="eyebrow">Web3 · market watch · studio projects</div>
+  <div class="eyebrow">Web3 · market watch · wallet safety · beginner guide</div>
   <h1>Think Exist <span class="grad">Crypto</span></h1>
-  <p>A live hub for crypto-related Think Exist projects, daily market snapshots, trending assets and updates from Think Exist HQ.</p>
-  <div class="row"><a class="btn primary" href="#markets">Live market →</a><a class="btn" href="#xfeed">X feed</a><a class="btn" href="#studio-projects">Studio projects</a></div>
+  <p>A practical crypto hub: live prices, DEX Screener charts, whale and wallet headlines, studio projects, and a beginner path for buying and storing crypto safely.</p>
+  <div class="row"><a class="btn primary" href="#markets">Live market →</a><a class="btn" href="#dexscreener">DEX Screener</a><a class="btn" href="#learn">Start here</a><a class="btn" href="#wallet-news">Wallet news</a></div>
 </section>
 
 <section class="section" id="markets">
@@ -31,9 +31,62 @@
   <div class="statusline" id="marketStatus">Connecting to market data…</div>
 </section>
 
+<section class="section" id="dexscreener">
+  <div class="sectionhead"><div><div class="eyebrow">On-chain market view</div><h2>DEX Screener</h2></div><p>Live decentralized-exchange charting inside Think Exist. The default view is a Solana market; you can load another supported pair by address.</p></div>
+  <div class="dex-tools">
+    <label><span>Network</span><select id="dexChain"><option value="solana">Solana</option><option value="ethereum">Ethereum</option><option value="base">Base</option><option value="bsc">BNB Chain</option></select></label>
+    <label class="dex-address"><span>Pair / token address</span><input id="dexAddress" inputmode="text" autocomplete="off" placeholder="Paste a DEX Screener pair or token address"></label>
+    <button class="btn primary" id="loadDex" type="button">Load chart</button>
+  </div>
+  <div class="dex-frame">
+    <iframe id="dexFrame" loading="lazy" src="https://dexscreener.com/solana/6ueGm9qsdDY1vFf2M6v6whVbYY2qXU6RwrqJ6ZPG9C3q?embed=1&info=0&theme=dark&trades=1" title="DEX Screener chart" allowfullscreen></iframe>
+  </div>
+  <div class="statusline">Third-party market data from DEX Screener. A chart appearing here is not an endorsement of the token or pair.</div>
+  <div class="row leftrow"><a class="btn" href="https://dexscreener.com/" target="_blank" rel="noopener">Open full DEX Screener ↗</a></div>
+</section>
+
 <section class="section">
   <div class="sectionhead"><div><div class="eyebrow">What's moving</div><h2>Trending on CoinGecko</h2></div><p>Live trending searches, not a recommendation to buy or sell.</p></div>
   <div class="grid3" id="trending"><article class="card"><p>Loading trends…</p></article></div>
+</section>
+
+<section class="section" id="wallet-news">
+  <div class="sectionhead"><div><div class="eyebrow">Whale & wallet watch</div><h2>Large-wallet headlines</h2></div><p>Recent public reporting about major wallet movements, whale activity and exchange transfers. Headlines are informational and may describe speculation rather than confirmed intent.</p></div>
+  <div class="news-grid" id="walletNews"><article class="card skeleton-card"><p>Loading wallet headlines…</p></article></div>
+  <div class="statusline" id="walletNewsStatus">Connecting to wallet news…</div>
+</section>
+
+<section class="section" id="learn">
+  <div class="sectionhead"><div><div class="eyebrow">Crypto for beginners</div><h2>From zero to your first wallet</h2></div><p>A simple path for someone who has never purchased crypto before. Educational only — not a recommendation to buy a particular asset.</p></div>
+
+  <div class="crypto-steps">
+    <article class="card"><b>01</b><h3>Choose where to buy</h3><p>Use a reputable, regulated exchange or on-ramp that is available where you live. Create your own account, use a unique password, and turn on two-factor authentication before funding it.</p></article>
+    <article class="card"><b>02</b><h3>Buy a small amount first</h3><p>Start with an amount you can afford to lose while you learn. Review the total price, spread and fees before confirming. You do not need to buy a whole coin.</p></article>
+    <article class="card"><b>03</b><h3>Decide where to hold it</h3><p><strong>Exchange custody:</strong> simplest for beginners, but the exchange controls the keys. <strong>Self-custody wallet:</strong> you control the keys and take responsibility for security. <strong>Hardware wallet:</strong> useful for larger or long-term holdings.</p></article>
+    <article class="card"><b>04</b><h3>Match the network</h3><p>Before withdrawing, confirm the receiving wallet supports the exact network you selected. Sending an asset on the wrong network or to an incompatible address can cause permanent loss.</p></article>
+    <article class="card"><b>05</b><h3>Test before sending more</h3><p>For a first transfer, send a small test amount. Confirm it arrives, then send the rest. Copy-and-paste the address and compare the beginning and end before you approve the transaction.</p></article>
+    <article class="card"><b>06</b><h3>Keep records</h3><p>Save transaction history, purchase prices, transfers and sales. Crypto activity can have tax consequences depending on your jurisdiction.</p></article>
+  </div>
+</section>
+
+<section class="section" id="wallet-rules">
+  <div class="sectionhead"><div><div class="eyebrow">Wallet rules</div><h2>Rules that protect your crypto</h2></div><p>These habits matter more than chasing the next token.</p></div>
+  <div class="wallet-rules">
+    <article class="card danger-card"><h3>Never share the recovery phrase</h3><p>Your seed/recovery phrase and private key are master access. No legitimate support agent, moderator, website or airdrop needs them.</p></article>
+    <article class="card"><h3>Back it up offline</h3><p>Write the recovery phrase down and store it somewhere physically secure. Avoid screenshots, cloud notes, DMs and ordinary email.</p></article>
+    <article class="card"><h3>Use a separate wallet for risky activity</h3><p>Keep long-term holdings separate from the wallet you use for new dApps, mints, memes or experimental sites.</p></article>
+    <article class="card"><h3>Verify the contract address</h3><p>Token names and logos can be copied. Confirm the contract or mint address from the project's official sources before swapping.</p></article>
+    <article class="card"><h3>Read what you sign</h3><p>A wallet signature can authorize more than a simple login. Do not approve transactions or permissions you do not understand.</p></article>
+    <article class="card"><h3>Never import a private key into a bot</h3><p>Do not paste your seed phrase or private key into Telegram, Discord, a website form, a browser chat, or an unverified trading bot.</p></article>
+  </div>
+</section>
+
+<section class="section">
+  <div class="callout glowcall">
+    <div class="eyebrow">Beginner shortcut</div>
+    <h2>The simple version</h2>
+    <p>Buy through a reputable service → protect the account with 2FA → create a wallet only when you need self-custody or on-chain access → write the recovery phrase down offline → test transfers with a small amount → never share your seed phrase or private key.</p>
+  </div>
 </section>
 
 <section class="section" id="studio-projects">
@@ -54,7 +107,7 @@
 </section>
 
 <section class="section">
-  <div class="callout"><div class="eyebrow">Safety note</div><h2>Verify before you connect</h2><p>Crypto links on this page should point only to official Think Exist destinations. Never enter a seed phrase or private key into a website. Market data is informational and may be delayed or temporarily unavailable.</p></div>
+  <div class="callout"><div class="eyebrow">Safety note</div><h2>Verify before you connect</h2><p>Crypto links on this page should point only to official Think Exist destinations or clearly labeled third-party services. Never enter a seed phrase or private key into a website. Market and news data may be delayed or temporarily unavailable.</p></div>
 </section>
 </main>
 
@@ -66,6 +119,7 @@
   const cards=document.getElementById('marketCards'), status=document.getElementById('marketStatus'), trend=document.getElementById('trending');
   const names={bitcoin:'Bitcoin',ethereum:'Ethereum',solana:'Solana'};
   const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:n<1?4:2}).format(n);
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   async function loadMarket(){
     try{
       const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true',{cache:'no-store'});
@@ -86,13 +140,34 @@
       const d=await r.json(), top=(d.coins||[]).slice(0,6);
       trend.innerHTML=top.map(x=>{
         const i=x.item||{}, rank=i.market_cap_rank?('#'+i.market_cap_rank):'Unranked';
-        return '<article class="card"><div class="eyebrow">'+rank+'</div><h3>'+String(i.name||'').replace(/[<>&]/g,'')+' <span style="color:var(--muted)">('+String(i.symbol||'').replace(/[<>&]/g,'')+')</span></h3><p>Trending search activity on CoinGecko.</p></article>';
+        return '<article class="card"><div class="eyebrow">'+rank+'</div><h3>'+esc(i.name||'')+' <span style="color:var(--muted)">('+esc(i.symbol||'')+')</span></h3><p>Trending search activity on CoinGecko.</p></article>';
       }).join('') || '<article class="card"><p>No trend data available.</p></article>';
     }catch(e){trend.innerHTML='<article class="card"><p>Trending feed is temporarily unavailable.</p></article>';}
   }
-  loadMarket(); loadTrending();
+  async function loadWalletNews(){
+    const box=document.getElementById('walletNews'), s=document.getElementById('walletNewsStatus');
+    try{
+      const r=await fetch('/api/wallet-news',{cache:'no-store'}); if(!r.ok)throw new Error();
+      const d=await r.json(), items=(d.items||[]).slice(0,8);
+      if(!items.length)throw new Error();
+      box.innerHTML=items.map((n,i)=>'<a class="news-card" href="'+esc(n.url)+'" target="_blank" rel="noopener"><span class="news-num">'+String(i+1).padStart(2,'0')+'</span><div><small>'+esc(n.source||'News')+'</small><h3>'+esc(n.title||'Crypto wallet update')+'</h3><p>'+esc(n.published||'Recent')+'</p></div><b>↗</b></a>').join('');
+      s.textContent='Updated '+new Date().toLocaleTimeString()+' · public news headlines';
+    }catch(e){
+      box.innerHTML='<article class="card"><h3>Wallet news is reconnecting.</h3><p>The rest of the crypto guide remains available.</p></article>';
+      s.textContent='Could not refresh wallet headlines.';
+    }
+  }
+  const dexFrame=document.getElementById('dexFrame'),dexChain=document.getElementById('dexChain'),dexAddress=document.getElementById('dexAddress');
+  document.getElementById('loadDex').addEventListener('click',()=>{
+    const chain=dexChain.value;
+    const addr=dexAddress.value.trim().replace(/[^a-zA-Z0-9]/g,'');
+    if(addr.length<20){dexAddress.focus();return;}
+    dexFrame.src='https://dexscreener.com/'+encodeURIComponent(chain)+'/'+encodeURIComponent(addr)+'?embed=1&info=0&theme=dark&trades=1';
+  });
+  loadMarket(); loadTrending(); loadWalletNews();
   setInterval(loadMarket,120000);
   setInterval(loadTrending,300000);
+  setInterval(loadWalletNews,600000);
 })();
 </script>
 <script src="vera-guide.js" defer></script>

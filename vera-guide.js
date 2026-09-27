@@ -26,6 +26,8 @@
   ],
   crypto:[
    'Quick safety fact: a legitimate website never needs your wallet seed phrase.',
+   'New to crypto? The Start Here guide explains buying, custody, transfers and wallet safety step by step.',
+   'DEX Screener charts are third-party market data. A chart appearing on the page is not an endorsement.'
    'Market prices can move faster than a page refresh, so treat snapshots as informational.',
    'Official links matter. Verify the destination before connecting a wallet.'
   ],

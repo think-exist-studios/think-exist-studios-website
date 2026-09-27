@@ -22,6 +22,17 @@
   <p>Add artwork, project links and portfolio entries without editing website code.</p>
 </section>
 
+<section class="creator-accountbar" id="creatorAccountBar">
+  <div class="creator-accountstate">
+    <span class="account-dot" id="accountDot"></span>
+    <div><strong id="accountLabel">Not signed in</strong><span id="accountDetail">Sign in to manage your creator page.</span></div>
+  </div>
+  <div class="toolbar">
+    <button class="btn primary" id="accountSignIn" type="button">Sign in</button>
+    <button class="btn hide" id="accountSignOut" type="button">Log out</button>
+  </div>
+</section>
+
 <section class="authbox" id="authBox">
   <h2>Creator access</h2>
   <p style="color:var(--muted)">First time here? Claim your approved account with the invite code. Already claimed it? Sign in below.</p>
@@ -78,6 +89,12 @@
     <div class="sectionhead"><div><div class="eyebrow">Your work</div><h2>Portfolio entries</h2></div><p>Edit the content, replace artwork, publish, unpublish or remove anything on your page.</p></div>
     <div id="items"></div>
   </div>
+
+  <div class="section hide" id="feedbackManager" style="padding-top:35px">
+    <div class="sectionhead"><div><div class="eyebrow">Profile feedback</div><h2>Ratings & comments</h2></div><p>Cash can review what visitors leave on his public profile, hide comments, restore them, or remove them.</p></div>
+    <div class="statusline" id="feedbackSummary"></div>
+    <div id="feedbackItems"></div>
+  </div>
 </section>
 </main>
 
@@ -91,21 +108,35 @@
   );
   const authBox=document.getElementById('authBox'), editor=document.getElementById('editor');
   const authStatus=document.getElementById('authStatus'), saveStatus=document.getElementById('saveStatus'), items=document.getElementById('items');
+  const accountLabel=document.getElementById('accountLabel'), accountDetail=document.getElementById('accountDetail'), accountDot=document.getElementById('accountDot');
+  const accountSignIn=document.getElementById('accountSignIn'), accountSignOut=document.getElementById('accountSignOut');
+  const feedbackManager=document.getElementById('feedbackManager'), feedbackItems=document.getElementById('feedbackItems'), feedbackSummary=document.getElementById('feedbackSummary');
   let session=null, contributor=null, editingItem=null, currentItems=[];
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const setAuthMessage=(m)=>authStatus.textContent=m;
 
+  function paintAccountState(){
+    const signedIn=Boolean(session&&contributor);
+    accountDot.classList.toggle('online',signedIn);
+    accountLabel.textContent=signedIn?'Signed in as '+contributor.display_name:'Not signed in';
+    accountDetail.textContent=signedIn?(contributor.email+' · Creator access active'):'Sign in to manage your creator page.';
+    accountSignIn.classList.toggle('hide',signedIn);
+    accountSignOut.classList.toggle('hide',!signedIn);
+  }
+
   async function refresh(){
     const {data:{session:s}}=await sb.auth.getSession(); session=s;
-    if(!session){authBox.classList.remove('hide');editor.classList.add('hide');return;}
+    if(!session){contributor=null;authBox.classList.remove('hide');editor.classList.add('hide');feedbackManager.classList.add('hide');paintAccountState();return;}
     const {data,error}=await sb.from('studio_contributors').select('slug,email,display_name,role_title').single();
     if(error||!data){await sb.auth.signOut();setAuthMessage('This account is not approved for Creator Studio.');return;}
-    contributor=data; authBox.classList.add('hide'); editor.classList.remove('hide');
+    contributor=data; authBox.classList.add('hide'); editor.classList.remove('hide'); paintAccountState();
     document.getElementById('who').textContent='Signed in as '+data.display_name+' · '+data.email+' · You control what is published on your page.';
     const publicLink=document.getElementById('publicPageLink');
     if(data.slug==='cash-cassius-miller'){publicLink.classList.remove('hide');publicLink.href='people/cash.html';}
     else{publicLink.classList.add('hide');}
     await loadItems();
+    if(data.slug==='cash-cassius-miller'){feedbackManager.classList.remove('hide');await loadFeedbackManager();}
+    else{feedbackManager.classList.add('hide');}
   }
 
   document.getElementById('claimForm').addEventListener('submit',async e=>{
@@ -161,7 +192,10 @@
   }
 
   document.getElementById('cancelEdit').addEventListener('click',()=>resetWorkForm('Edit cancelled.'));
-  document.getElementById('signOut').addEventListener('click',async()=>{resetWorkForm();await sb.auth.signOut();contributor=null;session=null;await refresh();});
+  accountSignIn.addEventListener('click',()=>document.getElementById('loginForm').scrollIntoView({behavior:'smooth',block:'center'}));
+  const signOutAll=async()=>{resetWorkForm();await sb.auth.signOut();contributor=null;session=null;await refresh();};
+  document.getElementById('signOut').addEventListener('click',signOutAll);
+  accountSignOut.addEventListener('click',signOutAll);
 
   document.getElementById('workForm').addEventListener('submit',async e=>{
     e.preventDefault(); if(!session||!contributor)return;
@@ -198,6 +232,40 @@
     resetWorkForm(message);
     await loadItems();
   });
+
+  async function loadFeedbackManager(){
+    if(!contributor||contributor.slug!=='cash-cassius-miller')return;
+    const {data,error}=await sb.from('profile_feedback')
+      .select('id,display_name,rating,comment,approved,created_at')
+      .eq('profile_slug',contributor.slug)
+      .order('created_at',{ascending:false})
+      .limit(100);
+    if(error){feedbackSummary.textContent='Could not load profile feedback.';feedbackItems.innerHTML='';return;}
+    const rows=data||[];
+    const visible=rows.filter(x=>x.approved);
+    const avg=visible.length?visible.reduce((sum,x)=>sum+Number(x.rating||0),0)/visible.length:0;
+    feedbackSummary.textContent=visible.length?('Public rating: '+avg.toFixed(1)+' / 5 from '+visible.length+' rating'+(visible.length===1?'':'s')+'.'):'No public ratings yet.';
+    if(!rows.length){feedbackItems.innerHTML='<p class="statusline">No ratings or comments yet.</p>';return;}
+    feedbackItems.innerHTML=rows.map(x=>{
+      const stars='★'.repeat(Number(x.rating)||0)+'☆'.repeat(5-(Number(x.rating)||0));
+      const comment=x.comment?'<p>'+esc(x.comment)+'</p>':'<p class="statusline">Rating only.</p>';
+      const date=new Date(x.created_at).toLocaleString();
+      return '<article class="feedback-admin-row" data-id="'+esc(x.id)+'"><div><div class="feedback-stars">'+stars+'</div><strong>'+esc(x.display_name)+'</strong><span class="statusline">'+esc(date)+' · '+(x.approved?'Visible':'Hidden')+'</span>'+comment+'</div><div class="toolbar"><button class="btn feedback-toggle" type="button" data-state="'+x.approved+'">'+(x.approved?'Hide':'Show')+'</button><button class="btn feedback-delete" type="button">Delete</button></div></article>';
+    }).join('');
+    feedbackItems.querySelectorAll('.feedback-toggle').forEach(btn=>btn.addEventListener('click',async()=>{
+      const row=btn.closest('.feedback-admin-row'), state=btn.dataset.state==='true';
+      const {error}=await sb.from('profile_feedback').update({approved:!state,updated_at:new Date().toISOString()}).eq('id',row.dataset.id);
+      if(error){feedbackSummary.textContent='Could not update feedback: '+error.message;return;}
+      await loadFeedbackManager();
+    }));
+    feedbackItems.querySelectorAll('.feedback-delete').forEach(btn=>btn.addEventListener('click',async()=>{
+      const row=btn.closest('.feedback-admin-row');
+      if(!confirm('Delete this rating/comment?'))return;
+      const {error}=await sb.from('profile_feedback').delete().eq('id',row.dataset.id);
+      if(error){feedbackSummary.textContent='Could not delete feedback: '+error.message;return;}
+      await loadFeedbackManager();
+    }));
+  }
 
   async function loadItems(){
     const {data,error}=await sb.from('portfolio_items').select('*').eq('contributor_slug',contributor.slug).order('sort_order',{ascending:true}).order('created_at',{ascending:false});

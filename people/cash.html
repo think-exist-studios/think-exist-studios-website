@@ -15,11 +15,28 @@
 </div></header>
 
 <main class="shell">
+<section class="profile-accountbar" id="profileAccountBar">
+  <div class="creator-accountstate">
+    <span class="account-dot" id="profileAccountDot"></span>
+    <div><strong id="profileAccountLabel">Creator account: signed out</strong><span id="profileAccountDetail">Cash can sign in to manage this page.</span></div>
+  </div>
+  <div class="toolbar">
+    <a class="btn primary" id="profileSignIn" href="../creator-studio.html">Sign in</a>
+    <a class="btn hide" id="profileManage" href="../creator-studio.html">Manage page</a>
+    <button class="btn hide" id="profileSignOut" type="button">Log out</button>
+  </div>
+</section>
+
 <section class="profilehero">
   <div>
     <div class="eyebrow">Creator profile</div>
     <h1>Cash <span class="grad">(Cassius) Miller</span></h1>
     <p>Graphic designer, comic book artist, writer and creator of <strong>StarGazer</strong>.</p>
+    <div class="profile-rating-summary" aria-live="polite">
+      <span class="feedback-stars" id="heroStars">☆☆☆☆☆</span>
+      <strong id="heroRating">No ratings yet</strong>
+      <a href="#feedback">Rate this profile ↓</a>
+    </div>
     <div class="tagrow" style="margin-top:14px"><span class="tag">Artist</span><span class="tag">Business</span><span class="tag">Writer</span><span class="tag">Creative</span></div>
     <div class="row" style="justify-content:flex-start"><a class="btn primary" href="#portfolio">View work ↓</a><a class="btn" href="../creator-studio.html">Manage portfolio</a></div>
   </div>
@@ -46,6 +63,34 @@
   <div class="statusline" id="portfolioStatus">Loading published portfolio…</div>
 </section>
 
+<section class="section" id="feedback">
+  <div class="sectionhead"><div><div class="eyebrow">Community feedback</div><h2>Rate Cash's profile</h2></div><p>Visitors can leave a 1–5 star rating and an optional public comment. No email address is required.</p></div>
+  <div class="feedback-layout">
+    <form class="card feedback-form" id="feedbackForm">
+      <div class="eyebrow">Your rating</div>
+      <div class="rating-picker" id="ratingPicker" role="radiogroup" aria-label="Choose a rating">
+        <button type="button" data-rating="1" aria-label="1 star">★</button>
+        <button type="button" data-rating="2" aria-label="2 stars">★</button>
+        <button type="button" data-rating="3" aria-label="3 stars">★</button>
+        <button type="button" data-rating="4" aria-label="4 stars">★</button>
+        <button type="button" data-rating="5" aria-label="5 stars">★</button>
+      </div>
+      <div class="field"><label for="feedbackName">Display name</label><input id="feedbackName" maxlength="40" required placeholder="How should your name appear?"></div>
+      <div class="field"><label for="feedbackComment">Comment <span class="statusline">(optional)</span></label><textarea id="feedbackComment" maxlength="800" placeholder="What do you think of Cash's work or profile?"></textarea></div>
+      <button class="btn primary" id="feedbackSubmit" type="submit">Post rating</button>
+      <div class="statusline" id="feedbackStatus">Choose 1–5 stars before posting.</div>
+    </form>
+    <div class="feedback-community">
+      <div class="rating-overview">
+        <strong id="ratingAverage">—</strong><span>/ 5</span>
+        <div class="feedback-stars" id="ratingStars">☆☆☆☆☆</div>
+        <p id="ratingCount">No ratings yet.</p>
+      </div>
+      <div id="commentsList"><p class="statusline">Loading comments…</p></div>
+    </div>
+  </div>
+</section>
+
 <section class="section">
   <div class="callout"><div class="eyebrow">Related People</div><h2>Creators around the studio</h2><p>This area is built to link Cash, Ganny and future collaborators to one another while keeping each person's work separate and clearly credited.</p><a class="feature-link" href="../index.html#people">See the studio people →</a></div>
 </section>
@@ -59,26 +104,88 @@
     'https://aivziwaudzuzwlkjmuly.supabase.co',
     'sb_publishable_07ChHzoUQS98-PHaxbNx2g_zmZ2QXeP'
   );
-  const grid = document.getElementById('portfolioGrid');
-  const status = document.getElementById('portfolioStatus');
-  const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  async function load(){
-    const {data,error} = await sb.from('portfolio_items')
+  const profileSlug='cash-cassius-miller';
+  const grid=document.getElementById('portfolioGrid'), portfolioStatus=document.getElementById('portfolioStatus');
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  async function loadAccountState(){
+    const {data:{session}}=await sb.auth.getSession();
+    const dot=document.getElementById('profileAccountDot'), label=document.getElementById('profileAccountLabel'), detail=document.getElementById('profileAccountDetail');
+    const signIn=document.getElementById('profileSignIn'), manage=document.getElementById('profileManage'), signOut=document.getElementById('profileSignOut');
+    if(!session){
+      dot.classList.remove('online');label.textContent='Creator account: signed out';detail.textContent='Cash can sign in to manage this page.';
+      signIn.classList.remove('hide');manage.classList.add('hide');signOut.classList.add('hide');return;
+    }
+    const {data}=await sb.from('studio_contributors').select('slug,display_name,email').maybeSingle();
+    if(data?.slug===profileSlug){
+      dot.classList.add('online');label.textContent='Signed in as '+data.display_name;detail.textContent=data.email+' · Creator access active';
+      signIn.classList.add('hide');manage.classList.remove('hide');signOut.classList.remove('hide');
+    }else{
+      dot.classList.remove('online');label.textContent='Signed in to another account';detail.textContent='This page belongs to Cash.';
+      signIn.classList.remove('hide');manage.classList.add('hide');signOut.classList.remove('hide');
+    }
+  }
+
+  document.getElementById('profileSignOut').addEventListener('click',async()=>{await sb.auth.signOut();await loadAccountState();});
+
+  async function loadPortfolio(){
+    const {data,error}=await sb.from('portfolio_items')
       .select('title,description,image_url,project_url,tags,sort_order')
-      .eq('contributor_slug','cash-cassius-miller')
-      .eq('published',true)
-      .order('sort_order',{ascending:true})
-      .order('created_at',{ascending:false});
-    if(error || !data?.length){status.textContent='Showing featured work.';return;}
-    grid.innerHTML = data.map(item => {
-      const image = item.image_url ? '<img src="'+esc(item.image_url)+'" alt="Artwork for '+esc(item.title)+'">' : '';
-      const tags = (item.tags||[]).map(t=>'<span class="tag">'+esc(t)+'</span>').join('');
-      const link = item.project_url ? '<a class="feature-link" href="'+esc(item.project_url)+'" target="_blank" rel="noopener">View project ↗</a>' : '';
+      .eq('contributor_slug',profileSlug).eq('published',true)
+      .order('sort_order',{ascending:true}).order('created_at',{ascending:false});
+    if(error||!data?.length){portfolioStatus.textContent='Showing featured work.';return;}
+    grid.innerHTML=data.map(item=>{
+      const image=item.image_url?'<img src="'+esc(item.image_url)+'" alt="Artwork for '+esc(item.title)+'">':'';
+      const tags=(item.tags||[]).map(t=>'<span class="tag">'+esc(t)+'</span>').join('');
+      const link=item.project_url?'<a class="feature-link" href="'+esc(item.project_url)+'" target="_blank" rel="noopener">View project ↗</a>':'';
       return '<article class="work">'+image+'<div class="body"><div class="tagrow">'+tags+'</div><h3>'+esc(item.title)+'</h3><p>'+esc(item.description||'')+'</p>'+link+'</div></article>';
     }).join('');
-    status.textContent='Portfolio synced with Creator Studio.';
+    portfolioStatus.textContent='Portfolio synced with Creator Studio.';
   }
-  load();
+
+  let selectedRating=0;
+  const picker=[...document.querySelectorAll('#ratingPicker button')];
+  function paintPicker(){
+    picker.forEach(btn=>btn.classList.toggle('selected',Number(btn.dataset.rating)<=selectedRating));
+    document.getElementById('feedbackStatus').textContent=selectedRating?('Selected '+selectedRating+' star'+(selectedRating===1?'':'s')+'.'):'Choose 1–5 stars before posting.';
+  }
+  picker.forEach(btn=>btn.addEventListener('click',()=>{selectedRating=Number(btn.dataset.rating);paintPicker();}));
+
+  async function loadFeedback(){
+    const {data,error}=await sb.from('profile_feedback')
+      .select('display_name,rating,comment,created_at')
+      .eq('profile_slug',profileSlug).eq('approved',true)
+      .order('created_at',{ascending:false}).limit(50);
+    const rows=error?[]:(data||[]);
+    const avg=rows.length?rows.reduce((s,x)=>s+Number(x.rating||0),0)/rows.length:0;
+    const rounded=Math.round(avg);
+    document.getElementById('ratingAverage').textContent=rows.length?avg.toFixed(1):'—';
+    document.getElementById('ratingStars').textContent='★'.repeat(rounded)+'☆'.repeat(5-rounded);
+    document.getElementById('ratingCount').textContent=rows.length?(rows.length+' rating'+(rows.length===1?'':'s')):'No ratings yet.';
+    document.getElementById('heroStars').textContent='★'.repeat(rounded)+'☆'.repeat(5-rounded);
+    document.getElementById('heroRating').textContent=rows.length?(avg.toFixed(1)+' from '+rows.length+' rating'+(rows.length===1?'':'s')):'No ratings yet';
+    const comments=rows.filter(x=>x.comment);
+    document.getElementById('commentsList').innerHTML=comments.length?comments.map(x=>{
+      const date=new Date(x.created_at).toLocaleDateString();
+      const stars='★'.repeat(Number(x.rating)||0)+'☆'.repeat(5-(Number(x.rating)||0));
+      return '<article class="comment-card"><div class="comment-head"><strong>'+esc(x.display_name)+'</strong><span class="feedback-stars">'+stars+'</span></div><p>'+esc(x.comment)+'</p><small>'+esc(date)+'</small></article>';
+    }).join(''):'<p class="statusline">No public comments yet. Be the first to leave one.</p>';
+  }
+
+  document.getElementById('feedbackForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const status=document.getElementById('feedbackStatus');
+    if(!selectedRating){status.textContent='Choose a star rating first.';return;}
+    const displayName=document.getElementById('feedbackName').value.trim();
+    const comment=document.getElementById('feedbackComment').value.trim();
+    status.textContent='Posting…';
+    const {data,error}=await sb.functions.invoke('submit-profile-feedback',{body:{profileSlug,displayName,rating:selectedRating,comment}});
+    if(error||data?.error){status.textContent=data?.error||error?.message||'Could not post feedback.';return;}
+    e.target.reset();selectedRating=0;paintPicker();status.textContent='Posted. Thank you for the feedback.';await loadFeedback();
+  });
+
+  sb.auth.onAuthStateChange(()=>setTimeout(loadAccountState,0));
+  loadAccountState();loadPortfolio();loadFeedback();
 })();
 </script>
 <script src="../vera-guide.js" defer></script>

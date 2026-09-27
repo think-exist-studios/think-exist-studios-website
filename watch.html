@@ -110,6 +110,8 @@
   {name:'NASA',playlist:'UUA_DiR1FfKNvjuUpBHmylQw'},
   {name:'Google Developers',playlist:'UU_x5XG1OV2P6uZZ5FSM9Ttw'}
  ];
+ function fetchWithTimeout(url,opts={},ms=7000){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),ms);return fetch(url,{...opts,signal:controller.signal}).finally(()=>clearTimeout(timer));}
+ const media=u=>'/api/media?url='+encodeURIComponent(u);
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function wirePlayers(){
    feed.querySelectorAll('.watch-play').forEach(btn=>btn.addEventListener('click',()=>{
@@ -121,7 +123,7 @@
    }));
  }
  function paint(items){
-   feed.innerHTML=items.map((v,i)=>'<article class="watch-card"><div class="watch-player" data-id="'+esc(v.id)+'"><img loading="lazy" src="https://i.ytimg.com/vi/'+encodeURIComponent(v.id)+'/hqdefault.jpg" alt=""><button class="watch-play" type="button" aria-label="Play '+esc(v.title)+'"><span>▶</span></button></div><div class="watch-meta"><small>'+esc(v.channel||'YouTube')+' · '+String(i+1).padStart(2,'0')+'</small><h3>'+esc(v.title||'Untitled video')+'</h3><p>Tap to watch here · YouTube embed</p></div></article>').join('');
+   feed.innerHTML=items.map((v,i)=>'<article class="watch-card"><div class="watch-player" data-id="'+esc(v.id)+'"><img loading="lazy" referrerpolicy="no-referrer" src="'+media('https://i.ytimg.com/vi/'+v.id+'/hqdefault.jpg')+'" alt="'+esc(v.title||'YouTube thumbnail')+'" onerror="this.style.display=\'none\'"><button class="watch-play" type="button" aria-label="Play '+esc(v.title)+'"><span>▶</span></button></div><div class="watch-meta"><small>'+esc(v.channel||'YouTube')+' · '+String(i+1).padStart(2,'0')+'</small><h3>'+esc(v.title||'Untitled video')+'</h3><p>Tap to watch here · YouTube embed</p></div></article>').join('');
    wirePlayers();
  }
  function paintFallback(){
@@ -131,7 +133,7 @@
  async function load(){
    status.textContent='Refreshing YouTube feed…';
    try{
-     const r=await fetch('/api/tech-videos',{cache:'no-store'});
+     const r=await fetchWithTimeout('/api/tech-videos',{cache:'no-store'},7500);
      if(!r.ok)throw new Error();
      const d=await r.json(),items=(d.items||[]).slice(0,10);
      if(items.length){
@@ -147,6 +149,8 @@
    }
  }
  refresh.addEventListener('click',load);
+ paintFallback();
+ status.textContent='Loading fresh videos… showing fallback channels now.';
  load();
 })();
 </script>

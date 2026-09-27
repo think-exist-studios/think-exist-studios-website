@@ -441,3 +441,45 @@
 
 /* Seed phrase warning emphasis */
 .seed-danger-text{color:#ff6b6b;font-weight:800}
+
+
+/* Membership and account UI */
+.home-memberbar,.member-account-card{
+  margin-top:14px;
+  border:1px solid #8bdcff2b;
+  background:linear-gradient(120deg,#0c1728cc,#17162bcc);
+  border-radius:16px;
+  padding:12px 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  backdrop-filter:blur(10px);
+}
+.home-member-state{display:flex;align-items:center;gap:10px;min-width:0}
+.home-member-state>div{display:grid;min-width:0}
+.home-member-state strong{font-size:.88rem}
+.home-member-state span:not(.account-dot){font-size:.74rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.member-account-card h2{margin:4px 0}.member-account-card p{margin:0;color:var(--muted)}
+.member-dashboard-grid{display:grid;grid-template-columns:minmax(260px,.72fr) minmax(0,1.28fr);gap:16px}
+.account-reference-full{font:700 .74rem/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;border:1px solid var(--line);background:#050a13;border-radius:10px;padding:10px;margin:11px 0;color:#c9d6e9}
+.member-ref-meta{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:10px 0 14px;color:var(--muted)}
+.member-ref-meta strong{color:var(--ink)}
+.member-notification-list{display:grid;gap:10px;margin-top:14px;max-height:520px;overflow:auto}
+.member-notice{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;border:1px solid var(--line);border-radius:13px;background:#ffffff05;padding:12px}
+.member-notice.unread{border-color:#8bdcff55;background:#8bdcff0a;box-shadow:inset 3px 0 0 #8bdcff}
+.member-notice>div:first-child{display:grid;gap:4px}
+.member-notice small{font-size:.62rem;letter-spacing:.1em;color:var(--cyan);font-weight:900}
+.member-notice strong{font-size:.92rem}
+.member-notice p{margin:2px 0;color:#dce5f4;font-size:.8rem}
+.member-notice span{color:var(--muted);font-size:.68rem}
+.member-notice-actions{display:flex;flex-direction:column;align-items:flex-end;gap:8px;justify-content:center}
+@media(max-width:760px){
+  .home-memberbar,.member-account-card{display:grid;grid-template-columns:1fr;padding:11px 12px}
+  .home-memberbar .toolbar,.member-account-card .toolbar{width:100%}
+  .home-memberbar .toolbar .btn,.member-account-card .toolbar .btn{flex:1}
+  .member-dashboard-grid{grid-template-columns:1fr}
+  .member-notice{grid-template-columns:1fr}
+  .member-notice-actions{align-items:stretch}
+  .member-notice-actions .btn{width:100%}
+}

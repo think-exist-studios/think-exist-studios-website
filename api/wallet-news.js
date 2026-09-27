@@ -1,3 +1,4 @@
+const fetchWithTimeout=(url,opts={},ms=6000)=>{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),ms);return fetch(url,{...opts,signal:controller.signal}).finally(()=>clearTimeout(timer));};
 const clean=s=>String(s||'')
  .replace(/<!\[CDATA\[|\]\]>/g,'')
  .replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'")
@@ -9,7 +10,7 @@ module.exports=async function handler(req,res){
   try{
     const q=encodeURIComponent('crypto whale wallet OR large wallet OR whale alert cryptocurrency');
     const url='https://news.google.com/rss/search?q='+q+'&hl=en-US&gl=US&ceid=US:en';
-    const r=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0 ThinkExistCrypto/1.0'}});
+    const r=await fetchWithTimeout(url,{headers:{'User-Agent':'Mozilla/5.0 ThinkExistCrypto/1.0'}},6000);
     if(!r.ok)throw new Error('news');
     const xml=await r.text();
     const items=[...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0,12).map(m=>{

@@ -119,11 +119,23 @@ RECORDS
   <div class="sectionhead"><div><div class="eyebrow">Offline recovery backup</div><h2>Seed phrase worksheet</h2></div><p>For safety, this website does <strong>not</strong> provide a box for entering a real seed phrase or private key.</p></div>
   <div class="recovery-safe card danger-card">
     <h3>Use this only as a blank template</h3>
-    <p>Copy or print the blank worksheet, then fill the words in <strong>offline</strong> on paper or another secure offline method. Never paste your actual seed phrase into this website, a chat, email, Discord, Telegram, or an unknown app.</p>
-    <div class="recovery-actions"><button class="btn primary" id="copySeedTemplate" type="button">Copy 12-word blank template</button><button class="btn" id="copySeedTemplate24" type="button">Copy 24-word blank template</button></div>
-    <pre id="seedTemplatePreview">1. __________   2. __________   3. __________   4. __________
-5. __________   6. __________   7. __________   8. __________
-9. __________  10. __________  11. __________  12. __________</pre>
+    <p>Choose a 12-word or 24-word format, tap <strong>Copy template</strong>, then paste the whole blank form into your own <strong>offline/local Notepad</strong> and type one recovery word after each number. A paper backup is safer than a digital note. Do not use a cloud-synced note for a real seed phrase, and never paste the phrase into this website, chat, email, Discord, Telegram, or an unknown app.</p>
+    <div class="recovery-actions"><button class="btn primary" id="copySeedTemplate" type="button">Copy 12-word Notepad template</button><button class="btn" id="copySeedTemplate24" type="button">Copy 24-word Notepad template</button></div>
+    <pre id="seedTemplatePreview">SEED PHRASE — 12-WORD TEMPLATE
+Type one word after each number.
+
+01. 
+02. 
+03. 
+04. 
+05. 
+06. 
+07. 
+08. 
+09. 
+10. 
+11. 
+12. </pre>
     <p class="seed-warning"><strong>Think Exist Studios will never ask for your recovery phrase or private key.</strong></p>
     <div class="statusline" id="seedTemplateStatus">Blank template only — no secret information is stored here.</div>
   </div>
@@ -246,10 +258,10 @@ RECORDS
   };
   const checklist=document.getElementById('cryptoChecklistText'),checkStatus=document.getElementById('checklistStatus');
   document.getElementById('copyCryptoChecklist').addEventListener('click',()=>copyText(checklist.textContent,checkStatus,'Checklist copied. Keep seed phrases and private keys out of it.'));
-  const makeSeedTemplate=n=>Array.from({length:n},(_,i)=>String(i+1).padStart(2,' ') + '. __________').reduce((rows,x,i)=>{const r=Math.floor(i/4);(rows[r]||(rows[r]=[])).push(x);return rows;},[]).map(r=>r.join('   ')).join('\n');
+  const makeSeedTemplate=n=>'SEED PHRASE — '+n+'-WORD TEMPLATE\nType one word after each number.\n\n'+Array.from({length:n},(_,i)=>String(i+1).padStart(2,'0')+'. ').join('\n');
   const seedPreview=document.getElementById('seedTemplatePreview'),seedStatus=document.getElementById('seedTemplateStatus');
-  document.getElementById('copySeedTemplate').addEventListener('click',()=>{const t=makeSeedTemplate(12);seedPreview.textContent=t;copyText(t,seedStatus,'Blank 12-word worksheet copied. Fill it offline only.');});
-  document.getElementById('copySeedTemplate24').addEventListener('click',()=>{const t=makeSeedTemplate(24);seedPreview.textContent=t;copyText(t,seedStatus,'Blank 24-word worksheet copied. Fill it offline only.');});
+  document.getElementById('copySeedTemplate').addEventListener('click',()=>{const t=makeSeedTemplate(12);seedPreview.textContent=t;copyText(t,seedStatus,'12-word Notepad template copied. Paste it into a secure offline/local note and type after each number.');});
+  document.getElementById('copySeedTemplate24').addEventListener('click',()=>{const t=makeSeedTemplate(24);seedPreview.textContent=t;copyText(t,seedStatus,'24-word Notepad template copied. Paste it into a secure offline/local note and type after each number.');});
 
 
   const blockchainLessons=[

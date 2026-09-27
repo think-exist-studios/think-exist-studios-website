@@ -630,3 +630,26 @@
   .nft-radar-strip{grid-template-columns:1fr}
   .nft-crypto-grid{grid-template-columns:1fr}
 }
+
+
+/* Daily quiz answer feedback */
+.quiz-help{margin:6px 0 0;color:var(--muted);font-size:.75rem;line-height:1.45}
+.quiz-answer{position:relative;transition:border-color .18s ease,background .18s ease,box-shadow .18s ease,transform .18s ease}
+.quiz-answer.quiz-selected{transform:translateX(2px)}
+.quiz-answer.quiz-correct{
+  color:#d9ffea;
+  border-color:#4fe18a!important;
+  background:linear-gradient(120deg,#123322,#0f2a1e)!important;
+  box-shadow:0 0 0 1px #4fe18a33,0 10px 28px #1c8c4e22;
+}
+.quiz-answer.quiz-wrong{
+  color:#ffe2e2;
+  border-color:#ff6969!important;
+  background:linear-gradient(120deg,#371818,#2b1318)!important;
+  box-shadow:0 0 0 1px #ff696933,0 10px 28px #9a202022;
+}
+.quiz-answer.quiz-correct:after,.quiz-answer.quiz-wrong:after{margin-left:auto;font-size:1rem;font-weight:1000}
+.quiz-answer.quiz-correct:after{content:"✓";color:#69f2a1}
+.quiz-answer.quiz-wrong:after{content:"✕";color:#ff8d8d}
+.quiz-status{min-height:22px;margin-top:10px}
+@media(max-width:620px){.quiz-help{font-size:.72rem}.quiz-answer.quiz-selected{transform:none}}

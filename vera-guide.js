@@ -3,11 +3,13 @@
  const facts={
   home:[
    'VERA here. I stand for Versatile Ethical Reasoning Assistant.',
-   'Studio tip: Discover changes throughout the day, so it is worth checking twice.',
-   'The Unfinished already has character switching between Sir Barely and Sir Almost.',
-   'Tap me whenever I appear and I will swap the fact.'
+   'The studio now uses dedicated pages for projects, people, games, media and creator tools.',
+   'The Unfinished is a Think Exist Studios game project.',
+   'Tap me whenever I appear and I will swap the fact.',
+   'Need more room? Minimize my tip, or hide me for this browsing session and reopen me from the VERA button.'
   ],
   games:[
+   'The Unfinished is developed under Think Exist Studios.',
    'The game prototype already tracks health, damage and respawning.',
    'Sir Barely and Sir Almost can already be switched in the Godot prototype.',
    'The current prototype uses Godot 4 compatibility rendering for mobile-minded development.',
@@ -28,7 +30,8 @@
    'Use the refresh button whenever you want a new snapshot of the art and NFT feeds.'
   ],
   watch:[
-   'Think Exist Watch now supports playable video from YouTube, TikTok, Twitch, Vimeo, Dailymotion and PeerTube.',
+   'Think Exist Watch supports playable video from YouTube, TikTok, Twitch, Vimeo, Dailymotion and PeerTube.',
+   'The Art page stays available from the main navigation while you browse Watch.',
    'Use the source tabs on Watch to switch platforms without leaving the Think Exist site.',
    'The feed refreshes from selected YouTube channels without exposing your private account data.'
   ],
@@ -53,26 +56,55 @@
  };
  const page=document.body.dataset.page || (location.pathname.includes('crypto')?'crypto':location.pathname.includes('creator')?'creator':location.pathname.includes('/people/')?'people':'home');
  const pool=facts[page]||facts.home;
- let idx=Math.floor(Math.random()*pool.length), timer, moveTimer;
- const root=document.createElement('aside');root.className='vera-guide';root.setAttribute('aria-label','VERA website guide');
- root.innerHTML='<div class="vera-bubble" role="status" aria-live="polite"><button class="vera-close" aria-label="Hide VERA tip">×</button><strong>VERA SAYS</strong><p></p></div><button class="vera-character" aria-label="Ask VERA for another fact"><img alt="VERA, Think Exist Studios AI Systems Guardian"></button>';
- document.body.appendChild(root);
- const bubble=root.querySelector('.vera-bubble'), text=bubble.querySelector('p'), char=root.querySelector('.vera-character'), close=root.querySelector('.vera-close');
- char.querySelector('img').src=VERA_IMAGE;
+ let idx=Math.floor(Math.random()*pool.length), timer;
+ const root=document.createElement('aside');
+ root.className='vera-guide';
+ root.setAttribute('aria-label','VERA website guide');
+ root.innerHTML='<div class="vera-bubble" role="status" aria-live="polite"><div class="vera-controls"><button class="vera-minimize" type="button" aria-label="Minimize VERA tip">−</button><button class="vera-close" type="button" aria-label="Hide VERA for this session">×</button></div><strong>VERA SAYS</strong><p></p></div><button class="vera-character" type="button" aria-label="Ask VERA for another fact"><img alt="VERA, Think Exist Studios AI Systems Guardian"></button>';
+ const launcher=document.createElement('button');
+ launcher.className='vera-launcher';
+ launcher.type='button';
+ launcher.setAttribute('aria-label','Show VERA');
+ launcher.textContent='VERA';
+ document.body.append(root,launcher);
+
+ const bubble=root.querySelector('.vera-bubble'), text=bubble.querySelector('p'), char=root.querySelector('.vera-character'), close=root.querySelector('.vera-close'), minimize=root.querySelector('.vera-minimize');
  const img=char.querySelector('img');
  img.src=VERA_IMAGE;
  img.addEventListener('load',()=>char.classList.add('vera-image-ready'),{once:true});
- img.addEventListener('error',()=>{
-   img.hidden=true;
-   char.classList.add('vera-image-fallback');
- },{once:true});
+ img.addEventListener('error',()=>{img.hidden=true;char.classList.add('vera-image-fallback')},{once:true});
+
+ const getHidden=()=>{try{return sessionStorage.getItem('thinkexist-vera-hidden')==='1'}catch(e){return false}};
+ const setHidden=v=>{try{v?sessionStorage.setItem('thinkexist-vera-hidden','1'):sessionStorage.removeItem('thinkexist-vera-hidden')}catch(e){}};
+
  function say(){
    text.textContent=pool[idx++%pool.length];
    bubble.classList.add('show');
    clearTimeout(timer);
    timer=setTimeout(()=>bubble.classList.remove('show'),10000);
  }
- char.addEventListener('click',()=>say());
- close.addEventListener('click',e=>{e.stopPropagation();bubble.classList.remove('show')});
- setTimeout(()=>say(),900);
+ function hideVera(){
+   clearTimeout(timer);
+   bubble.classList.remove('show');
+   root.classList.add('is-hidden');
+   launcher.classList.add('show');
+   setHidden(true);
+ }
+ function showVera(){
+   root.classList.remove('is-hidden');
+   launcher.classList.remove('show');
+   setHidden(false);
+   say();
+ }
+ char.addEventListener('click',say);
+ minimize.addEventListener('click',e=>{e.stopPropagation();clearTimeout(timer);bubble.classList.remove('show')});
+ close.addEventListener('click',e=>{e.stopPropagation();hideVera()});
+ launcher.addEventListener('click',showVera);
+
+ if(getHidden()){
+   root.classList.add('is-hidden');
+   launcher.classList.add('show');
+ }else{
+   setTimeout(say,900);
+ }
 })();

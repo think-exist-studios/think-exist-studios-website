@@ -32,7 +32,7 @@
 </section>
 
 <section class="section moses-report-section" id="moses-report">
-  <div class="sectionhead"><div><div class="eyebrow">Market Observation & Strategy Evaluation Specialist</div><h2>MOSES Report</h2></div><p>MOSES watches broad crypto conditions, unusual moves, protocol upgrades and market catalysts, then explains what he sees. Research only — not a promise of profit.</p></div>
+  <div class="sectionhead"><div><div class="eyebrow">Market Observation & Strategy Evaluation Specialist</div><h2>MOSES Report</h2></div><div><p>MOSES watches broad crypto conditions, unusual moves, protocol upgrades and market catalysts, then explains what he sees. Research only — not a promise of profit.</p><a class="feature-link" href="moses.html">Meet MOSES →</a></div></div>
 
   <div class="moses-report-banner">
     <div class="moses-report-identity">
@@ -48,6 +48,11 @@
       <div><small>MEDIAN 24H</small><strong id="mosesMedian">—</strong></div>
       <div><small>BTC 24H</small><strong id="mosesBtc">—</strong></div>
     </div>
+  </div>
+
+  <div class="moses-rotation-wrap">
+    <div class="moses-rotation-label"><div><span class="eyebrow">Core rotation watch</span><strong>BTC · ETH · SOL · XRP · XLM</strong></div><p>MOSES follows this basket alongside the broader market. Inclusion means monitored, not recommended.</p></div>
+    <div class="moses-rotation-grid" id="mosesRotation"><div class="moses-rotation-chip">Loading rotation watch…</div></div>
   </div>
 
   <div class="sectionhead moses-subhead"><div><div class="eyebrow">Research watchlist</div><h3>Most Lucrative Potential</h3></div><p>Coins currently showing the strongest combination of liquidity, activity, momentum and opportunity profile in MOSES's model. A high score is not a guarantee of future returns.</p></div>
@@ -268,6 +273,7 @@ Write one word after each number.
     breadth:document.getElementById('mosesBreadth'),
     median:document.getElementById('mosesMedian'),
     btc:document.getElementById('mosesBtc'),
+    rotation:document.getElementById('mosesRotation'),
     potential:document.getElementById('mosesPotential'),
     moves:document.getElementById('mosesMoves'),
     catalysts:document.getElementById('mosesCatalysts'),
@@ -290,6 +296,12 @@ Write one word after each number.
       mosesEls.breadth.textContent=(Number(m.breadth_positive_pct)||0).toFixed(1)+'%';
       mosesEls.median.textContent=signed(m.median_24h_change_pct);
       mosesEls.btc.textContent=signed(m.bitcoin_24h_change_pct);
+
+      const rotation=(d.major_assets||[]).filter(x=>['BTC','ETH','SOL','XRP','XLM'].includes(String(x.symbol||'').toUpperCase()));
+      mosesEls.rotation.innerHTML=rotation.length?rotation.map(x=>{
+        const change=Number(x.change_24h_pct)||0;
+        return '<article class="moses-rotation-chip"><div><strong>'+esc(x.symbol||'')+'</strong><span>'+esc(x.name||'')+'</span></div><div><b>'+compactUsd(x.price_usd)+'</b><em class="'+(change>=0?'up':'down')+'">'+signed(change)+'</em></div></article>';
+      }).join(''):'<div class="moses-rotation-chip">Rotation watch is reconnecting.</div>';
 
       const potential=(d.most_lucrative_potential||[]).slice(0,6);
       mosesEls.potential.innerHTML=potential.length?potential.map((x,i)=>{

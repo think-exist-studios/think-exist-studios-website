@@ -11,7 +11,8 @@
    'The game prototype already tracks health, damage and respawning.',
    'Sir Barely and Sir Almost can already be switched in the Godot prototype.',
    'The current prototype uses Godot 4 compatibility rendering for mobile-minded development.',
-   'A private development workspace is never the same thing as a public playable deployment.'
+   'A private development workspace is never the same thing as a public playable deployment.',
+   'Steam public broadcasts are available through Steam itself; the Game Lab links there rather than pretending native Steam playback is embedded.'
   ],
   discover:[
    'The word robot entered popular culture through Karel Čapek’s 1920 play R.U.R.',
@@ -31,7 +32,8 @@
    'DEX Screener charts are third-party market data. A chart appearing on the page is not an endorsement.',
    'Use the copyable beginner checklist, but never type a real seed phrase or private key into the website.',
    'Market prices can move faster than a page refresh, so treat snapshots as informational.',
-   'Official links matter. Verify the destination before connecting a wallet.'
+   'Official links matter. Verify the destination before connecting a wallet.',
+   'Blockchain 101 rotates through a short beginner lesson and quiz each day.'
   ],
   creator:[
    'Creator Studio separates publishing tools from the public portfolio pages.',

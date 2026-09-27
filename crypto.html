@@ -18,7 +18,7 @@
   <div class="eyebrow">Web3 · market watch · wallet safety · beginner guide</div>
   <h1>Think Exist <span class="grad">Crypto</span></h1>
   <p>A practical crypto hub: live prices, DEX Screener charts, whale and wallet headlines, studio projects, and a beginner path for buying and storing crypto safely.</p>
-  <div class="row"><a class="btn primary" href="#markets">Live market →</a><a class="btn" href="#dexscreener">DEX Screener</a><a class="btn" href="#learn">Start here</a><a class="btn" href="#beginner-checklist">Checklist</a><a class="btn" href="#wallet-news">Wallet news</a></div>
+  <div class="row"><a class="btn primary" href="#markets">Live market →</a><a class="btn" href="#dexscreener">DEX Screener</a><a class="btn" href="#learn">Start here</a><a class="btn" href="#beginner-checklist">Checklist</a><a class="btn" href="#blockchain-101">Blockchain 101</a><a class="btn" href="#wallet-news">Wallet news</a></div>
 </section>
 
 <section class="section" id="markets">
@@ -129,6 +129,25 @@ RECORDS
   </div>
 </section>
 
+
+<section class="section" id="blockchain-101">
+  <div class="sectionhead"><div><div class="eyebrow">Blockchain 101 for beginners</div><h2>Daily lesson + quiz</h2></div><p>A different short lesson appears each day. No account is required and quiz answers stay in your browser.</p></div>
+  <div class="blockchain-daily">
+    <article class="card lesson-card">
+      <div class="tagrow"><span class="tag live-tag">Today's lesson</span><span class="tag" id="lessonDay">Day --</span></div>
+      <h3 id="lessonTitle">Loading lesson…</h3>
+      <p id="lessonBody"></p>
+      <div class="lesson-example" id="lessonExample"></div>
+    </article>
+    <article class="card quiz-card">
+      <div class="eyebrow">Quick quiz</div>
+      <h3 id="quizQuestion">Loading question…</h3>
+      <div id="quizAnswers" class="quiz-answers"></div>
+      <div class="statusline" id="quizStatus">Choose one answer.</div>
+    </article>
+  </div>
+</section>
+
 <section class="section" id="wallet-rules">
   <div class="sectionhead"><div><div class="eyebrow">Wallet rules</div><h2>Rules that protect your crypto</h2></div><p>These habits matter more than chasing the next token.</p></div>
   <div class="wallet-rules">
@@ -230,6 +249,30 @@ RECORDS
   const seedPreview=document.getElementById('seedTemplatePreview'),seedStatus=document.getElementById('seedTemplateStatus');
   document.getElementById('copySeedTemplate').addEventListener('click',()=>{const t=makeSeedTemplate(12);seedPreview.textContent=t;copyText(t,seedStatus,'Blank 12-word worksheet copied. Fill it offline only.');});
   document.getElementById('copySeedTemplate24').addEventListener('click',()=>{const t=makeSeedTemplate(24);seedPreview.textContent=t;copyText(t,seedStatus,'Blank 24-word worksheet copied. Fill it offline only.');});
+
+
+  const blockchainLessons=[
+    {title:'What is a blockchain?',body:'A blockchain is a shared record of transactions stored across many computers. Instead of one company keeping the only copy, many participants verify and keep copies of the same ledger.',example:'Think of it like a public notebook where new pages are added in order and older pages are very difficult to secretly rewrite.',q:'What is the main idea of a blockchain?',a:['A shared ledger verified by many computers','A password manager','A bank account number'],correct:0},
+    {title:'Coins, tokens, and networks',body:'A coin is usually native to its own blockchain, such as BTC on Bitcoin or SOL on Solana. A token is created on top of an existing blockchain.',example:'SOL pays fees on Solana. A token launched on Solana uses Solana as its network.',q:'Which statement is correct?',a:['Every token has its own blockchain','A token can run on an existing blockchain','All crypto uses the Bitcoin network'],correct:1},
+    {title:'Public address vs. private key',body:'A public wallet address is meant to receive funds and can be shared. A private key or recovery phrase controls the wallet and must remain secret.',example:'Public address = mailbox address. Private key = the master key to the mailbox.',q:'Which item should never be shared?',a:['Public wallet address','Token symbol','Private key or recovery phrase'],correct:2},
+    {title:'What are network fees?',body:'Blockchain transactions use network resources. A fee pays validators or miners for processing and securing the transaction.',example:'On Ethereum the fee is often called gas. On Solana the fee is paid in SOL.',q:'Why do blockchain transactions have fees?',a:['To pay for network processing and security','Because wallets charge rent','To create a username'],correct:0},
+    {title:'What is a smart contract?',body:'A smart contract is code stored on a blockchain that can automatically carry out rules when users interact with it.',example:'A decentralized exchange can use smart contracts to swap one token for another without a traditional broker.',q:'What is a smart contract?',a:['A paper agreement mailed to a miner','Blockchain code that executes rules','A wallet recovery phrase'],correct:1},
+    {title:'Centralized vs. decentralized exchanges',body:'A centralized exchange holds assets for users inside accounts. A decentralized exchange lets users trade through their own wallets and smart contracts.',example:'On a DEX, you usually connect a self-custody wallet and approve the trade yourself.',q:'On a decentralized exchange, who normally approves the wallet transaction?',a:['The user with the wallet','A bank teller','The website visitor next to you'],correct:0},
+    {title:'Why test transactions matter',body:'Blockchain transfers can be irreversible. Sending a small test amount first helps confirm the address and network before moving a larger amount.',example:'Send a small amount, verify it arrives, then send the remainder.',q:'Why send a small test transaction first?',a:['To change the token price','To verify the address and network','To create a new blockchain'],correct:1}
+  ];
+  const now=new Date(), start=new Date(now.getFullYear(),0,0), day=Math.floor((now-start)/86400000), lesson=blockchainLessons[(day-1)%blockchainLessons.length];
+  document.getElementById('lessonDay').textContent='Day '+day;
+  document.getElementById('lessonTitle').textContent=lesson.title;
+  document.getElementById('lessonBody').textContent=lesson.body;
+  document.getElementById('lessonExample').textContent='Example: '+lesson.example;
+  document.getElementById('quizQuestion').textContent=lesson.q;
+  const quizBox=document.getElementById('quizAnswers'),quizStatus=document.getElementById('quizStatus');
+  quizBox.innerHTML=lesson.a.map((a,i)=>'<button class="btn quiz-answer" type="button" data-i="'+i+'">'+esc(a)+'</button>').join('');
+  quizBox.querySelectorAll('.quiz-answer').forEach(btn=>btn.addEventListener('click',()=>{
+    const ok=Number(btn.dataset.i)===lesson.correct;
+    quizStatus.textContent=ok?'Correct. Nice work.':'Not quite. Review today’s lesson and try again.';
+    quizStatus.className='statusline '+(ok?'up':'down');
+  }));
 
   const dexFrame=document.getElementById('dexFrame'),dexChain=document.getElementById('dexChain'),dexAddress=document.getElementById('dexAddress');
   document.getElementById('loadDex').addEventListener('click',()=>{

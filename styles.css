@@ -653,3 +653,80 @@
 .quiz-answer.quiz-wrong:after{content:"✕";color:#ff8d8d}
 .quiz-status{min-height:22px;margin-top:10px}
 @media(max-width:620px){.quiz-help{font-size:.72rem}.quiz-answer.quiz-selected{transform:none}}
+
+
+/* Grouped primary navigation */
+.nav{align-items:center}
+.nav-menu{position:relative}
+.nav-menu>summary{
+  list-style:none;
+  cursor:pointer;
+  color:#d8e0f2;
+  padding:8px 10px;
+  border-radius:999px;
+  font-size:.86rem;
+  user-select:none;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.nav-menu>summary::-webkit-details-marker{display:none}
+.nav-menu>summary:after{content:"▾";font-size:.68rem;color:#91a3c5;transition:transform .18s ease}
+.nav-menu[open]>summary{background:#ffffff10;color:#fff}
+.nav-menu[open]>summary:after{transform:rotate(180deg)}
+.nav-menu-panel{
+  position:absolute;
+  top:calc(100% + 10px);
+  right:0;
+  z-index:80;
+  width:max-content;
+  min-width:205px;
+  display:grid;
+  gap:4px;
+  padding:8px;
+  border:1px solid #ffffff24;
+  border-radius:14px;
+  background:#0a1220f7;
+  box-shadow:0 18px 50px #0009;
+  backdrop-filter:blur(16px);
+}
+.nav-menu-panel a{
+  display:block;
+  border-radius:9px!important;
+  padding:9px 11px!important;
+  font-size:.82rem!important;
+  white-space:nowrap;
+}
+.nav-menu-panel a:hover{background:#ffffff12}
+.home-category-grid{grid-template-columns:repeat(4,minmax(0,1fr));width:min(1040px,100%)}
+.home-path-note{padding-top:28px}
+@media(max-width:900px){
+  .home-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:760px){
+  .topin{overflow:visible}
+  .nav{
+    max-width:none!important;
+    width:100%;
+    overflow:visible!important;
+    flex-wrap:wrap!important;
+    gap:6px!important;
+  }
+  .nav-menu>summary,.nav>a{
+    min-height:38px;
+    padding:8px 11px!important;
+    border:1px solid #ffffff16;
+    background:#ffffff08;
+    border-radius:999px;
+    font-size:.78rem!important;
+  }
+  .nav-menu{position:relative}
+  .nav-menu-panel{
+    left:0;
+    right:auto;
+    top:calc(100% + 7px);
+    min-width:190px;
+    max-width:min(250px,calc(100vw - 24px));
+  }
+  .home-category-grid{grid-template-columns:1fr}
+}

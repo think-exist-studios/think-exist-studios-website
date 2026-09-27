@@ -19,7 +19,7 @@ const getNews=async q=>{
 
 module.exports=async function handler(req,res){
  res.setHeader('Cache-Control','s-maxage=600, stale-while-revalidate=1800');
- const out={artworks:[],artistNews:[],nfts:[],nftNews:[],updated:new Date().toISOString()};
+ const out={artworks:[],artistNews:[],updated:new Date().toISOString()};
  try{
    const day=Math.floor(Date.now()/86400000), page=(day%40)+1;
    const ar=await fetchWithTimeout('https://api.artic.edu/api/v1/artworks/search?query%5Bterm%5D%5Bis_public_domain%5D=true&limit=8&page='+page+'&fields=id,title,artist_display,date_display,image_id,is_public_domain',{},6500);

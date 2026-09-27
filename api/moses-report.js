@@ -17,7 +17,7 @@ function median(values){const a=values.filter(Number.isFinite).sort((x,y)=>x-y);
 function money(n){return Number(n||0);}
 
 async function fetchMarkets(){
-  const url='https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h,7d,30d';
+  const url='https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h,7d,30d';
   const r=await fetchWithTimeout(url,{headers:{accept:'application/json','user-agent':'ThinkExist-MOSES-Report/1.0'},cache:'no-store'},8000);
   if(!r.ok)throw new Error('market');
   const data=await r.json();
@@ -157,15 +157,16 @@ module.exports=async function handler(req,res){
   try{
     const [markets,generalNews,upgradeNews,solanaNews]=await Promise.all([
       fetchMarkets(),
-      fetchNews('cryptocurrency market Bitcoin Ethereum Solana major move adoption regulation',7),
+      fetchNews('cryptocurrency market Bitcoin Ethereum Solana XRP XLM Stellar major move adoption regulation',8),
       fetchNews('cryptocurrency protocol upgrade mainnet launch integration token upgrade blockchain',7),
-      fetchNews('site:solana.com Solana changelog upgrade Firedancer Agave mainnet',5)
+      fetchNews('Solana XRP Ripple XLM Stellar network upgrade integration adoption mainnet',7)
     ]);
 
     const market=classifyMarket(markets);
     const leaders=lucrativeWatchlist(markets);
     const moves=unusualMoves(markets);
-    const major=markets.filter(c=>['bitcoin','ethereum','solana'].includes(c.id)).map(c=>({
+    const rotationIds=['bitcoin','ethereum','solana','ripple','stellar'];
+    const major=markets.filter(c=>rotationIds.includes(c.id)).sort((a,b)=>rotationIds.indexOf(a.id)-rotationIds.indexOf(b.id)).map(c=>({
       id:c.id,name:c.name,symbol:String(c.symbol||'').toUpperCase(),price_usd:money(c.current_price),
       change_24h_pct:pct(c.price_change_percentage_24h),
       change_7d_pct:pct(c.price_change_percentage_7d_in_currency),
@@ -178,6 +179,7 @@ module.exports=async function handler(req,res){
       updated:new Date().toISOString(),
       market,
       major_assets:major,
+      rotation_watch:{label:'Core rotation watch',assets:['BTC','ETH','SOL','XRP','XLM'],note:'MOSES follows this core basket alongside the broader market. Inclusion is for observation, not a recommendation to buy.'},
       unusual_moves:moves,
       most_lucrative_potential:leaders,
       catalyst_radar:[...upgradeNews,...solanaNews].slice(0,10),
@@ -194,7 +196,7 @@ module.exports=async function handler(req,res){
       updated:new Date().toISOString(),
       error:'MOSES market feed is temporarily unavailable.',
       market:{condition:'Data reconnecting',tone:'neutral',explanation:'Live market inputs could not be refreshed.'},
-      major_assets:[],unusual_moves:[],most_lucrative_potential:[],catalyst_radar:[],market_news:[]
+      major_assets:[],rotation_watch:{label:'Core rotation watch',assets:['BTC','ETH','SOL','XRP','XLM'],note:'Live data is reconnecting.'},unusual_moves:[],most_lucrative_potential:[],catalyst_radar:[],market_news:[]
     });
   }
 };

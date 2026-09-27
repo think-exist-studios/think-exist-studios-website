@@ -142,7 +142,14 @@
     const brand=document.getElementById('creatorBrandLine');
     if(data.brand_name){brand.textContent=data.brand_name;brand.classList.remove('hide');}
     const bg=document.getElementById('creatorPublicBg');
-    if(data.background_image_url){bg.style.backgroundImage='url("'+data.background_image_url.replace(/"/g,'%22')+'")';bg.classList.remove('hide');}
+    if(data.background_image_url){
+      const safeBg=data.background_image_url.replace(/"/g,'%22');
+      document.body.style.backgroundImage='linear-gradient(180deg,#070b16cc,#070b16f2 72%),url("'+safeBg+'")';
+      document.body.style.backgroundSize='cover';
+      document.body.style.backgroundPosition='center';
+      document.body.style.backgroundAttachment='fixed';
+      bg.classList.add('hide');
+    }
     applyWatermarkToExisting();
   }
 

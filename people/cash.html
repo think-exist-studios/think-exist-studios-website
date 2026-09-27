@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="../styles.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body data-page="people">
+<body data-page="people">\n<div class="creator-public-bg hide" id="creatorPublicBg" aria-hidden="true"></div>
 <header class="top"><div class="topin shell">
   <a class="brand" href="../index.html">Think <b>Exist</b> Studios</a>
   <nav class="nav"><a href="../projects.html">Projects</a><a href="../games.html">Games</a><a href="../discover.html">Discover</a><a href="../watch.html">Watch</a><a href="../art.html">Art</a><a href="../people.html">People</a><a href="../crypto.html">Crypto</a><a href="../creator-studio.html">Creator Studio</a><a href="../vera.html">VERA</a><a href="https://x.com/ThinkExistHQ" target="_blank" rel="noopener">X ↗</a></nav>
@@ -30,8 +30,10 @@
 <section class="profilehero">
   <div>
     <div class="eyebrow">Creator profile</div>
+    <div class="statusline hide" id="creatorBrandLine"></div>
     <h1>Cash <span class="grad">(Cassius) Miller</span></h1>
-    <p>Graphic designer, comic book artist, writer and creator of <strong>StarGazer</strong>.</p>
+    <p id="creatorHeadlineText">Graphic designer, comic book artist, writer and creator of <strong>StarGazer</strong>.</p>
+    <p class="statusline hide" id="creatorBioText"></p>
     <div class="profile-rating-summary" aria-live="polite">
       <span class="feedback-stars" id="heroStars">☆☆☆☆☆</span>
       <strong id="heroRating">No ratings yet</strong>
@@ -40,7 +42,7 @@
     <div class="tagrow" style="margin-top:14px"><span class="tag">Artist</span><span class="tag">Business</span><span class="tag">Writer</span><span class="tag">Creative</span></div>
     <div class="row" style="justify-content:flex-start"><a class="btn primary" href="#portfolio">View work ↓</a><a class="btn" href="../creator-studio.html">Manage portfolio</a></div>
   </div>
-  <img src="../assets/cash-stargazer-hero.svg" alt="StarGazer artwork by Cash Cassius Miller">
+  <img class="creator-avatar" id="creatorAvatar" src="../assets/cash-stargazer-hero.svg" alt="Cash Cassius Miller creator profile image">
 </section>
 
 <section class="section">
@@ -105,8 +107,44 @@
     'sb_publishable_07ChHzoUQS98-PHaxbNx2g_zmZ2QXeP'
   );
   const profileSlug='cash-cassius-miller';
+  let creatorProfileSettings=null;
   const grid=document.getElementById('portfolioGrid'), portfolioStatus=document.getElementById('portfolioStatus');
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  function watermarkHtml(){
+    const p=creatorProfileSettings||{};
+    const opacity=Math.max(5,Math.min(80,Number(p.watermark_opacity)||28))/100;
+    if(!p.watermark_image_url&&!p.watermark_text&&!p.brand_name)return '';
+    const img=p.watermark_image_url?'<img src="'+esc(p.watermark_image_url)+'" alt="">':'';
+    const txt=p.watermark_text||p.brand_name||'';
+    return '<div class="creator-watermark-mark" style="opacity:'+opacity+'">'+img+(txt?'<span>'+esc(txt)+'</span>':'')+'</div>';
+  }
+
+  function applyWatermarkToExisting(){
+    const mark=watermarkHtml();
+    if(!mark)return;
+    grid.querySelectorAll('.work').forEach(card=>{
+      card.classList.add('creator-watermarked');
+      if(!card.querySelector('.creator-watermark-mark'))card.insertAdjacentHTML('beforeend',mark);
+    });
+  }
+
+  async function loadCreatorProfile(){
+    const {data,error}=await sb.from('creator_profile_settings').select('headline,bio,brand_name,profile_image_url,background_image_url,watermark_image_url,watermark_text,watermark_opacity,is_public').eq('contributor_slug',profileSlug).maybeSingle();
+    if(error||!data)return;
+    creatorProfileSettings=data;
+    const avatar=document.getElementById('creatorAvatar');
+    if(data.profile_image_url)avatar.src=data.profile_image_url;
+    const headline=document.getElementById('creatorHeadlineText');
+    if(data.headline)headline.textContent=data.headline;
+    const bio=document.getElementById('creatorBioText');
+    if(data.bio){bio.textContent=data.bio;bio.classList.remove('hide');}
+    const brand=document.getElementById('creatorBrandLine');
+    if(data.brand_name){brand.textContent=data.brand_name;brand.classList.remove('hide');}
+    const bg=document.getElementById('creatorPublicBg');
+    if(data.background_image_url){bg.style.backgroundImage='url("'+data.background_image_url.replace(/"/g,'%22')+'")';bg.classList.remove('hide');}
+    applyWatermarkToExisting();
+  }
 
   async function loadAccountState(){
     const {data:{session}}=await sb.auth.getSession();
@@ -138,7 +176,7 @@
       const image=item.image_url?'<img src="'+esc(item.image_url)+'" alt="Artwork for '+esc(item.title)+'">':'';
       const tags=(item.tags||[]).map(t=>'<span class="tag">'+esc(t)+'</span>').join('');
       const link=item.project_url?'<a class="feature-link" href="'+esc(item.project_url)+'" target="_blank" rel="noopener">View project ↗</a>':'';
-      return '<article class="work">'+image+'<div class="body"><div class="tagrow">'+tags+'</div><h3>'+esc(item.title)+'</h3><p>'+esc(item.description||'')+'</p>'+link+'</div></article>';
+      return '<article class="work creator-watermarked">'+image+'<div class="body"><div class="tagrow">'+tags+'</div><h3>'+esc(item.title)+'</h3><p>'+esc(item.description||'')+'</p>'+link+'</div>'+watermarkHtml()+'</article>';
     }).join('');
     portfolioStatus.textContent='Portfolio synced with Creator Studio.';
   }
@@ -185,7 +223,7 @@
   });
 
   sb.auth.onAuthStateChange(()=>setTimeout(loadAccountState,0));
-  loadAccountState();loadPortfolio();loadFeedback();
+  loadCreatorProfile();loadAccountState();loadPortfolio();loadFeedback();
 })();
 </script>
 <script src="../vera-guide.js" defer></script>

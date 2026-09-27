@@ -56,6 +56,8 @@
 <footer class="footer shell">Discover · Think Exist Studios</footer>
 <script>
 (()=>{
+ function fetchWithTimeout(url,opts={},ms=6500){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),ms);return fetch(url,{...opts,signal:controller.signal}).finally(()=>clearTimeout(timer));}
+ const media=u=>'/api/media?url='+encodeURIComponent(u);
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch{return 'source'}};
  const clock=document.getElementById('discoverClock'); const tick=()=>clock.textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});tick();setInterval(tick,1000);
@@ -63,9 +65,9 @@
  async function loadTech(){
   const box=document.getElementById('techNews'), status=document.getElementById('techStatus');
   try{
-   const ids=await fetch('https://hacker-news.firebaseio.com/v0/topstories.json').then(r=>r.json());
+   const ids=await fetchWithTimeout('https://hacker-news.firebaseio.com/v0/topstories.json',{},5000).then(r=>{if(!r.ok)throw new Error();return r.json()});
    const sample=ids.slice(0,18);
-   const stories=(await Promise.all(sample.map(id=>fetch('https://hacker-news.firebaseio.com/v0/item/'+id+'.json').then(r=>r.json()).catch(()=>null)))).filter(x=>x&&x.title).slice(0,10);
+   const stories=(await Promise.all(sample.map(id=>fetchWithTimeout('https://hacker-news.firebaseio.com/v0/item/'+id+'.json',{},3500).then(r=>r.ok?r.json():null).catch(()=>null)))).filter(x=>x&&x.title).slice(0,10);
    box.innerHTML=stories.map((s,i)=>'<a class="news-card" href="'+esc(s.url||('https://news.ycombinator.com/item?id='+s.id))+'" target="_blank" rel="noopener"><span class="news-num">'+String(i+1).padStart(2,'0')+'</span><div><small>'+esc(host(s.url||'https://news.ycombinator.com'))+'</small><h3>'+esc(s.title)+'</h3><p>'+Number(s.score||0)+' points · '+Number(s.descendants||0)+' comments</p></div><b>↗</b></a>').join('');
    status.textContent='Updated '+new Date().toLocaleTimeString()+' · Hacker News public API';
   }catch(e){box.innerHTML='<article class="card"><h3>Headline feed is resting.</h3><p>Try refreshing the page in a moment.</p></article>';status.textContent='Could not refresh headlines.'}
@@ -79,25 +81,34 @@
   {name:'NASA',playlist:'UUA_DiR1FfKNvjuUpBHmylQw'},
   {name:'Google Developers',playlist:'UU_x5XG1OV2P6uZZ5FSM9Ttw'}
  ];
- function paintVideos(){
+ function paintVideoFallback(){
   const box=document.getElementById('techVideos');
   const items=[...videoChannels].sort(()=>Math.random()-.5).slice(0,6);
-  box.innerHTML=items.map(v=>'<article class="video-card"><div class="video-frame"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/videoseries?list='+encodeURIComponent(v.playlist)+'" title="'+esc(v.name)+' recent videos" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><div class="video-body"><small>ROTATING CHANNEL</small><h3>'+esc(v.name)+'</h3><p>Recent uploads · playlist updates automatically</p></div></article>').join('');
+  box.innerHTML=items.map(v=>'<article class="video-card"><div class="video-frame video-fallback"><a class="video-fallback-link" href="https://www.youtube.com/results?search_query='+encodeURIComponent(v.name)+'" target="_blank" rel="noopener"><span>▶</span><strong>'+esc(v.name)+'</strong></a></div><div class="video-body"><small>CHANNEL FEED</small><h3>'+esc(v.name)+'</h3><p>Fresh videos are loading in the background.</p></div></article>').join('');
+ }
+ async function paintVideos(){
+  const box=document.getElementById('techVideos');
+  try{
+   const r=await fetchWithTimeout('/api/tech-videos',{cache:'no-store'},7500); if(!r.ok)throw new Error();
+   const d=await r.json(),items=(d.items||[]).slice(0,6);
+   if(!items.length)throw new Error();
+   box.innerHTML=items.map(v=>'<article class="video-card"><a class="video-frame video-thumb" href="https://www.youtube.com/watch?v='+encodeURIComponent(v.id)+'" target="_blank" rel="noopener"><img loading="lazy" referrerpolicy="no-referrer" src="'+media('https://i.ytimg.com/vi/'+v.id+'/hqdefault.jpg')+'" alt="'+esc(v.title||'YouTube thumbnail')+'" onerror="this.style.display=\'none\'"><span class="video-thumb-play">▶</span></a><div class="video-body"><small>'+esc(v.channel||'YouTube')+'</small><h3>'+esc(v.title||'Latest video')+'</h3><p>Tap to watch · refreshed automatically</p></div></article>').join('');
+  }catch(e){paintVideoFallback();}
  }
  document.getElementById('shuffleVideos').addEventListener('click',paintVideos);
 
  async function loadAnime(){
   const box=document.getElementById('animeGrid'),status=document.getElementById('animeStatus'),trailer=document.getElementById('trailerShell');
   try{
-   const r=await fetch('https://api.jikan.moe/v4/top/anime?filter=airing&limit=10'); if(!r.ok)throw 0;
+   const r=await fetchWithTimeout('https://api.jikan.moe/v4/top/anime?filter=airing&limit=10',{},6500); if(!r.ok)throw 0;
    const d=await r.json(), items=(d.data||[]).slice(0,10);
-   box.innerHTML=items.map((a,i)=>'<a class="anime-card" href="'+esc(a.url||'#')+'" target="_blank" rel="noopener"><img loading="lazy" src="'+esc(a.images?.webp?.large_image_url||a.images?.jpg?.large_image_url||'')+'" alt=""><div><span>#'+(i+1)+'</span><h3>'+esc(a.title_english||a.title||'Untitled')+'</h3><p>'+esc((a.genres||[]).slice(0,3).map(g=>g.name).join(' · '))+'</p></div></a>').join('');
+   box.innerHTML=items.map((a,i)=>'<a class="anime-card" href="'+esc(a.url||'#')+'" target="_blank" rel="noopener"><img loading="lazy" referrerpolicy="no-referrer" src="'+media(a.images?.webp?.large_image_url||a.images?.jpg?.large_image_url||'')+'" alt="'+esc(a.title_english||a.title||'Anime artwork')+'" onerror="this.style.display=\'none\'"><div><span>#'+(i+1)+'</span><h3>'+esc(a.title_english||a.title||'Untitled')+'</h3><p>'+esc((a.genres||[]).slice(0,3).map(g=>g.name).join(' · '))+'</p></div></a>').join('');
    const withTrailer=items.find(a=>a.trailer?.youtube_id);
    trailer.innerHTML=withTrailer?'<iframe src="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(withTrailer.trailer.youtube_id)+'" title="'+esc(withTrailer.title||'Anime trailer')+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>':'<div class="trailer-empty">No embeddable trailer in the current top list. The anime cards are still live.</div>';
    status.textContent='Updated '+new Date().toLocaleTimeString()+' · current airing ranking';
   }catch(e){box.innerHTML='<article class="card"><h3>Anime radar is reconnecting.</h3><p>Try again shortly.</p></article>';status.textContent='Could not refresh anime data.'}
  }
- loadTech();paintVideos();loadAnime();
+ loadTech();paintVideoFallback();paintVideos();loadAnime();
  setInterval(loadTech,300000);setInterval(loadAnime,900000);
 })();
 </script>

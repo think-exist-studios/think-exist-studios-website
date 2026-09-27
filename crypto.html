@@ -35,13 +35,13 @@
   <div class="sectionhead"><div><div class="eyebrow">On-chain market view</div><h2>DEX Screener</h2></div><p>Live decentralized-exchange charting inside Think Exist. The default view is a Solana market; you can load another supported pair by address.</p></div>
   <div class="dex-tools">
     <label><span>Network</span><select id="dexChain"><option value="solana">Solana</option><option value="ethereum">Ethereum</option><option value="base">Base</option><option value="bsc">BNB Chain</option></select></label>
-    <label class="dex-address"><span>Pair / token address</span><input id="dexAddress" inputmode="text" autocomplete="off" placeholder="Paste a DEX Screener pair or token address"></label>
+    <label class="dex-address"><span>Pair / token address</span><input id="dexAddress" inputmode="text" autocomplete="off" value="So11111111111111111111111111111111111111112" placeholder="Paste a DEX Screener pair or token address"></label>
     <button class="btn primary" id="loadDex" type="button">Load chart</button>
   </div>
-  <div class="dex-frame">
-    <iframe id="dexFrame" loading="lazy" src="https://dexscreener.com/solana/6ueGm9qsdDY1vFf2M6v6whVbYY2qXU6RwrqJ6ZPG9C3q?embed=1&info=0&theme=dark&trades=1" title="DEX Screener chart" allowfullscreen></iframe>
+  <div class="dex-frame dex-native" id="dexNative">
+    <div class="dex-loading"><strong>Loading market pair…</strong><span>Using a privacy-friendly Think Exist data connection.</span></div>
   </div>
-  <div class="statusline">Third-party market data from DEX Screener. A chart appearing here is not an endorsement of the token or pair.</div>
+  <div class="statusline" id="dexStatus">Loading DEX market data…</div>
   <div class="row leftrow"><a class="btn" href="https://dexscreener.com/" target="_blank" rel="noopener">Open full DEX Screener ↗</a></div>
 </section>
 
@@ -195,13 +195,14 @@ RECORDS
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <script>
 (() => {
+  function fetchWithTimeout(url,opts={},ms=7000){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),ms);return fetch(url,{...opts,signal:controller.signal}).finally(()=>clearTimeout(timer));}
   const cards=document.getElementById('marketCards'), status=document.getElementById('marketStatus'), trend=document.getElementById('trending');
   const names={bitcoin:'Bitcoin',ethereum:'Ethereum',solana:'Solana'};
   const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:n<1?4:2}).format(n);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   async function loadMarket(){
     try{
-      const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true',{cache:'no-store'});
+      const r=await fetchWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true',{cache:'no-store'},6500);
       if(!r.ok)throw new Error('Market service unavailable');
       const d=await r.json();
       cards.innerHTML=Object.keys(names).map(id=>{
@@ -214,7 +215,7 @@ RECORDS
   }
   async function loadTrending(){
     try{
-      const r=await fetch('https://api.coingecko.com/api/v3/search/trending',{cache:'no-store'});
+      const r=await fetchWithTimeout('https://api.coingecko.com/api/v3/search/trending',{cache:'no-store'},6500);
       if(!r.ok)throw new Error();
       const d=await r.json(), top=(d.coins||[]).slice(0,6);
       trend.innerHTML=top.map(x=>{
@@ -226,7 +227,7 @@ RECORDS
   async function loadWalletNews(){
     const box=document.getElementById('walletNews'), s=document.getElementById('walletNewsStatus');
     try{
-      const r=await fetch('/api/wallet-news',{cache:'no-store'}); if(!r.ok)throw new Error();
+      const r=await fetchWithTimeout('/api/wallet-news',{cache:'no-store'},7500); if(!r.ok)throw new Error();
       const d=await r.json(), items=(d.items||[]).slice(0,8);
       if(!items.length)throw new Error();
       box.innerHTML=items.map((n,i)=>'<a class="news-card" href="'+esc(n.url)+'" target="_blank" rel="noopener"><span class="news-num">'+String(i+1).padStart(2,'0')+'</span><div><small>'+esc(n.source||'News')+'</small><h3>'+esc(n.title||'Crypto wallet update')+'</h3><p>'+esc(n.published||'Recent')+'</p></div><b>↗</b></a>').join('');
@@ -274,14 +275,64 @@ RECORDS
     quizStatus.className='statusline '+(ok?'up':'down');
   }));
 
-  const dexFrame=document.getElementById('dexFrame'),dexChain=document.getElementById('dexChain'),dexAddress=document.getElementById('dexAddress');
-  document.getElementById('loadDex').addEventListener('click',()=>{
+  const dexNative=document.getElementById('dexNative'),dexStatus=document.getElementById('dexStatus'),dexChain=document.getElementById('dexChain'),dexAddress=document.getElementById('dexAddress');
+  const fmt=(n,d=2)=>Number.isFinite(Number(n))?Number(n).toLocaleString(undefined,{maximumFractionDigits:d}):'—';
+  async function loadDex(){
     const chain=dexChain.value;
     const addr=dexAddress.value.trim().replace(/[^a-zA-Z0-9]/g,'');
-    if(addr.length<20){dexAddress.focus();return;}
-    dexFrame.src='https://dexscreener.com/'+encodeURIComponent(chain)+'/'+encodeURIComponent(addr)+'?embed=1&info=0&theme=dark&trades=1';
-  });
-  loadMarket(); loadTrending(); loadWalletNews();
+    if(addr.length<20){dexAddress.focus();dexStatus.textContent='Enter a valid pair or token address.';return;}
+    dexNative.innerHTML='<div class="dex-loading"><strong>Loading market pair…</strong><span>This will stop automatically if the provider does not respond.</span></div>';
+    dexStatus.textContent='Refreshing DEX market data…';
+    try{
+      const r=await fetchWithTimeout('/api/dex-pair?chain='+encodeURIComponent(chain)+'&address='+encodeURIComponent(addr),{cache:'no-store'},8000);
+      if(!r.ok)throw new Error();
+      const d=await r.json(),p=d.pair;
+      if(!p){dexNative.innerHTML='<div class="dex-loading"><strong>No supported pair found.</strong><span>Try a token or pair address from DEX Screener.</span></div>';dexStatus.textContent='No pair returned. The page is still working.';return;}
+      const ch=Number(p.priceChange?.h24);
+      const chClass=Number.isFinite(ch)?(ch>=0?'up':'down'):'';
+      dexNative.innerHTML='<div class="dex-native-head"><div><small>'+esc((p.chainId||chain).toUpperCase())+' · '+esc(p.dexId||'DEX')+'</small><h3>'+esc(p.baseToken?.symbol||'Token')+' / '+esc(p.quoteToken?.symbol||'Pair')+'</h3><p>'+esc(p.baseToken?.name||'')+'</p></div><a class="btn" href="'+esc(p.url||'https://dexscreener.com/')+'" target="_blank" rel="noopener">Open chart ↗</a></div>'+
+      '<div class="dex-native-grid"><article><small>PRICE USD</small><strong>'+(p.priceUsd?'
+  setInterval(loadMarket,120000);
+  setInterval(loadTrending,300000);
+  setInterval(loadWalletNews,600000);
+})();
+</script>
+<script src="vera-guide.js" defer></script>
+</body></html>+fmt(p.priceUsd,8):'—')+'</strong></article>'+
+      '<article><small>24H CHANGE</small><strong class="'+chClass+'">'+(Number.isFinite(ch)?(ch>=0?'+':'')+fmt(ch,2)+'%':'—')+'</strong></article>'+
+      '<article><small>24H VOLUME</small><strong>
+  setInterval(loadMarket,120000);
+  setInterval(loadTrending,300000);
+  setInterval(loadWalletNews,600000);
+})();
+</script>
+<script src="vera-guide.js" defer></script>
+</body></html>+fmt(p.volume?.h24,0)+'</strong></article>'+
+      '<article><small>LIQUIDITY</small><strong>
+  setInterval(loadMarket,120000);
+  setInterval(loadTrending,300000);
+  setInterval(loadWalletNews,600000);
+})();
+</script>
+<script src="vera-guide.js" defer></script>
+</body></html>+fmt(p.liquidity?.usd,0)+'</strong></article>'+
+      '<article><small>MARKET CAP</small><strong>
+  setInterval(loadMarket,120000);
+  setInterval(loadTrending,300000);
+  setInterval(loadWalletNews,600000);
+})();
+</script>
+<script src="vera-guide.js" defer></script>
+</body></html>+fmt(p.marketCap||p.fdv,0)+'</strong></article>'+
+      '<article><small>24H TXNS</small><strong>'+fmt((Number(p.txns?.h24?.buys)||0)+(Number(p.txns?.h24?.sells)||0),0)+'</strong></article></div>';
+      dexStatus.textContent='Updated '+new Date().toLocaleTimeString()+' · DEX Screener data via Think Exist';
+    }catch(e){
+      dexNative.innerHTML='<div class="dex-loading"><strong>DEX feed timed out.</strong><span>Nothing is stuck — use the full DEX Screener link below or try again.</span></div>';
+      dexStatus.textContent='DEX data provider did not respond in time.';
+    }
+  }
+  document.getElementById('loadDex').addEventListener('click',loadDex);
+  loadMarket(); loadTrending(); loadWalletNews(); loadDex();
   setInterval(loadMarket,120000);
   setInterval(loadTrending,300000);
   setInterval(loadWalletNews,600000);

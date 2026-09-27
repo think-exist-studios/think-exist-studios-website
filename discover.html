@@ -62,15 +62,18 @@
   }catch(e){box.innerHTML='<article class="card"><h3>Headline feed is resting.</h3><p>Try refreshing the page in a moment.</p></article>';status.textContent='Could not refresh headlines.'}
  }
 
- let videoItems=[];
+ const videoChannels=[
+  {name:'MKBHD',playlist:'UUBJycsmduvYEL83R_U4JriQ'},
+  {name:'Linus Tech Tips',playlist:'UUXuqSBlHAE6Xw-yeJA0Tunw'},
+  {name:'The Verge',playlist:'UUddiUEpeqJcYeBxX1IVBKvQ'},
+  {name:'CNET',playlist:'UUYBzNzkwFRJgF_pWcR9fmcA'},
+  {name:'NASA',playlist:'UUA_DiR1FfKNvjuUpBHmylQw'},
+  {name:'Google Developers',playlist:'UU_x5XG1OV2P6uZZ5FSM9Ttw'}
+ ];
  function paintVideos(){
   const box=document.getElementById('techVideos');
-  if(!videoItems.length){box.innerHTML='<article class="card"><h3>Video feed unavailable</h3><p>The page still has live tech headlines and anime discovery while the video feed reconnects.</p></article>';return;}
-  const items=[...videoItems].sort(()=>Math.random()-.5).slice(0,6);
-  box.innerHTML=items.map(v=>'<article class="video-card"><div class="video-frame"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.id)+'" title="'+esc(v.title)+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><div class="video-body"><small>'+esc(v.channel)+'</small><h3>'+esc(v.title)+'</h3><p>'+new Date(v.published).toLocaleDateString()+'</p></div></article>').join('');
- }
- async function loadVideos(){
-  try{const r=await fetch('/api/tech-videos',{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json();videoItems=d.items||[];paintVideos();}catch(e){videoItems=[];paintVideos();}
+  const items=[...videoChannels].sort(()=>Math.random()-.5).slice(0,6);
+  box.innerHTML=items.map(v=>'<article class="video-card"><div class="video-frame"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/videoseries?list='+encodeURIComponent(v.playlist)+'" title="'+esc(v.name)+' recent videos" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><div class="video-body"><small>ROTATING CHANNEL</small><h3>'+esc(v.name)+'</h3><p>Recent uploads · playlist updates automatically</p></div></article>').join('');
  }
  document.getElementById('shuffleVideos').addEventListener('click',paintVideos);
 
@@ -85,8 +88,8 @@
    status.textContent='Updated '+new Date().toLocaleTimeString()+' · current airing ranking';
   }catch(e){box.innerHTML='<article class="card"><h3>Anime radar is reconnecting.</h3><p>Try again shortly.</p></article>';status.textContent='Could not refresh anime data.'}
  }
- loadTech();loadVideos();loadAnime();
- setInterval(loadTech,300000);setInterval(loadVideos,600000);setInterval(loadAnime,900000);
+ loadTech();paintVideos();loadAnime();
+ setInterval(loadTech,300000);setInterval(loadAnime,900000);
 })();
 </script>
 <script src="vera-guide.js" defer></script>

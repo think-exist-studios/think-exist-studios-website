@@ -1,0 +1,55 @@
+<!doctype html><html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#060907">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MOSES">
+<link rel="apple-touch-icon" href="assets/moses-app-icon-192.svg"><link rel="manifest" href="moses.webmanifest">
+<link rel="icon" href="assets/moses-app-icon-192.svg"><title>MOSES Trading</title>
+<link rel="stylesheet" href="moses-app.css?v=1"></head><body><div class="wrap">
+<div class="top"><div class="brand"><img src="/functions/v1/moses-app/icon.svg"><div><h1>MOSES Trading</h1><div class="sub">CALEB → AARON → EZRA → MOSES → JOSHUA · NOAH</div></div></div><div class="topActions"><button id="refreshBtn" class="refreshBtn">↻ Refresh</button><div class="status">● LIVE PWA</div></div></div>
+
+<section id="dash" class="page on">
+<div class="grid"><div class="card"><div class="lab">Wallet Value</div><div id="walletValue" class="big">—</div></div><div class="card"><div class="lab">SOL Balance</div><div id="solBalance" class="big">—</div></div><div class="card"><div class="lab">Autonomous</div><div id="autoState" class="big">—</div></div><div class="card"><div class="lab">Live Token Holdings</div><div id="livePositionCount" class="big">—</div></div></div>
+<div class="section">Live Wallet Holdings</div><div id="holdings" class="card"><div class="muted">Loading wallet…</div></div>
+<div class="section">Performance / Gains & Losses</div><div class="card"><div id="pnlSummary" class="muted">Unlock owner controls to load P/L history.</div><div class="chartbox"><canvas id="pnlChart"></canvas></div></div>
+<div class="section">Active Coin Price</div><div class="card"><div id="tokenChartTitle"><b>No active coin selected</b></div><div id="tokenChartMeta" class="muted">Tap View Live Chart on a holding.</div><div class="chartbox"><canvas id="tokenChart"></canvas></div></div>
+<div class="section">Decision Trace — Why MOSES Did It</div><div id="decisionTrace" class="card"><div class="muted">Unlock owner controls to see the latest decision chain.</div></div>
+<div class="section">Current Handoff</div><div id="handoff" class="card"><div class="muted">Unlock owner controls to see live team handoffs.</div></div>
+</section>
+
+<section id="scout" class="page"><div class="section">CALEB Sniper Feed</div><div id="sniperFeed" class="card"><div class="muted">Loading candidates…</div></div><div class="section">AARON Recommendations</div><div id="aaronFeed" class="card"><div class="muted">Loading analyst handoffs…</div></div><div class="section">EZRA Quant Plans</div><div id="ezraFeed" class="card"><div class="muted">Loading probability and trade-plan math…</div></div></section>
+
+<section id="trades" class="page">
+<div class="section">Manual Contract Handoff</div><div class="card"><div class="notice">Paste a Solana contract. MOSES checks hard exitability limits, buys within your selected $3–$6 amount, and JOSHUA manages the exit.</div><div class="lab">Contract address</div><div class="inputWrap"><input id="manualMint" class="inp" placeholder="Paste Solana mint address"><button id="clearMint" class="clear">×</button></div><div class="chips"><button class="chip on" data-size="3">$3</button><button class="chip" data-size="4">$4</button><button class="chip" data-size="5">$5</button><button class="chip" data-size="6">$6</button></div><button id="manualBuy" class="btn primary">Hand to MOSES</button><div id="manualMsg" class="muted" style="margin-top:8px">No order submitted.</div></div>
+<div class="section">Live Trade History</div><div class="card"><div id="tradeStats" class="kpi"><div><span class="muted">Live</span><b>—</b></div><div><span class="muted">Buys</span><b>—</b></div><div><span class="muted">Sells</span><b>—</b></div><div><span class="muted">Paper</span><b>—</b></div></div><div id="liveHistory" style="margin-top:8px"><div class="muted">Unlock owner controls to load history.</div></div></div>
+<div class="section">Paper Tests</div><div id="paperHistory" class="card"><div class="muted">Unlock owner controls to load paper-test history.</div></div>
+</section>
+
+<section id="team" class="page">
+<div class="section">MOSES Dossier</div><div class="card"><div class="row"><span>Official designation</span><b>MOSES</b></div><div class="row"><span>Acronym</span><b>Market Operations & Strategic Execution System</b></div><div class="row"><span>Department</span><b>Think Exist Crypto Operations</b></div><div class="row"><span>Primary role</span><b>Trader / Execution Lead</b></div><div class="row"><span>Market</span><b>Solana / Meme-Coin Scalping</b></div><div class="row"><span>Trade-size lane</span><b>$3–$6</b></div><div class="row"><span>Concurrent positions</span><b>Up to 3</b></div><div class="muted" style="margin-top:8px">Signing keys, owner credentials, internal tokens, and other sensitive security details are deliberately excluded.</div></div>
+
+<div class="section">Trading Team</div><div class="teamGrid">
+<div class="member"><h3>CALEB <span class="typeBadge bot">BOT</span></h3><div class="role">Crypto Asset Launch & Entry Beacon</div><div class="perm"><b>Sniper Bot.</b> Scans new Solana launches, boosts, velocity, volume and momentum. Read-only. Cannot sign or trade.</div></div>
+<div class="member"><h3>AARON <span class="typeBadge">AI AGENT</span></h3><div class="role">Adaptive Analysis & Risk Opportunity Navigator</div><div class="perm"><b>Market Analyst.</b> Reviews CALEB candidates, treats “new/unproven” separately from hard structural danger, and suggests a $3–$6 entry.</div></div>
+<div class="member"><h3>EZRA <span class="typeBadge">AI AGENT</span></h3><div class="role">Expected-value & Z-score Risk Analyst</div><div class="perm"><b>Quant / Probability Analyst.</b> Uses robust historical outcomes, Bayesian probability estimates, expected value, risk/reward, and live position math to calculate entry quality, target, stop, trailing distance, and hold window. Cannot sign transactions.</div></div>
+<div class="member"><h3>MOSES <span class="typeBadge">AI AGENT</span></h3><div class="role">Market Operations & Strategic Execution System</div><div class="perm"><b>Execution Lead.</b> Receives qualified handoffs, applies execution limits, and sends live entries.</div></div>
+<div class="member"><h3>JOSHUA <span class="typeBadge">AI AGENT</span></h3><div class="role">Judgment & Oversight System for Holdings, Upside & Abort</div><div class="perm"><b>Position Guardian.</b> Watches holdings, profit targets, trailing exits, hard stops and time exits, and reconciles tracked positions to the actual wallet.</div></div>
+</div>
+<div class="section">Systems Support</div><div class="teamGrid"><div class="member"><h3>NOAH <span class="typeBadge">AI AGENT</span></h3><div class="role">Network Operations & Application Health</div><div class="perm"><b>Maintenance Agent.</b> Watches application health, stale feeds, schedules, queues, data mismatches and owner-device sessions. Safe/reversible maintenance only. No wallet access and no trading authority.</div></div></div>
+<div class="section">NOAH System Health</div><div id="noahHealth" class="card"><div class="muted">Unlock owner controls to load maintenance status.</div></div>
+
+<div class="section">Live Operations Board</div><div class="card"><div class="ops head"><div>Member</div><div>Status</div><div>Target</div><div>What they are doing</div></div><div id="opsBoard"><div class="muted">Unlock owner controls to load live operations.</div></div><div class="muted" style="margin-top:8px">Near-real-time view. App refreshes every 5 seconds; team check-ins occur about every 15–30 seconds.</div></div>
+</section>
+
+<section id="safety" class="page">
+<div class="section">Trading Controls</div><div class="card"><div class="row"><div><b>Autonomous Mode</b><div class="muted">Allow CALEB → AARON → EZRA → MOSES to open new positions</div></div><button id="autoToggle" class="switch"></button></div><div class="row"><div><b>Owner Device Lock</b><div class="muted">Require this paired device for manual contract buys</div></div><button id="deviceLockToggle" class="switch"></button></div><div class="row"><div><b>This Device</b><div id="pairState" class="muted">Not checked</div></div><span id="pairBadge" class="badge">—</span></div><button id="pairBtn" class="btn gold">Pair This Device</button><button id="unpairBtn" class="btn red" style="display:none">Unpair This Device</button></div>
+<div class="section">Execution Safety</div><div id="safetyData" class="card"><div class="muted">Unlock owner controls to load safety settings.</div></div>
+<div class="section">Owner Access</div><div class="card"><div class="lab">Owner token</div><input id="ownerToken" class="inp" type="password" autocomplete="off" placeholder="Enter owner token"><button id="unlock" class="btn primary">Unlock Controls</button><button id="lock" class="btn">Lock Session</button><div id="ownerMsg" class="muted" style="margin-top:8px">Private controls are locked.</div></div>
+<div class="section">Install</div><div class="card"><b>Install MOSES as an app</b><div class="muted" style="margin-top:5px">Use this button or your browser’s Add to Home screen option.</div><button id="install" class="btn primary" style="display:none">Install MOSES</button></div>
+</section>
+</div>
+<nav class="nav"><button class="on" data-page="dash">Portfolio</button><button data-page="scout">Scout</button><button data-page="trades">Trades</button><button data-page="team">Team</button><button data-page="safety">Safety</button></nav>
+
+<script src="moses-app.js?v=1" defer></script></body></html>

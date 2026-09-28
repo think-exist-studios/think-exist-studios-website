@@ -1,5 +1,5 @@
-const CACHE="moses-pwa-v1";
-const SHELL=["/moses-app.html","/moses-app.css?v=1","/moses-app.js?v=1","/moses.webmanifest","/assets/moses-app-icon-192.svg","/assets/moses-app-icon-512.svg"];
+const CACHE="moses-pwa-v2";
+const SHELL=["/moses-app.html","/moses-app.css?v=2","/moses-app.js?v=2","/moses.webmanifest","/assets/moses-app-icon-192.svg","/assets/moses-app-icon-512.svg"];
 self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).catch(()=>{}))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener("fetch",e=>{

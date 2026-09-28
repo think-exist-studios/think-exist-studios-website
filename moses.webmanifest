@@ -1,0 +1,29 @@
+{
+  "name": "MOSES Trading — Think Exist Studios",
+  "short_name": "MOSES",
+  "description": "Private owner dashboard for the MOSES trading system.",
+  "start_url": "/moses-app.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#060907",
+  "theme_color": "#060907",
+  "categories": [
+    "finance",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "/assets/moses-app-icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/moses-app-icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

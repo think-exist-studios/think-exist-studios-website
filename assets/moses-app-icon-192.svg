@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 512 512">
+<defs>
+<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe681"/><stop offset=".42" stop-color="#d6b14a"/><stop offset="1" stop-color="#8a6318"/></linearGradient>
+<radialGradient id="bg" cx=".5" cy=".35" r=".8"><stop offset="0" stop-color="#182018"/><stop offset="1" stop-color="#050805"/></radialGradient>
+</defs>
+<rect width="512" height="512" rx="108" fill="url(#bg)"/>
+<rect x="10" y="10" width="492" height="492" rx="98" fill="none" stroke="url(#g)" stroke-width="14"/>
+<circle cx="256" cy="228" r="152" fill="none" stroke="#3d3214" stroke-width="10"/>
+<path d="M98 302h45l18-74 26 114 29-154 28 115 24-84 24 102 28-67 20 48h64" fill="none" stroke="url(#g)" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M374 74l12-20 12 20 22-7-12 23h-44l-12-23z" fill="url(#g)"/>
+<text x="386" y="124" text-anchor="middle" fill="url(#g)" font-family="Arial,Helvetica,sans-serif" font-size="52" font-weight="900">TES</text>
+<text x="386" y="149" text-anchor="middle" fill="#f4e4ad" font-family="Arial,Helvetica,sans-serif" font-size="13" font-weight="700" letter-spacing="2">THINK EXIST</text>
+<text x="386" y="167" text-anchor="middle" fill="#f4e4ad" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="700" letter-spacing="2">STUDIOS</text>
+<circle cx="256" cy="222" r="70" fill="#090d09" stroke="url(#g)" stroke-width="9"/>
+<path d="M214 265v-86h24l18 30 18-30h24v86h-23v-44l-19 29-19-29v44z" fill="url(#g)"/>
+<text x="256" y="411" text-anchor="middle" fill="url(#g)" font-family="Arial,Helvetica,sans-serif" font-size="76" font-weight="900" letter-spacing="2">MOSES</text>
+<text x="256" y="445" text-anchor="middle" fill="#f6edcf" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700" letter-spacing="5">AI TRADING AGENT</text>
+</svg>

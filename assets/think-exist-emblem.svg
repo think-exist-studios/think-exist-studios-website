@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+<title id="title">Think Exist emblem</title>
+<desc id="desc">Cosmic metallic Think Exist studio emblem with concentric arcs, flowing lower bands, and a central four-point star.</desc>
+<defs>
+  <linearGradient id="cosmic" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#f5f7ff"/>
+    <stop offset=".18" stop-color="#aeb8ca"/>
+    <stop offset=".34" stop-color="#6c37ff"/>
+    <stop offset=".50" stop-color="#d34fff"/>
+    <stop offset=".64" stop-color="#ff9c45"/>
+    <stop offset=".78" stop-color="#f6d68c"/>
+    <stop offset="1" stop-color="#d9e0ea"/>
+  </linearGradient>
+  <radialGradient id="core" cx=".5" cy=".46" r=".62">
+    <stop offset="0" stop-color="#fff7cf"/>
+    <stop offset=".12" stop-color="#ffbd65"/>
+    <stop offset=".30" stop-color="#b14cff"/>
+    <stop offset=".55" stop-color="#5526a7"/>
+    <stop offset=".78" stop-color="#121326"/>
+    <stop offset="1" stop-color="#05060b"/>
+  </radialGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fff4c6"/>
+    <stop offset=".38" stop-color="#ffc66b"/>
+    <stop offset=".68" stop-color="#d88b38"/>
+    <stop offset="1" stop-color="#fff0b8"/>
+  </linearGradient>
+  <filter id="glow" x="-35%" y="-35%" width="170%" height="170%">
+    <feGaussianBlur stdDeviation="7" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+    <feDropShadow dx="0" dy="7" stdDeviation="9" flood-color="#000" flood-opacity=".55"/>
+  </filter>
+</defs>
+
+<g opacity=".55" filter="url(#glow)" fill="none" stroke="#a04bff" stroke-width="8">
+  <path d="M66 246 A190 190 0 0 1 446 246"/>
+  <path d="M104 241 A152 152 0 0 1 408 241"/>
+  <path d="M146 236 A110 110 0 0 1 366 236"/>
+</g>
+
+<g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#soft)">
+  <path d="M66 246 A190 190 0 0 1 446 246" stroke="#05060a" stroke-width="34"/>
+  <path d="M66 246 A190 190 0 0 1 446 246" stroke="url(#cosmic)" stroke-width="24"/>
+  <path d="M66 246 A190 190 0 0 1 446 246" stroke="#fff" stroke-opacity=".55" stroke-width="1.5"/>
+
+  <path d="M104 241 A152 152 0 0 1 408 241" stroke="#05060a" stroke-width="30"/>
+  <path d="M104 241 A152 152 0 0 1 408 241" stroke="url(#cosmic)" stroke-width="20"/>
+  <path d="M104 241 A152 152 0 0 1 408 241" stroke="#fff" stroke-opacity=".48" stroke-width="1.25"/>
+
+  <path d="M146 236 A110 110 0 0 1 366 236" stroke="#05060a" stroke-width="27"/>
+  <path d="M146 236 A110 110 0 0 1 366 236" stroke="url(#cosmic)" stroke-width="17"/>
+  <path d="M146 236 A110 110 0 0 1 366 236" stroke="#fff" stroke-opacity=".44" stroke-width="1"/>
+
+  <path d="M64 274 C92 236 118 232 150 270 C184 311 207 335 256 335 C305 335 328 311 362 270 C394 232 420 236 448 274" stroke="#05060a" stroke-width="37"/>
+  <path d="M64 274 C92 236 118 232 150 270 C184 311 207 335 256 335 C305 335 328 311 362 270 C394 232 420 236 448 274" stroke="url(#cosmic)" stroke-width="25"/>
+  <path d="M64 274 C92 236 118 232 150 270 C184 311 207 335 256 335 C305 335 328 311 362 270 C394 232 420 236 448 274" stroke="#fff" stroke-opacity=".55" stroke-width="1.6"/>
+
+  <path d="M78 306 C106 270 130 268 160 301 C191 336 216 359 256 359 C296 359 321 336 352 301 C382 268 406 270 434 306" stroke="#05060a" stroke-width="32"/>
+  <path d="M78 306 C106 270 130 268 160 301 C191 336 216 359 256 359 C296 359 321 336 352 301 C382 268 406 270 434 306" stroke="url(#cosmic)" stroke-width="20"/>
+  <path d="M78 306 C106 270 130 268 160 301 C191 336 216 359 256 359 C296 359 321 336 352 301 C382 268 406 270 434 306" stroke="#fff" stroke-opacity=".42" stroke-width="1.2"/>
+
+  <path d="M96 336 C121 307 145 306 171 333 C198 362 222 382 256 382 C290 382 314 362 341 333 C367 306 391 307 416 336" stroke="#05060a" stroke-width="27"/>
+  <path d="M96 336 C121 307 145 306 171 333 C198 362 222 382 256 382 C290 382 314 362 341 333 C367 306 391 307 416 336" stroke="url(#cosmic)" stroke-width="16"/>
+</g>
+
+<g filter="url(#soft)">
+  <circle cx="256" cy="272" r="80" fill="#05060a" stroke="#05060a" stroke-width="14"/>
+  <circle cx="256" cy="272" r="72" fill="url(#core)" stroke="url(#gold)" stroke-width="5"/>
+  <circle cx="256" cy="272" r="63" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="1"/>
+  <path d="M256 218 C262 250 278 266 310 272 C278 278 262 294 256 326 C250 294 234 278 202 272 C234 266 250 250 256 218Z"
+        fill="#fffdf2" stroke="url(#gold)" stroke-width="2.5"/>
+</g>
+
+<g fill="#fff7d8" opacity=".95">
+  <circle cx="256" cy="72" r="2.4"/>
+  <circle cx="106" cy="201" r="1.7"/>
+  <circle cx="407" cy="206" r="1.8"/>
+</g>
+<g stroke="url(#gold)" stroke-width="1.4" opacity=".8">
+  <path d="M256 54v36M238 72h36"/>
+  <path d="M91 201h30"/>
+  <path d="M392 206h30"/>
+</g>
+</svg>

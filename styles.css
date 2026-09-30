@@ -771,3 +771,311 @@
   .studio-crest{width:120px}
 }
 @media(prefers-reduced-motion:reduce){.studio-crest img{animation:none!important}}
+
+
+/* Cosmic homepage redesign — approved Think Exist visual direction */
+body[data-page="home"]{
+  --bg:#050817;
+  --panel:#0b1020;
+  --panel2:#11172a;
+  background:
+    linear-gradient(180deg,#040713cc 0%,#050817c7 48%,#060916 100%),
+    url("assets/cosmic-home-bg.svg") center top/cover fixed no-repeat,
+    #050817;
+}
+body[data-page="home"]:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 18%,#a45aff20,transparent 24%),
+    radial-gradient(circle at 80% 42%,#ff9b6120,transparent 28%),
+    linear-gradient(180deg,transparent 55%,#050817 92%);
+}
+body[data-page="home"] .top{
+  background:linear-gradient(180deg,#050817f6,#060918e8);
+  border-bottom:1px solid #c8a3ff2d;
+  box-shadow:0 8px 34px #0007,0 1px 0 #f7bd7720 inset;
+}
+body[data-page="home"] .topin{min-height:78px}
+body[data-page="home"] .brand{
+  gap:12px;
+  letter-spacing:.08em;
+  font-size:.92rem;
+  text-transform:uppercase;
+}
+body[data-page="home"] .brand b{
+  background:linear-gradient(90deg,#f8f8ff,#9c7cff 58%,#ffbd77);
+  background-clip:text;
+}
+body[data-page="home"] .brand-mark{
+  width:48px;height:48px;flex-basis:48px;
+  filter:drop-shadow(0 0 10px #9d63ff88) drop-shadow(0 0 7px #ffb25b66);
+}
+body[data-page="home"] .nav-menu>summary,
+body[data-page="home"] .nav>a{
+  color:#ececff;
+  border:1px solid transparent;
+}
+body[data-page="home"] .nav-menu>summary:hover,
+body[data-page="home"] .nav>a:hover{
+  border-color:#9d7cff38;
+  background:#ffffff08;
+  box-shadow:0 0 24px #845cff14;
+}
+body[data-page="home"] .signalbar{
+  background:#060918e8;
+  border-bottom:1px solid #9a76ff26;
+  color:#c9c8df;
+  box-shadow:0 6px 26px #0004;
+}
+body[data-page="home"] .signaltrack i{
+  background:#ffd38a;
+  box-shadow:0 0 12px #ffae5f;
+}
+
+body[data-page="home"] .home-memberbar{
+  position:relative;
+  z-index:2;
+  margin-top:18px;
+  padding:14px 18px;
+  border:1px solid #b594ff42;
+  border-radius:20px;
+  background:
+    linear-gradient(110deg,#111529d9,#17132ad9),
+    radial-gradient(circle at 80% 20%,#8c5fff22,transparent 35%);
+  box-shadow:0 20px 50px #0006,0 0 45px #8e66ff0f,inset 0 1px 0 #ffffff10;
+  backdrop-filter:blur(18px);
+}
+body[data-page="home"] .home-memberbar .btn{
+  border-color:#bea7ff44;
+  background:#0c1020b8;
+}
+body[data-page="home"] .home-memberbar .btn.primary{
+  color:#080a14;
+  background:linear-gradient(90deg,#9deaff,#b78dff 53%,#ffd0e9);
+  box-shadow:0 0 28px #9f80ff2e;
+}
+
+body[data-page="home"] main.shell{
+  width:min(1240px,calc(100% - 34px));
+}
+body[data-page="home"] .hero-live{
+  min-height:760px;
+  padding:58px 22px 42px;
+  margin-top:18px;
+  border:1px solid #b590ff1f;
+  border-radius:32px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 36%,#9b5cff1f 0%,transparent 26%),
+    radial-gradient(circle at 50% 70%,#ffaf6722 0%,transparent 30%),
+    linear-gradient(180deg,#070b1899,#070a14c7 70%,#050817ee);
+  box-shadow:0 35px 100px #0008,inset 0 1px 0 #ffffff0b;
+}
+body[data-page="home"] .hero-live:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,transparent 49.85%,#ffbd7455 50%,transparent 50.15%),
+    radial-gradient(circle at 50% 36%,transparent 0 26%,#ca95ff13 26.2% 26.5%,transparent 27%),
+    radial-gradient(circle at 50% 36%,transparent 0 34%,#ffffff0b 34.2% 34.4%,transparent 34.8%);
+  mix-blend-mode:screen;
+}
+body[data-page="home"] .orb{display:none}
+body[data-page="home"] .studio-crest{
+  width:clamp(210px,27vw,340px);
+  margin:-6px auto 2px;
+  filter:none;
+}
+body[data-page="home"] .studio-crest:before{
+  inset:17%;
+  background:
+    radial-gradient(circle,#fff3bd36 0%,#ff9c5d30 18%,#9b52ff31 40%,transparent 72%);
+  filter:blur(34px);
+}
+body[data-page="home"] .studio-crest img{
+  filter:
+    drop-shadow(0 22px 36px #0009)
+    drop-shadow(0 0 24px #9258ff55)
+    drop-shadow(0 0 9px #ffb26366);
+}
+body[data-page="home"] .livepill{
+  margin-top:4px;
+  border-color:#a98cff42;
+  background:#080d1bcc;
+  box-shadow:0 0 30px #8f5cff15,inset 0 1px 0 #ffffff0b;
+}
+body[data-page="home"] .eyebrow{
+  color:#cec8ff;
+  text-shadow:0 0 16px #7f66ff4d;
+}
+body[data-page="home"] .hero h1{
+  font-size:clamp(3rem,6.6vw,5.7rem);
+  max-width:1050px;
+  text-shadow:0 12px 38px #0009;
+}
+body[data-page="home"] .grad{
+  background:linear-gradient(90deg,#f7fbff 0%,#96e7ff 31%,#a78cff 61%,#ffc6e2 82%,#ffc07b 100%);
+  background-clip:text;
+}
+body[data-page="home"] .hero>p{
+  color:#d0d3e2;
+  max-width:900px;
+}
+body[data-page="home"] .hero .row .btn{
+  min-width:150px;
+  border-color:#a98cff47;
+  background:#0a0e1dcc;
+  box-shadow:inset 0 1px 0 #ffffff0b;
+}
+body[data-page="home"] .hero .row .btn.primary{
+  color:#070914;
+  border:0;
+  background:linear-gradient(90deg,#99eaff,#b58cff 53%,#f5b7ef);
+  box-shadow:0 0 26px #a57cff36,0 12px 30px #0005;
+}
+body[data-page="home"] .hero .row .btn:hover{
+  border-color:#f3b67488;
+  box-shadow:0 0 28px #a56cff30,0 16px 38px #0007;
+}
+
+body[data-page="home"] .home-category-grid{
+  width:100%;
+  gap:16px;
+  margin-top:34px;
+}
+body[data-page="home"] .pulse-card{
+  min-height:185px;
+  padding:22px 20px 18px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  border-radius:20px;
+  border:1px solid #baa0ff55;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 24%,#9469ff34,transparent 27%),
+    linear-gradient(160deg,#111831e8,#080d1be8 65%);
+  box-shadow:0 22px 52px #0007,inset 0 1px 0 #ffffff13;
+}
+body[data-page="home"] .pulse-card:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.9;
+  background:
+    radial-gradient(circle at 52% 24%,#ffffff 0 1px,transparent 2px),
+    radial-gradient(circle at 68% 18%,#ffba6e 0 1px,transparent 2px),
+    radial-gradient(circle at 32% 34%,#be8aff 0 1px,transparent 2px),
+    radial-gradient(circle at 50% 40%,#6b55d833 0 18%,transparent 18.5%),
+    radial-gradient(circle at 50% 40%,transparent 0 23%,#d6c5ff22 23.4% 24%,transparent 24.5%);
+  pointer-events:none;
+}
+body[data-page="home"] .pulse-card:after{
+  content:"";
+  position:absolute;
+  left:-10%;
+  right:-10%;
+  top:41%;
+  height:42%;
+  border-radius:50% 50% 0 0;
+  border-top:1px solid #efb87555;
+  background:linear-gradient(180deg,#7048c517,transparent 62%);
+  pointer-events:none;
+}
+body[data-page="home"] .pulse-card:nth-child(1){background:radial-gradient(circle at 50% 25%,#7d5cff45,transparent 25%),linear-gradient(160deg,#121a34,#070c18 68%)}
+body[data-page="home"] .pulse-card:nth-child(2){background:radial-gradient(circle at 50% 24%,#6fdfff3d,transparent 26%),linear-gradient(160deg,#101a32,#090d19 68%)}
+body[data-page="home"] .pulse-card:nth-child(3){background:radial-gradient(circle at 58% 25%,#ffac643b,transparent 25%),linear-gradient(160deg,#17152d,#090d19 68%)}
+body[data-page="home"] .pulse-card:nth-child(4){background:radial-gradient(circle at 52% 22%,#cf68ff46,transparent 24%),linear-gradient(160deg,#14122d,#090d19 68%)}
+body[data-page="home"] .pulse-card:hover{
+  transform:translateY(-6px) scale(1.01);
+  border-color:#ffd08a88;
+  box-shadow:0 28px 70px #0008,0 0 32px #9d6cff1d,inset 0 1px 0 #ffffff17;
+}
+body[data-page="home"] .pulse-card small,
+body[data-page="home"] .pulse-card strong,
+body[data-page="home"] .pulse-card em{position:relative;z-index:2}
+body[data-page="home"] .pulse-card small{color:#c3badc;letter-spacing:.16em}
+body[data-page="home"] .pulse-card strong{font-size:1.18rem}
+body[data-page="home"] .pulse-card em{color:#b7bfd1}
+body[data-page="home"] .pulse-card .pulse-dot{
+  z-index:3;
+  width:9px;height:9px;
+  box-shadow:0 0 14px currentColor;
+}
+
+body[data-page="home"] .home-path-note{
+  padding-top:34px;
+}
+body[data-page="home"] .home-path-note .callout{
+  position:relative;
+  overflow:hidden;
+  padding:40px 30px;
+  text-align:center;
+  border-radius:26px;
+  border-color:#ac86ff3f;
+  background:
+    linear-gradient(180deg,#090e1bcf,#080b16e8),
+    radial-gradient(circle at 50% 0%,#8a58ff23,transparent 52%);
+  box-shadow:0 28px 80px #0007,inset 0 1px 0 #ffffff0c;
+}
+body[data-page="home"] .home-path-note .callout:before{
+  content:"";
+  position:absolute;
+  left:8%;right:8%;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,#ffcf8c,#b68cff,#ffcf8c,transparent);
+  box-shadow:0 0 18px #ffba6a66;
+}
+body[data-page="home"] .home-path-note h2{
+  font-size:clamp(1.65rem,3.5vw,2.8rem);
+  margin:10px 0;
+}
+body[data-page="home"] .footer{
+  color:#aeb4c8;
+  border-top-color:#a389ff25;
+}
+
+/* Keep VERA available without covering the cosmic homepage. */
+body[data-page="home"] .vera-guide{
+  width:92px;
+  height:120px;
+  right:max(12px,env(safe-area-inset-right));
+  left:auto;
+  transform:none;
+  bottom:max(12px,env(safe-area-inset-bottom));
+  opacity:.96;
+}
+body[data-page="home"] .vera-bubble{
+  width:min(220px,calc(100vw - 24px));
+  max-height:116px;
+  right:0;
+  left:auto;
+  bottom:calc(100% + 2px);
+  transform:scale(.94) translateY(5px);
+  transform-origin:bottom right;
+}
+body[data-page="home"] .vera-bubble.show{transform:scale(1) translateY(0)}
+body[data-page="home"] .vera-bubble p{font-size:.72rem}
+
+@media(max-width:900px){
+  body[data-page="home"] .hero-live{min-height:700px;padding-inline:16px}
+  body[data-page="home"] .studio-crest{width:190px}
+  body[data-page="home"] .home-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:760px){
+  body[data-page="home"] .topin{min-height:68px}
+  body[data-page="home"] .brand{font-size:.78rem;letter-spacing:.05em}
+  body[data-page="home"] .brand-mark{width:38px;height:38px;flex-basis:38px}
+  body[data-page="home"] .home-memberbar{margin-top:12px;border-radius:16px}
+  body[data-page="home"] .hero-live{margin-top:12px;min-height:auto;padding:34px 12px 28px;border-radius:22px}
+  body[data-page="home"] .studio-crest{width:160px}
+  body[data-page="home"] .hero h1{font-size:clamp(2.45rem,11vw,4rem)}
+  body[data-page="home"] .home-category-grid{grid-template-columns:1fr}
+  body[data-page="home"] .pulse-card{min-height:148px}
+  body[data-page="home"] .vera-guide{width:78px;height:102px}
+}

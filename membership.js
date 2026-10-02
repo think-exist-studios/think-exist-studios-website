@@ -4,6 +4,7 @@
    'sb_publishable_07ChHzoUQS98-PHaxbNx2g_zmZ2QXeP'
  );
  let session=null,member=null,creator=null;
+ let creatorConversations=[],activeCreatorConversation=null,creatorThreadChannel=null;
 
  const $=id=>document.getElementById(id);
  const toggle=(id,show)=>{const el=$(id);if(el)el.classList.toggle('hide',!show);};
@@ -45,6 +46,100 @@
    return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  }
 
+
+ async function loadCreatorConversations(){
+   const box=$('memberCreatorConversationList');
+   if(!box||!session?.user)return;
+   const {data,error}=await sb.from('creator_conversations')
+     .select('id,creator_slug,kind,subject,request_details,status,created_at')
+     .eq('member_user_id',session.user.id)
+     .order('created_at',{ascending:false});
+   if(error){box.innerHTML='<p class="statusline">Creator messages are temporarily unavailable.</p>';return;}
+   creatorConversations=data||[];
+   let allMessages=[];
+   if(creatorConversations.length){
+     const ids=creatorConversations.map(x=>x.id);
+     const res=await sb.from('creator_messages')
+       .select('conversation_id,sender_role,body,created_at,read_at')
+       .in('conversation_id',ids)
+       .order('created_at',{ascending:false});
+     allMessages=res.data||[];
+   }
+   const creatorName=slug=>slug==='cash-cassius-miller'?'Cash (Cassius) Miller':String(slug||'Creator').split('-').map(x=>x.charAt(0).toUpperCase()+x.slice(1)).join(' ');
+   if(!creatorConversations.length){
+     box.innerHTML='<p class="statusline">No creator conversations yet. Open a creator profile to send a message or project request.</p>';
+     $('memberCreatorThread').innerHTML='<div class="creator-thread-empty">Your creator conversations will appear here.</div>';
+     $('memberCreatorReplyForm').classList.add('hide');
+     return;
+   }
+   box.innerHTML=creatorConversations.map(c=>{
+     const msgs=allMessages.filter(m=>m.conversation_id===c.id);
+     const unread=msgs.filter(m=>m.sender_role==='creator'&&!m.read_at).length;
+     const last=msgs[0]?.body||((c.kind==='commission'?'Project request':'Conversation')+' started');
+     return '<button class="creator-conversation-row'+(activeCreatorConversation?.id===c.id?' active':'')+'" type="button" data-id="'+escapeHtml(c.id)+'"><div class="creator-conversation-top"><strong>'+escapeHtml(creatorName(c.creator_slug))+'</strong><span class="creator-kind">'+escapeHtml(c.kind==='commission'?'PROJECT':'MESSAGE')+'</span></div><span>'+escapeHtml(c.subject||'Direct message')+'</span><small>'+escapeHtml(last.slice(0,90))+'</small>'+(unread?'<b class="creator-unread">'+unread+'</b>':'')+'</button>';
+   }).join('');
+   box.querySelectorAll('.creator-conversation-row').forEach(btn=>btn.addEventListener('click',()=>openMemberCreatorConversation(btn.dataset.id)));
+   if(activeCreatorConversation){
+     const refreshed=creatorConversations.find(c=>c.id===activeCreatorConversation.id);
+     if(refreshed)activeCreatorConversation=refreshed;
+   }else if(creatorConversations[0]){
+     await openMemberCreatorConversation(creatorConversations[0].id,false);
+   }
+ }
+
+ async function openMemberCreatorConversation(id,reloadList=true){
+   const c=creatorConversations.find(x=>x.id===id);
+   if(!c)return;
+   activeCreatorConversation=c;
+   const creatorName=c.creator_slug==='cash-cassius-miller'?'Cash (Cassius) Miller':String(c.creator_slug||'Creator').split('-').map(x=>x.charAt(0).toUpperCase()+x.slice(1)).join(' ');
+   $('memberCreatorThreadHeader').innerHTML='<div><div class="eyebrow">'+escapeHtml(c.kind==='commission'?'Project request':'Direct message')+'</div><h3>'+escapeHtml(creatorName)+'</h3><p>'+escapeHtml(c.subject||'Direct message')+' · '+escapeHtml(c.status)+'</p></div>';
+   await sb.from('creator_messages').update({read_at:new Date().toISOString()})
+     .eq('conversation_id',id).eq('sender_role','creator').is('read_at',null);
+   await renderMemberCreatorThread(id);
+   $('memberCreatorReplyForm').classList.toggle('hide',c.status!=='open');
+   if(c.status!=='open')text('memberCreatorReplyStatus','This conversation is closed.');
+   else text('memberCreatorReplyStatus','');
+   subscribeMemberCreatorThread(id);
+   if(reloadList)await loadCreatorConversations();
+ }
+
+ async function renderMemberCreatorThread(id){
+   const {data,error}=await sb.from('creator_messages').select('id,sender_role,body,created_at').eq('conversation_id',id).order('created_at',{ascending:true});
+   if(error){$('memberCreatorThread').innerHTML='<div class="creator-thread-empty">Could not load this conversation.</div>';return;}
+   const rows=data||[];
+   $('memberCreatorThread').innerHTML=rows.length?rows.map(m=>{
+     const who=m.sender_role==='member'?'You':'Creator';
+     return '<article class="creator-message '+escapeHtml(m.sender_role)+'"><div class="creator-message-meta"><strong>'+who+'</strong><span>'+new Date(m.created_at).toLocaleString()+'</span></div><p>'+escapeHtml(m.body)+'</p></article>';
+   }).join(''):'<div class="creator-thread-empty">No messages in this conversation yet.</div>';
+   $('memberCreatorThread').scrollTop=$('memberCreatorThread').scrollHeight;
+ }
+
+ function subscribeMemberCreatorThread(id){
+   if(creatorThreadChannel)sb.removeChannel(creatorThreadChannel);
+   creatorThreadChannel=sb.channel('member-hub-'+id)
+     .on('postgres_changes',{event:'INSERT',schema:'public',table:'creator_messages',filter:'conversation_id=eq.'+id},async()=>{await renderMemberCreatorThread(id);await loadCreatorConversations();})
+     .subscribe();
+ }
+
+ $('memberCreatorReplyForm')?.addEventListener('submit',async e=>{
+   e.preventDefault();
+   if(!session?.user||!activeCreatorConversation||activeCreatorConversation.status!=='open')return;
+   const body=$('memberCreatorReplyBody').value.trim();
+   if(!body)return;
+   text('memberCreatorReplyStatus','Sending…');
+   const {error}=await sb.from('creator_messages').insert({
+     conversation_id:activeCreatorConversation.id,
+     sender_user_id:session.user.id,
+     sender_role:'member',
+     body
+   });
+   if(error){text('memberCreatorReplyStatus','Could not send: '+error.message);return;}
+   $('memberCreatorReplyBody').value='';
+   text('memberCreatorReplyStatus','Sent.');
+   await renderMemberCreatorThread(activeCreatorConversation.id);
+   await loadCreatorConversations();
+ });
+
  async function refresh(){
    const {data:{session:s}}=await sb.auth.getSession();
    session=s; member=null; creator=null;
@@ -58,7 +153,7 @@
      creator=c.data||null;
    }
    paint();
-   if(session?.user)await loadNotifications();
+   if(session?.user)await Promise.all([loadNotifications(),loadCreatorConversations()]);
  }
 
  function paint(){
@@ -93,8 +188,9 @@
  }
 
  async function signOut(){
+   if(creatorThreadChannel){await sb.removeChannel(creatorThreadChannel);creatorThreadChannel=null;}
    await sb.auth.signOut();
-   session=null;member=null;creator=null;
+   session=null;member=null;creator=null;creatorConversations=[];activeCreatorConversation=null;
    paint();
    text('membershipStatusLine','Logged out.');
  }

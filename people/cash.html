@@ -48,7 +48,7 @@
       <a href="#feedback">Rate this profile ↓</a>
     </div>
     <div class="tagrow" style="margin-top:14px"><span class="tag">Artist</span><span class="tag">Business</span><span class="tag">Writer</span><span class="tag">Creative</span></div>
-    <div class="row" style="justify-content:flex-start"><a class="btn primary" href="#portfolio">View work ↓</a><a class="btn" href="../creator-studio.html">Manage portfolio</a></div>
+    <div class="row" style="justify-content:flex-start"><a class="btn primary" href="#portfolio">View work ↓</a><a class="btn" href="#contactCreator">Message Cash</a><a class="btn" href="#commissionRequest">Commission / project request</a><a class="btn" href="../creator-studio.html">Manage portfolio</a></div>
   </div>
   <img class="creator-avatar" id="creatorAvatar" src="../assets/cash-stargazer-hero.svg" alt="Cash Cassius Miller creator profile image">
 </section>
@@ -61,6 +61,39 @@
     <a class="linktile" href="https://instagram.com/stargazerwebtoon" target="_blank" rel="noopener"><strong>Instagram ↗</strong><span>@stargazerwebtoon</span></a>
     <a class="linktile" href="mailto:stargazer.webtoon@gmail.com"><strong>Email ↗</strong><span>stargazer.webtoon@gmail.com</span></a>
     <a class="linktile" href="https://cash.app/$cashsiusm" target="_blank" rel="noopener"><strong>Cash App ↗</strong><span>$cashsiusm</span></a>
+  </div>
+</section>
+
+
+<section class="section" id="contactCreator">
+  <div class="sectionhead"><div><div class="eyebrow">Private creator contact</div><h2>Message Cash</h2></div><p>Use your Think Exist member account to message Cash without sharing personal phone numbers or private email addresses.</p></div>
+  <div class="creator-contact-grid">
+    <article class="card creator-message-panel">
+      <div class="eyebrow">Direct message</div><h3>Your conversation with Cash</h3>
+      <p class="statusline">This thread is private to your member account and Cash.</p>
+      <div class="creator-contact-auth" id="creatorContactAuth">Checking member access…</div>
+      <div class="creator-thread" id="creatorThread"><div class="creator-thread-empty">Sign in as a member to start a conversation.</div></div>
+      <form class="creator-compose hide" id="creatorMessageForm">
+        <textarea id="creatorMessageBody" maxlength="4000" required placeholder="Write a private message to Cash…"></textarea>
+        <div class="creator-compose-actions"><a class="feature-link" href="../membership.html#creatorMessages">Open member inbox →</a><button class="btn primary" type="submit">Send message</button></div>
+      </form>
+      <div class="statusline" id="creatorMessageStatus"></div>
+    </article>
+
+    <article class="card" id="commissionRequest">
+      <div class="eyebrow">Business inquiry</div><h3>Commission / project request</h3>
+      <p>Send a separate project inquiry so commission work does not get mixed into the regular conversation.</p>
+      <form class="creator-request-form hide" id="commissionForm">
+        <div class="field"><label for="commissionSubject">Project / request</label><input id="commissionSubject" maxlength="140" required placeholder="Cover art, character design, collaboration…"></div>
+        <div class="grid2">
+          <div class="field"><label for="commissionBudget">Budget <span class="statusline">(optional)</span></label><input id="commissionBudget" maxlength="80" placeholder="Example: $150–$250"></div>
+          <div class="field"><label for="commissionTimeline">Timeline <span class="statusline">(optional)</span></label><input id="commissionTimeline" maxlength="80" placeholder="Example: by Nov. 15"></div>
+        </div>
+        <div class="field"><label for="commissionDetails">Details</label><textarea id="commissionDetails" maxlength="4000" required placeholder="Describe the project, deliverables, references, and anything Cash should know."></textarea></div>
+        <button class="btn primary" type="submit">Send project request</button>
+      </form>
+      <div class="statusline" id="commissionStatus">Member sign-in is required to send a request.</div>
+    </article>
   </div>
 </section>
 
@@ -237,8 +270,164 @@
     e.target.reset();selectedRating=0;paintPicker();status.textContent='Posted. Thank you for the feedback.';await loadFeedback();
   });
 
-  sb.auth.onAuthStateChange(()=>setTimeout(loadAccountState,0));
-  loadCreatorProfile();loadAccountState();loadPortfolio();loadFeedback();
+
+  let memberSession=null, memberRecord=null, activeMemberConversation=null, memberThreadChannel=null;
+
+  function memberDisplayName(){
+    return memberRecord?.display_name||memberSession?.user?.user_metadata?.display_name||memberSession?.user?.email?.split('@')[0]||'Member';
+  }
+
+  function renderContactSignedOut(){
+    document.getElementById('creatorContactAuth').innerHTML='Sign in with a free Think Exist member account to send private messages. <a class="feature-link" href="../membership.html#login">Member sign in →</a>';
+    document.getElementById('creatorMessageForm').classList.add('hide');
+    document.getElementById('commissionForm').classList.add('hide');
+    document.getElementById('commissionStatus').textContent='Member sign-in is required to send a request.';
+    document.getElementById('creatorThread').innerHTML='<div class="creator-thread-empty">Your private conversation will appear here after you sign in.</div>';
+  }
+
+  async function loadMemberContactState(){
+    const {data:{session:s}}=await sb.auth.getSession();
+    memberSession=s; memberRecord=null; activeMemberConversation=null;
+    if(memberThreadChannel){await sb.removeChannel(memberThreadChannel);memberThreadChannel=null;}
+    if(!memberSession){renderContactSignedOut();return;}
+    const {data,error}=await sb.from('site_members').select('user_id,display_name,status').eq('user_id',memberSession.user.id).maybeSingle();
+    if(error||!data||data.status!=='active'){
+      document.getElementById('creatorContactAuth').innerHTML='This signed-in account does not have active member access yet. <a class="feature-link" href="../membership.html">Open Membership →</a>';
+      document.getElementById('creatorMessageForm').classList.add('hide');
+      document.getElementById('commissionForm').classList.add('hide');
+      document.getElementById('commissionStatus').textContent='Activate free membership to contact creators.';
+      document.getElementById('creatorThread').innerHTML='<div class="creator-thread-empty">Active membership is required for private creator messages.</div>';
+      return;
+    }
+    memberRecord=data;
+    document.getElementById('creatorContactAuth').innerHTML='<strong>Signed in as '+esc(memberDisplayName())+'</strong><span> · Messages stay inside your Think Exist account.</span>';
+    document.getElementById('creatorMessageForm').classList.remove('hide');
+    document.getElementById('commissionForm').classList.remove('hide');
+    document.getElementById('commissionStatus').textContent='Ready for a new commission or project inquiry.';
+    await loadGeneralConversation();
+  }
+
+  async function loadGeneralConversation(){
+    if(!memberSession?.user||!memberRecord)return;
+    const {data,error}=await sb.from('creator_conversations')
+      .select('id,kind,subject,status,created_at')
+      .eq('member_user_id',memberSession.user.id)
+      .eq('creator_slug',profileSlug)
+      .eq('kind','message')
+      .maybeSingle();
+    if(error){document.getElementById('creatorMessageStatus').textContent='Could not load conversation: '+error.message;return;}
+    activeMemberConversation=data||null;
+    if(!activeMemberConversation){
+      document.getElementById('creatorThread').innerHTML='<div class="creator-thread-empty">No messages yet. Start the conversation below.</div>';
+      return;
+    }
+    await renderMemberThread(activeMemberConversation.id);
+    subscribeMemberThread(activeMemberConversation.id);
+    if(activeMemberConversation.status!=='open'){
+      document.getElementById('creatorMessageBody').disabled=true;
+      document.getElementById('creatorMessageForm').querySelector('button[type=submit]').disabled=true;
+      document.getElementById('creatorMessageStatus').textContent='This conversation is closed by the creator. You can start a separate project request if needed.';
+    }
+  }
+
+  async function renderMemberThread(conversationId){
+    const {data,error}=await sb.from('creator_messages')
+      .select('id,sender_role,body,created_at,read_at')
+      .eq('conversation_id',conversationId)
+      .order('created_at',{ascending:true});
+    if(error){document.getElementById('creatorThread').innerHTML='<div class="creator-thread-empty">Could not load messages.</div>';return;}
+    await sb.from('creator_messages').update({read_at:new Date().toISOString()})
+      .eq('conversation_id',conversationId).eq('sender_role','creator').is('read_at',null);
+    const rows=data||[];
+    document.getElementById('creatorThread').innerHTML=rows.length?rows.map(m=>{
+      const who=m.sender_role==='member'?'You':'Cash';
+      return '<article class="creator-message '+esc(m.sender_role)+'"><div class="creator-message-meta"><strong>'+who+'</strong><span>'+new Date(m.created_at).toLocaleString()+'</span></div><p>'+esc(m.body)+'</p></article>';
+    }).join(''):'<div class="creator-thread-empty">No messages yet. Start the conversation below.</div>';
+    const box=document.getElementById('creatorThread');box.scrollTop=box.scrollHeight;
+  }
+
+  function subscribeMemberThread(conversationId){
+    if(memberThreadChannel)sb.removeChannel(memberThreadChannel);
+    memberThreadChannel=sb.channel('member-creator-'+conversationId)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'creator_messages',filter:'conversation_id=eq.'+conversationId},()=>renderMemberThread(conversationId))
+      .subscribe();
+  }
+
+  async function ensureGeneralConversation(){
+    if(activeMemberConversation)return activeMemberConversation;
+    const payload={
+      member_user_id:memberSession.user.id,
+      member_display_name:memberDisplayName().slice(0,80),
+      creator_slug:profileSlug,
+      kind:'message',
+      subject:'Direct message'
+    };
+    let result=await sb.from('creator_conversations').insert(payload).select('id,kind,subject,status,created_at').single();
+    if(result.error){
+      const fallback=await sb.from('creator_conversations').select('id,kind,subject,status,created_at')
+        .eq('member_user_id',memberSession.user.id).eq('creator_slug',profileSlug).eq('kind','message').maybeSingle();
+      if(fallback.error||!fallback.data)throw result.error;
+      activeMemberConversation=fallback.data;
+    }else activeMemberConversation=result.data;
+    subscribeMemberThread(activeMemberConversation.id);
+    return activeMemberConversation;
+  }
+
+  document.getElementById('creatorMessageForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const status=document.getElementById('creatorMessageStatus');
+    if(!memberSession?.user||!memberRecord){status.textContent='Sign in as a member first.';return;}
+    const body=document.getElementById('creatorMessageBody').value.trim();
+    if(!body)return;
+    status.textContent='Sending…';
+    try{
+      const conversation=await ensureGeneralConversation();
+      if(conversation.status!=='open'){status.textContent='This conversation is closed.';return;}
+      const {error}=await sb.from('creator_messages').insert({
+        conversation_id:conversation.id,
+        sender_user_id:memberSession.user.id,
+        sender_role:'member',
+        body
+      });
+      if(error)throw error;
+      document.getElementById('creatorMessageBody').value='';
+      status.textContent='Message sent.';
+      await renderMemberThread(conversation.id);
+    }catch(err){status.textContent='Could not send message: '+(err.message||err);}
+  });
+
+  document.getElementById('commissionForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const status=document.getElementById('commissionStatus');
+    if(!memberSession?.user||!memberRecord){status.textContent='Sign in as a member first.';return;}
+    const subject=document.getElementById('commissionSubject').value.trim();
+    const budget=document.getElementById('commissionBudget').value.trim();
+    const timeline=document.getElementById('commissionTimeline').value.trim();
+    const body=document.getElementById('commissionDetails').value.trim();
+    if(!subject||!body)return;
+    status.textContent='Sending project request…';
+    const conv=await sb.from('creator_conversations').insert({
+      member_user_id:memberSession.user.id,
+      member_display_name:memberDisplayName().slice(0,80),
+      creator_slug:profileSlug,
+      kind:'commission',
+      subject,
+      request_details:{budget:budget||null,timeline:timeline||null}
+    }).select('id').single();
+    if(conv.error){status.textContent='Could not create request: '+conv.error.message;return;}
+    const msg=await sb.from('creator_messages').insert({
+      conversation_id:conv.data.id,
+      sender_user_id:memberSession.user.id,
+      sender_role:'member',
+      body
+    });
+    if(msg.error){status.textContent='Request created, but the message could not be sent: '+msg.error.message;return;}
+    e.target.reset();
+    status.innerHTML='Project request sent. Track replies in your <a class="feature-link" href="../membership.html#creatorMessages">Member inbox →</a>';
+  });
+
+  sb.auth.onAuthStateChange(()=>setTimeout(()=>{loadAccountState();loadMemberContactState();},0));
+  loadCreatorProfile();loadAccountState();loadPortfolio();loadFeedback();loadMemberContactState();
 })();
 </script>
 <script src="../site-nav.js" defer></script>

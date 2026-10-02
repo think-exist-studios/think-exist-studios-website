@@ -103,11 +103,28 @@
           <div class="statusline" id="creatorAccountRefStatus"></div>
         </article>
         <article class="card">
-          <div class="eyebrow">Messages & updates</div><h3>Creator inbox</h3>
-          <p>Studio feature updates and account notices appear here.</p>
+          <div class="eyebrow">Studio updates</div><h3>Account notices</h3>
+          <p>Studio feature updates and account notices appear here. Member conversations are managed in the private inbox below.</p>
           <div class="member-notification-list" id="creatorNotificationList"><p class="statusline">Loading updates…</p></div>
         </article>
       </div>
+    </div>
+  </div>
+
+
+  <div class="section creator-messages-hub" id="creatorMemberMessages" style="padding-top:20px">
+    <div class="sectionhead"><div><div class="eyebrow">Private member contact</div><h2>Member Messages</h2></div><p>Reply to direct messages and commission/project requests sent from creator profiles. Members never need your personal phone number or private email address.</p></div>
+    <div class="creator-inbox-layout">
+      <div class="creator-conversation-list" id="creatorMemberConversationList"><p class="statusline">Loading member conversations…</p></div>
+      <article class="card creator-thread-card">
+        <div class="creator-thread-header" id="creatorMemberThreadHeader"><div><div class="eyebrow">Conversation</div><h3>Select a member thread</h3></div></div>
+        <div class="creator-request-meta hide" id="creatorRequestMeta"></div>
+        <div class="creator-thread" id="creatorMemberThread"><div class="creator-thread-empty">Choose a conversation to read or reply.</div></div>
+        <form class="creator-compose hide" id="creatorMemberReplyForm">
+          <textarea id="creatorMemberReplyBody" maxlength="4000" required placeholder="Reply to this member…"></textarea>
+          <div class="creator-compose-actions"><span class="statusline" id="creatorMemberReplyStatus"></span><div class="toolbar"><button class="btn" id="creatorConversationStatusBtn" type="button">Close thread</button><button class="btn primary" type="submit">Send reply</button></div></div>
+        </form>
+      </article>
     </div>
   </div>
 
@@ -287,6 +304,7 @@
   const accountSignIn=document.getElementById('accountSignIn'), accountSignOut=document.getElementById('accountSignOut');
   const feedbackManager=document.getElementById('feedbackManager'), feedbackItems=document.getElementById('feedbackItems'), feedbackSummary=document.getElementById('feedbackSummary');
   let session=null, contributor=null, editingItem=null, creatorProfileSettings=null, currentItems=[], currentGoals=[], currentCheckins=[], currentProgress=null, currentFeedbackStats={rating:null,ratings:0,comments:0};
+  let memberConversations=[], activeMemberConversation=null, creatorMemberThreadChannel=null;
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const setAuthMessage=(m)=>authStatus.textContent=m;
 
@@ -367,6 +385,119 @@
     document.getElementById('creatorAccountRole').textContent=contributor.role_title||'Creator';
   }
 
+
+  async function loadMemberConversations(){
+    const box=document.getElementById('creatorMemberConversationList');
+    if(!box||!session?.user||!contributor)return;
+    const {data,error}=await sb.from('creator_conversations')
+      .select('id,member_user_id,member_display_name,kind,subject,request_details,status,created_at')
+      .eq('creator_slug',contributor.slug)
+      .order('created_at',{ascending:false});
+    if(error){box.innerHTML='<p class="statusline">Member messages are temporarily unavailable.</p>';return;}
+    memberConversations=data||[];
+    let allMessages=[];
+    if(memberConversations.length){
+      const ids=memberConversations.map(x=>x.id);
+      const res=await sb.from('creator_messages')
+        .select('conversation_id,sender_role,body,created_at,read_at')
+        .in('conversation_id',ids)
+        .order('created_at',{ascending:false});
+      allMessages=res.data||[];
+    }
+    if(!memberConversations.length){
+      box.innerHTML='<p class="statusline">No member conversations yet. New messages and project requests will appear here.</p>';
+      document.getElementById('creatorMemberThread').innerHTML='<div class="creator-thread-empty">Your member inbox is ready.</div>';
+      document.getElementById('creatorMemberReplyForm').classList.add('hide');
+      document.getElementById('creatorRequestMeta').classList.add('hide');
+      return;
+    }
+    box.innerHTML=memberConversations.map(c=>{
+      const msgs=allMessages.filter(m=>m.conversation_id===c.id);
+      const unread=msgs.filter(m=>m.sender_role==='member'&&!m.read_at).length;
+      const last=msgs[0]?.body||((c.kind==='commission'?'Project request':'Conversation')+' started');
+      return '<button class="creator-conversation-row'+(activeMemberConversation?.id===c.id?' active':'')+'" type="button" data-id="'+esc(c.id)+'"><div class="creator-conversation-top"><strong>'+esc(c.member_display_name||'Member')+'</strong><span class="creator-kind">'+esc(c.kind==='commission'?'PROJECT':'MESSAGE')+'</span></div><span>'+esc(c.subject||'Direct message')+'</span><small>'+esc(last.slice(0,90))+'</small>'+(unread?'<b class="creator-unread">'+unread+'</b>':'')+'</button>';
+    }).join('');
+    box.querySelectorAll('.creator-conversation-row').forEach(btn=>btn.addEventListener('click',()=>openCreatorMemberConversation(btn.dataset.id)));
+    if(activeMemberConversation){
+      const refreshed=memberConversations.find(c=>c.id===activeMemberConversation.id);
+      if(refreshed)activeMemberConversation=refreshed;
+    }else if(memberConversations[0]){
+      await openCreatorMemberConversation(memberConversations[0].id,false);
+    }
+  }
+
+  async function openCreatorMemberConversation(id,reloadList=true){
+    const c=memberConversations.find(x=>x.id===id);
+    if(!c)return;
+    activeMemberConversation=c;
+    document.getElementById('creatorMemberThreadHeader').innerHTML='<div><div class="eyebrow">'+esc(c.kind==='commission'?'Project request':'Direct message')+'</div><h3>'+esc(c.member_display_name||'Member')+'</h3><p>'+esc(c.subject||'Direct message')+' · '+esc(c.status)+'</p></div>';
+    const meta=document.getElementById('creatorRequestMeta');
+    if(c.kind==='commission'){
+      const details=c.request_details||{};
+      const budget=details.budget?'<span><b>Budget:</b> '+esc(details.budget)+'</span>':'';
+      const timeline=details.timeline?'<span><b>Timeline:</b> '+esc(details.timeline)+'</span>':'';
+      meta.innerHTML=budget+timeline;
+      meta.classList.toggle('hide',!budget&&!timeline);
+    }else{meta.classList.add('hide');meta.innerHTML='';}
+    await sb.from('creator_messages').update({read_at:new Date().toISOString()})
+      .eq('conversation_id',id).eq('sender_role','member').is('read_at',null);
+    await renderCreatorMemberThread(id);
+    document.getElementById('creatorMemberReplyForm').classList.remove('hide');
+    document.getElementById('creatorMemberReplyBody').disabled=c.status!=='open';
+    document.getElementById('creatorMemberReplyForm').querySelector('button[type=submit]').disabled=c.status!=='open';
+    document.getElementById('creatorConversationStatusBtn').textContent=c.status==='open'?'Close thread':'Reopen thread';
+    document.getElementById('creatorMemberReplyStatus').textContent=c.status==='open'?'':'This thread is closed. Reopen it to reply.';
+    subscribeCreatorMemberThread(id);
+    if(reloadList)await loadMemberConversations();
+  }
+
+  async function renderCreatorMemberThread(id){
+    const {data,error}=await sb.from('creator_messages').select('id,sender_role,body,created_at').eq('conversation_id',id).order('created_at',{ascending:true});
+    if(error){document.getElementById('creatorMemberThread').innerHTML='<div class="creator-thread-empty">Could not load this conversation.</div>';return;}
+    const rows=data||[];
+    document.getElementById('creatorMemberThread').innerHTML=rows.length?rows.map(m=>{
+      const who=m.sender_role==='creator'?'You':(activeMemberConversation?.member_display_name||'Member');
+      return '<article class="creator-message '+esc(m.sender_role)+'"><div class="creator-message-meta"><strong>'+esc(who)+'</strong><span>'+new Date(m.created_at).toLocaleString()+'</span></div><p>'+esc(m.body)+'</p></article>';
+    }).join(''):'<div class="creator-thread-empty">No messages in this conversation yet.</div>';
+    const thread=document.getElementById('creatorMemberThread');thread.scrollTop=thread.scrollHeight;
+  }
+
+  function subscribeCreatorMemberThread(id){
+    if(creatorMemberThreadChannel)sb.removeChannel(creatorMemberThreadChannel);
+    creatorMemberThreadChannel=sb.channel('creator-studio-'+id)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'creator_messages',filter:'conversation_id=eq.'+id},async()=>{await renderCreatorMemberThread(id);await loadMemberConversations();})
+      .subscribe();
+  }
+
+  document.getElementById('creatorMemberReplyForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    if(!session?.user||!activeMemberConversation||activeMemberConversation.status!=='open')return;
+    const body=document.getElementById('creatorMemberReplyBody').value.trim();
+    if(!body)return;
+    const status=document.getElementById('creatorMemberReplyStatus');status.textContent='Sending…';
+    const {error}=await sb.from('creator_messages').insert({
+      conversation_id:activeMemberConversation.id,
+      sender_user_id:session.user.id,
+      sender_role:'creator',
+      body
+    });
+    if(error){status.textContent='Could not send: '+error.message;return;}
+    document.getElementById('creatorMemberReplyBody').value='';
+    status.textContent='Sent.';
+    await renderCreatorMemberThread(activeMemberConversation.id);
+    await loadMemberConversations();
+  });
+
+  document.getElementById('creatorConversationStatusBtn').addEventListener('click',async()=>{
+    if(!activeMemberConversation)return;
+    const next=activeMemberConversation.status==='open'?'closed':'open';
+    const {error}=await sb.from('creator_conversations').update({status:next}).eq('id',activeMemberConversation.id);
+    if(error){document.getElementById('creatorMemberReplyStatus').textContent='Could not update thread: '+error.message;return;}
+    activeMemberConversation.status=next;
+    await loadMemberConversations();
+    await openCreatorMemberConversation(activeMemberConversation.id,false);
+  });
+
   async function refresh(){
     const {data:{session:s}}=await sb.auth.getSession(); session=s;
     if(!session){contributor=null;authBox.classList.remove('hide');editor.classList.add('hide');feedbackManager.classList.add('hide');paintAccountState();return;}
@@ -375,7 +506,7 @@
     contributor=data; authBox.classList.add('hide'); editor.classList.remove('hide'); paintAccountState();
     document.getElementById('who').textContent='Signed in as '+data.display_name+' · '+data.email+' · You control what is published on your page.';
     paintCreatorAccountReference();
-    await Promise.all([loadCreatorProfileSettings(),loadCreatorNotifications()]);
+    await Promise.all([loadCreatorProfileSettings(),loadCreatorNotifications(),loadMemberConversations()]);
     const publicLink=document.getElementById('publicPageLink');
     if(data.slug==='cash-cassius-miller'){publicLink.classList.remove('hide');publicLink.href='people/cash.html';}
     else{publicLink.classList.add('hide');}
@@ -439,7 +570,7 @@
 
   document.getElementById('cancelEdit').addEventListener('click',()=>resetWorkForm('Edit cancelled.'));
   accountSignIn.addEventListener('click',()=>document.getElementById('loginForm').scrollIntoView({behavior:'smooth',block:'center'}));
-  const signOutAll=async()=>{resetWorkForm();await sb.auth.signOut();contributor=null;session=null;await refresh();};
+  const signOutAll=async()=>{resetWorkForm();if(creatorMemberThreadChannel){await sb.removeChannel(creatorMemberThreadChannel);creatorMemberThreadChannel=null;}await sb.auth.signOut();contributor=null;session=null;memberConversations=[];activeMemberConversation=null;await refresh();};
   document.getElementById('signOut').addEventListener('click',signOutAll);
   accountSignOut.addEventListener('click',signOutAll);
 

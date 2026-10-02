@@ -88,6 +88,22 @@
       <div class="member-notification-list" id="memberNotificationList"><p class="statusline">Loading updates…</p></div>
     </article>
   </div>
+
+  <div class="section creator-messages-hub" id="creatorMessages">
+    <div class="sectionhead"><div><div class="eyebrow">Creator messages</div><h2>Your creator inbox</h2></div><p>Direct messages and commission/project requests with Think Exist creators stay tied to this member account.</p></div>
+    <div class="creator-inbox-layout">
+      <div class="creator-conversation-list" id="memberCreatorConversationList"><p class="statusline">Loading creator conversations…</p></div>
+      <article class="card creator-thread-card">
+        <div class="creator-thread-header" id="memberCreatorThreadHeader"><div><div class="eyebrow">Conversation</div><h3>Select a creator thread</h3></div></div>
+        <div class="creator-thread" id="memberCreatorThread"><div class="creator-thread-empty">Choose a conversation to read or reply.</div></div>
+        <form class="creator-compose hide" id="memberCreatorReplyForm">
+          <textarea id="memberCreatorReplyBody" maxlength="4000" required placeholder="Reply to this creator…"></textarea>
+          <div class="creator-compose-actions"><span class="statusline" id="memberCreatorReplyStatus"></span><button class="btn primary" type="submit">Send reply</button></div>
+        </form>
+      </article>
+    </div>
+  </div>
+
 </section>
 
 <section class="section">

@@ -1,4 +1,6 @@
 (()=>{
+ const VERA_PUBLIC=false;
+ if(!VERA_PUBLIC)return;
  const VERA_IMAGE='/assets/vera.webp?v=4';
  const facts={
   home:[

@@ -1,4 +1,8 @@
 (()=>{
+  const VERA_PUBLIC=false;
+  if(!VERA_PUBLIC){
+    document.querySelectorAll('.nav a[href$="vera.html"]').forEach(a=>a.remove());
+  }
   const menus=[...document.querySelectorAll('.nav-menu')];
   if(!menus.length)return;
   menus.forEach(menu=>menu.addEventListener('toggle',()=>{
